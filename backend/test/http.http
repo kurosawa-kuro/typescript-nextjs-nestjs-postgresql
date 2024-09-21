@@ -1,0 +1,39 @@
+### ユーザーを作成する
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+  "name": "John Doe"
+}
+
+### すべてのユーザーを取得する
+GET http://localhost:3000/users
+
+### マイクロポストを作成する
+POST http://localhost:3000/microposts
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "title": "My first micropost"
+}
+
+### すべてのマイクロポストを取得する
+GET http://localhost:3000/microposts
+
+### カテゴリーを作成する
+POST http://localhost:3000/categories
+Content-Type: application/json
+
+{
+  "title": "Technology"
+}
+
+### すべてのカテゴリーを取得する
+GET http://localhost:3000/categories
+
+### マイクロポストに関連付けられたカテゴリーを取得する
+GET http://localhost:3000/microposts/1/categories
+
+### カテゴリーに属するマイクロポストを取得する
+GET http://localhost:3000/categories/1/microposts
