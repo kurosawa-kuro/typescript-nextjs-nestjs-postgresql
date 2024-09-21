@@ -1,5 +1,5 @@
 ### ユーザーを作成する
-POST http://localhost:3000/users
+POST http://localhost:3001/users
 Content-Type: application/json
 
 {
@@ -7,10 +7,10 @@ Content-Type: application/json
 }
 
 ### すべてのユーザーを取得する
-GET http://localhost:3000/users
+GET http://localhost:3001/users
 
 ### マイクロポストを作成する
-POST http://localhost:3000/microposts
+POST http://localhost:3001/microposts
 Content-Type: application/json
 
 {
@@ -19,10 +19,10 @@ Content-Type: application/json
 }
 
 ### すべてのマイクロポストを取得する
-GET http://localhost:3000/microposts
+GET http://localhost:3001/microposts
 
 ### カテゴリーを作成する
-POST http://localhost:3000/categories
+POST http://localhost:3001/categories
 Content-Type: application/json
 
 {
@@ -30,10 +30,10 @@ Content-Type: application/json
 }
 
 ### すべてのカテゴリーを取得する
-GET http://localhost:3000/categories
+GET http://localhost:3001/categories
 
 ### マイクロポストに関連付けられたカテゴリーを取得する
-GET http://localhost:3000/microposts/1/categories
+GET http://localhost:3001/microposts/1/categories
 
 ### カテゴリーに属するマイクロポストを取得する
-GET http://localhost:3000/categories/1/microposts
+GET http://localhost:3001/categories/1/microposts
