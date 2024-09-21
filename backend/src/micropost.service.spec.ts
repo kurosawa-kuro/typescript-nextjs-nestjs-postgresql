@@ -35,7 +35,8 @@ describe('MicroPostService', () => {
     it('should create a new micropost', async () => {
       const userId = 1;
       const title = 'Test MicroPost';
-      const mockMicroPost: MicroPost = { id: 1, userId, title };
+      const userName = 'TestUser';
+      const mockMicroPost: MicroPost = { id: 1, userId, title, userName };
 
       (mockClient.query as jest.Mock).mockImplementation((query) => {
         if (query === 'BEGIN' || query === 'COMMIT') {
@@ -50,7 +51,7 @@ describe('MicroPostService', () => {
       expect(mockPool.connect).toHaveBeenCalled();
       expect(mockClient.query).toHaveBeenCalledWith('BEGIN');
       expect(mockClient.query).toHaveBeenCalledWith(
-        'INSERT INTO micropost(user_id, title) VALUES($1, $2) RETURNING id, user_id as "userId", title',
+        expect.stringContaining('INSERT INTO micropost(user_id, title)'),
         [userId, title]
       );
       expect(mockClient.query).toHaveBeenCalledWith('COMMIT');
@@ -83,8 +84,8 @@ describe('MicroPostService', () => {
   describe('getMicroPosts', () => {
     it('should return all microposts', async () => {
       const mockMicroPosts: MicroPost[] = [
-        { id: 1, userId: 1, title: 'MicroPost 1' },
-        { id: 2, userId: 2, title: 'MicroPost 2' },
+        { id: 1, userId: 1, title: 'MicroPost 1', userName: 'User1' },
+        { id: 2, userId: 2, title: 'MicroPost 2', userName: 'User2' },
       ];
 
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: mockMicroPosts });
@@ -92,7 +93,9 @@ describe('MicroPostService', () => {
       const result = await microPostService.getMicroPosts();
 
       expect(result).toEqual(mockMicroPosts);
-      expect(mockPool.query).toHaveBeenCalledWith('SELECT id, user_id as "userId", title FROM micropost');
+      expect(mockPool.query).toHaveBeenCalledWith(
+        expect.stringContaining('SELECT m.id, m.user_id as "userId", m.title, u.name as "userName"')
+      );
     });
 
     it('should return an empty array if no microposts exist', async () => {
