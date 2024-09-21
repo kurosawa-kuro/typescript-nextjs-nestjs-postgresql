@@ -1,67 +1,79 @@
-expressのTS化
-→ Done
-DI化
-→ Done
 
-金曜日
-Prisma
-sqlite
-Postgres
+.env
 
-Test DB
+```
+DB_USER=postgres
+DB_HOST=localhost
+DB_NAME=web_app_db_integration
+DB_PASSWORD=postgres
+DB_PORT=5432
+```
 
-土曜日午後
-抽象サービスクラス
-抽象コントローラクラス
+.env.test
 
-backend\src\app\mockData\users.ts廃止時点で
-ディレクトリ構造を改革
+```
+DB_USER=postgres
+DB_HOST=localhost
+DB_NAME=web_app_db_integration_test
+DB_PASSWORD=postgres
+DB_PORT=5432
+```
 
-後で
-Swagger
-StroryBook
 
-アプリ設計をリファクタリングしてください
 
-# 改善されたデータベース設計
+```
+-- ユーザーテーブル
+CREATE TABLE "user" (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL
+);
 
-## テーブル
+-- マイクロポストテーブル
+CREATE TABLE micropost (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES "user"(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL
+);
 
-### users
-- id (主キー)
-- name
-- email (ユニーク)
-- password_hash
-- is_admin
-- memo
-- created_at
-- updated_at
+-- カテゴリーテーブル
+CREATE TABLE category (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL
+);
 
-### microposts
-- id (主キー)
-- user_id (外部キー)
-- title
-- content
-- image_path
-- created_at
-- updated_at
+-- マイクロポストとカテゴリーの多対多の関係を表す中間テーブル
+CREATE TABLE micropost_category (
+  micropost_id INTEGER REFERENCES micropost(id) ON DELETE CASCADE,
+  category_id INTEGER REFERENCES category(id) ON DELETE CASCADE,
+  PRIMARY KEY (micropost_id, category_id)
+);
+```
 
-### categories
-- id (主キー)
-- title
-- created_at
-- updated_at
+```
+-- ユーザーシードデータ
+INSERT INTO public."user" (name) VALUES 
+  ('Alice'),
+  ('Bob'),
+  ('Charlie');
 
-### micropost_categories (中間テーブル)
-- id (主キー)
-- micropost_id (外部キー)
-- category_id (外部キー)
-- created_at
-- updated_at
+-- カテゴリーシードデータ
+INSERT INTO category (title) VALUES
+  ('Technology'),
+  ('Science'),
+  ('Art');
 
-## リレーションシップ
-- users - microposts: 1対多
-- microposts - categories: 多対多 (micropost_categories中間テーブルを介して)
+-- マイクロポストシードデータ
+INSERT INTO micropost (user_id, title) VALUES
+  (1, 'Alice''s first post'),
+  (1, 'Alice''s second post'),
+  (2, 'Bob''s post'),
+  (3, 'Charlie''s post');
 
-user-micropost 一対多
-micropost-cagtegory 多対多
+-- マイクロポストとカテゴリーの多対多関係を作成するシードデータ
+INSERT INTO micropost_category (micropost_id, category_id) VALUES
+  (1, 1),
+  (1, 2),
+  (2, 3),
+  (3, 1),
+  (4, 3);
+```
