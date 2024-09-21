@@ -1,4 +1,3 @@
-// micropost.e2e-spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
@@ -48,6 +47,7 @@ describe('MicroPostController (e2e)', () => {
     expect(response.body.micropost).toHaveProperty('id');
     expect(response.body.micropost).toHaveProperty('userId', user.id);
     expect(response.body.micropost).toHaveProperty('title', 'My first micropost');
+    expect(response.body.micropost).toHaveProperty('userName', 'Test User');
   });
 
   it('should retrieve all microposts (GET /microposts)', async () => {
@@ -65,5 +65,37 @@ describe('MicroPostController (e2e)', () => {
     expect(testMicropost).toBeDefined();
     expect(testMicropost).toHaveProperty('title', 'Test micropost');
     expect(testMicropost).toHaveProperty('userId', user.id);
+    expect(testMicropost).toHaveProperty('userName', 'Another Test User');
+  });
+
+  it('should create a micropost with correct user name (POST /microposts)', async () => {
+    const user = await userService.createUser('John Doe');
+
+    const response = await request(app.getHttpServer())
+      .post('/microposts')
+      .send({ userId: user.id, title: 'John\'s micropost' })
+      .expect(201);
+
+    expect(response.body.micropost).toHaveProperty('userName', 'John Doe');
+  });
+
+  it('should retrieve microposts with user names (GET /microposts)', async () => {
+    const user1 = await userService.createUser('Alice');
+    const user2 = await userService.createUser('Bob');
+    await micropostService.createMicroPost(user1.id, 'Alice\'s post');
+    await micropostService.createMicroPost(user2.id, 'Bob\'s post');
+
+    const response = await request(app.getHttpServer())
+      .get('/microposts')
+      .expect(200);
+
+    expect(response.body).toEqual(expect.any(Array));
+    expect(response.body.length).toBe(2);
+
+    const alicePost = response.body.find(post => post.title === 'Alice\'s post');
+    const bobPost = response.body.find(post => post.title === 'Bob\'s post');
+
+    expect(alicePost).toHaveProperty('userName', 'Alice');
+    expect(bobPost).toHaveProperty('userName', 'Bob');
   });
 });
