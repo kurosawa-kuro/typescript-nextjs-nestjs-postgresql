@@ -13,6 +13,9 @@ export default function Home() {
   const [microposts, setMicroposts] = useState<Micropost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
 
   useEffect(() => {
     async function fetchMicroposts() {
@@ -32,6 +35,14 @@ export default function Home() {
 
     fetchMicroposts();
   }, []);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log({ title, content });
+    setIsModalOpen(false);
+    setTitle("");
+    setContent("");
+  };
 
   if (loading) {
     return (
@@ -57,6 +68,14 @@ export default function Home() {
       <h1 className="text-4xl font-bold mb-8 text-center text-purple-800">
         Microposts
       </h1>
+      <div className="mb-6 text-center">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+        >
+          New Micropost
+        </button>
+      </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {microposts.map((post) => (
           <div key={post.id} className="bg-white shadow-lg rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
@@ -70,6 +89,53 @@ export default function Home() {
           </div>
         ))}
       </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
+            <h2 className="text-2xl font-bold mb-4 text-gray-800">Create a new Micropost</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                <input
+                  type="text"
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="mt-1 block w-full rounded-md border-gray-300 border-2 shadow-sm focus:border-purple-500 focus:ring-purple-500 text-gray-900 px-3 py-2"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                <textarea
+                  id="content"
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  className="mt-1 block w-full rounded-md border-gray-300 border-2 shadow-sm focus:border-purple-500 focus:ring-purple-500 text-gray-900 px-3 py-2"
+                  rows={4}
+                  required
+                ></textarea>
+              </div>
+              <div className="flex justify-end space-x-2 mt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+                >
+                  Post
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
