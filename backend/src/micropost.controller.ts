@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Param, InternalServerErrorException, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
-import { MicroPostService } from './micropost.service';
+import { MicroPost, MicroPostService } from './micropost.service';
 import { UserService } from './user.service';
 import { MicropostCategoryService } from './micropost-category.service';
 
@@ -38,10 +38,15 @@ export class MicroPostController {
   }
 
   @Get()
-  async getMicroPosts() {
+  async getMicroPosts(): Promise<MicroPost[]> {
     try {
       const microposts = await this.microPostService.getMicroPosts();
-      return microposts;
+      return microposts.map(post => ({
+        id: post.id,
+        userId: post.userId,
+        title: post.title,
+        userName: post.userName
+      }));
     } catch (error) {
       this.logger.error(`Failed to get microposts: ${error.message}`, error.stack);
       throw new InternalServerErrorException('Failed to get microposts');
