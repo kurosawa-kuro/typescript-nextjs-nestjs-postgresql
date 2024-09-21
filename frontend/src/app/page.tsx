@@ -36,12 +36,33 @@ export default function Home() {
     fetchMicroposts();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ title, content });
-    setIsModalOpen(false);
-    setTitle("");
-    setContent("");
+    try {
+      const response = await fetch('http://localhost:3001/microposts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: 1, // この値は適切なユーザーIDに変更する必要があります
+          title: title,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create micropost');
+      }
+
+      const data = await response.json();
+      setMicroposts(prevMicroposts => [data.micropost, ...prevMicroposts]);
+      setIsModalOpen(false);
+      setTitle("");
+      setContent("");
+    } catch (err) {
+      console.error('Error creating micropost:', err);
+      setError('Error creating micropost. Please try again.');
+    }
   };
 
   if (loading) {
