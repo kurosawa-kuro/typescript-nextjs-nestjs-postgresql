@@ -1,14 +1,12 @@
-// src/category/category.module.ts
-
 import { Module } from '@nestjs/common';
-import { CategoryService } from './category.service';
 import { CategoryController } from './category.controller';
-import { DatabaseModule } from '../database/database.module';
+import { CategoryService } from './category.service';
+import { MicropostCategoryService } from '../micropost-category/micropost-category.service';
+import { MicropostCategoryModule } from '../micropost-category/micropost-category.module';
 
 @Module({
-  imports: [DatabaseModule],
-  providers: [CategoryService],
+  imports: [MicropostCategoryModule],
   controllers: [CategoryController],
-  exports: [CategoryService],
+  providers: [CategoryService, MicropostCategoryService],
 })
 export class CategoryModule {}

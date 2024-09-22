@@ -1,10 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import { AppModule } from './../src/app.module';
+import { AppModule } from '../src/app.module';
 import { UserService } from '../src/user/user.service';
 import { MicroPostService } from '../src/micropost/micropost.service';
 import { CategoryService } from '../src/category/category.service';
 import { Pool } from 'pg';
+import { MicropostCategoryService } from '../src/micropost-category/micropost-category.service';
 
 export async function setupTestApp() {
   const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -12,14 +13,15 @@ export async function setupTestApp() {
   }).compile();
 
   const app = moduleFixture.createNestApplication();
+  await app.init();
+
   const userService = moduleFixture.get<UserService>(UserService);
   const micropostService = moduleFixture.get<MicroPostService>(MicroPostService);
   const categoryService = moduleFixture.get<CategoryService>(CategoryService);
-  const pool = moduleFixture.get<Pool>('DATABASE_POOL');
+  const micropostCategoryService = moduleFixture.get<MicropostCategoryService>(MicropostCategoryService);
+  const pool = moduleFixture.get<Pool>(Pool);
 
-  await app.init();
-
-  return { app, userService, micropostService, categoryService, pool };
+  return { app, userService, micropostService, categoryService, micropostCategoryService, pool };
 }
 
 export async function clearDatabase(pool: Pool) {
