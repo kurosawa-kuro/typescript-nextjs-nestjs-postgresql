@@ -20,7 +20,10 @@ DROP TABLE IF EXISTS "user";
 const createTablesSql = `
 CREATE TABLE "user" (
   id SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  is_admin BOOLEAN NOT NULL DEFAULT false
 );
 
 CREATE TABLE micropost (
@@ -42,22 +45,29 @@ CREATE TABLE micropost_category (
 );
 `;
 
-const insertSeedDataSql = `
-INSERT INTO public."user" (name) VALUES 
-  ('Alice'),
-  ('Bob'),
-  ('Charlie');
+const insertAdminSql = `
+INSERT INTO public."user" (name, email, password_hash, is_admin) VALUES 
+  ('Admin', 'admin@example.com', 'hashed_password_here', true);
+`;
 
+const insertUsersSql = `
+INSERT INTO public."user" (name, email, password_hash, is_admin) VALUES 
+  ('Alice', 'alice@example.com', 'hashed_password_here', false),
+  ('Bob', 'bob@example.com', 'hashed_password_here', false),
+  ('Charlie', 'charlie@example.com', 'hashed_password_here', false);
+`;
+
+const insertOtherDataSql = `
 INSERT INTO category (title) VALUES
   ('Technology'),
   ('Science'),
   ('Art');
 
 INSERT INTO micropost (user_id, title) VALUES
-  (1, 'Alice''s first post'),
-  (1, 'Alice''s second post'),
-  (2, 'Bob''s post'),
-  (3, 'Charlie''s post');
+  (2, 'Alice''s first post'),
+  (2, 'Alice''s second post'),
+  (3, 'Bob''s post'),
+  (4, 'Charlie''s post');
 
 INSERT INTO micropost_category (micropost_id, category_id) VALUES
   (1, 1),
@@ -95,7 +105,9 @@ async function setupDatabase(): Promise<void> {
   await withConnection(async (client) => {
     await executeSql(client, dropTablesSql, 'Dropping tables');
     await executeSql(client, createTablesSql, 'Creating tables');
-    await executeSql(client, insertSeedDataSql, 'Inserting seed data');
+    await executeSql(client, insertAdminSql, 'Inserting admin user');
+    await executeSql(client, insertUsersSql, 'Inserting regular users');
+    await executeSql(client, insertOtherDataSql, 'Inserting other data');
   });
 }
 
