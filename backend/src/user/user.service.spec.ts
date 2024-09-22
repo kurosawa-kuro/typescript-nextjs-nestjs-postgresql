@@ -34,7 +34,7 @@ describe('UserService', () => {
     mockDatabaseService = {
       createUser: jest.fn(),
       findUser: jest.fn(),
-      listUsers: jest.fn(),
+      indexUsers: jest.fn(),
     } as unknown as jest.Mocked<DatabaseService>;
 
     jest.clearAllMocks();
@@ -98,33 +98,33 @@ describe('UserService', () => {
     });
   });
 
-  describe('listUsers', () => {
+  describe('indexUsers', () => {
     const mockUsers: User[] = [
       { id: 1, name: 'John Doe', email: 'john@example.com', isAdmin: false },
       { id: 2, name: 'Jane Doe', email: 'jane@example.com', isAdmin: true },
     ];
 
     it('should return all users', async () => {
-      mockDatabaseService.listUsers.mockResolvedValue(mockUsers);
+      mockDatabaseService.indexUsers.mockResolvedValue(mockUsers);
 
-      const result = await userService.listUsers();
+      const result = await userService.indexUsers();
 
       expect(result).toEqual(mockUsers);
-      expect(mockDatabaseService.listUsers).toHaveBeenCalled();
+      expect(mockDatabaseService.indexUsers).toHaveBeenCalled();
     });
 
     it('should return an empty array if no users exist', async () => {
-      mockDatabaseService.listUsers.mockResolvedValue([]);
+      mockDatabaseService.indexUsers.mockResolvedValue([]);
 
-      const result = await userService.listUsers();
+      const result = await userService.indexUsers();
 
       expect(result).toEqual([]);
     });
 
     it('should throw an error if query fails', async () => {
-      mockDatabaseService.listUsers.mockRejectedValue(new Error('Query failed'));
+      mockDatabaseService.indexUsers.mockRejectedValue(new Error('Query failed'));
 
-      await expect(userService.listUsers()).rejects.toThrow('Query failed');
+      await expect(userService.indexUsers()).rejects.toThrow('Query failed');
     });
   });
 });

@@ -52,7 +52,7 @@ export class DatabaseService implements OnModuleDestroy {
     return this.executeQuery(query, [id]).then(result => result.rows[0] || null);
   }
 
-  async listUsers(): Promise<User[]> {
+  async indexUsers(): Promise<User[]> {
     const query = 'SELECT id, name, email, is_admin as "isAdmin" FROM "user"';
     return this.executeQuery(query).then(result => result.rows);
   }
@@ -67,7 +67,7 @@ export class DatabaseService implements OnModuleDestroy {
     return this.executeQuery(query, [userId, title, imagePath]).then(result => result.rows[0]);
   }
 
-  async listMicroPosts(): Promise<MicroPost[]> {
+  async indexMicroPosts(): Promise<MicroPost[]> {
     const query = `
       SELECT m.id, m.user_id as "userId", m.title, m.image_path as "imagePath", u.name as "userName"
       FROM micropost m
@@ -82,7 +82,7 @@ export class DatabaseService implements OnModuleDestroy {
     return result.rows[0];
   }
 
-  async listCategories(): Promise<Category[]> {
+  async indexCategories(): Promise<Category[]> {
     const query = 'SELECT * FROM category';
     return this.executeQuery(query).then(result => result.rows);
   }

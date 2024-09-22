@@ -10,7 +10,7 @@ describe('CategoryService', () => {
     mockDatabaseService = {
       executeQuery: jest.fn(),
       createCategory: jest.fn(),
-      listCategories: jest.fn(),
+      indexCategories: jest.fn(),
     } as unknown as jest.Mocked<DatabaseService>;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -50,16 +50,16 @@ describe('CategoryService', () => {
         { id: 1, title: 'Category 1' },
         { id: 2, title: 'Category 2' },
       ];
-      mockDatabaseService.listCategories.mockResolvedValue(mockCategories);
+      mockDatabaseService.indexCategories.mockResolvedValue(mockCategories);
 
       const result = await categoryService.list();
 
       expect(result).toEqual(mockCategories);
-      expect(mockDatabaseService.listCategories).toHaveBeenCalled();
+      expect(mockDatabaseService.indexCategories).toHaveBeenCalled();
     });
 
     it('should return an empty array if no categories exist', async () => {
-      mockDatabaseService.listCategories.mockResolvedValue([]);
+      mockDatabaseService.indexCategories.mockResolvedValue([]);
 
       const result = await categoryService.list();
 
@@ -67,7 +67,7 @@ describe('CategoryService', () => {
     });
 
     it('should throw an error if query fails', async () => {
-      mockDatabaseService.listCategories.mockRejectedValue(new Error('Query failed'));
+      mockDatabaseService.indexCategories.mockRejectedValue(new Error('Query failed'));
 
       await expect(categoryService.list()).rejects.toThrow('Query failed');
     });

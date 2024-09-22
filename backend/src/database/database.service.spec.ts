@@ -86,7 +86,7 @@ describe('DatabaseService', () => {
     });
   });
 
-  describe('listUsers', () => {
+  describe('indexUsers', () => {
     it('should list all users', async () => {
       const mockUsers: User[] = [
         { id: 1, name: 'User 1', email: 'user1@example.com', isAdmin: false },
@@ -94,7 +94,7 @@ describe('DatabaseService', () => {
       ];
       mockPool.query.mockResolvedValueOnce({ rows: mockUsers } as MockQueryResult<User>);
 
-      const result = await service.listUsers();
+      const result = await service.indexUsers();
 
       expect(result).toEqual(mockUsers);
       expect(mockPool.query).toHaveBeenCalledWith(
@@ -173,7 +173,7 @@ describe('DatabaseService', () => {
     });
   });
 
-  describe('listMicroPosts', () => {
+  describe('indexMicroPosts', () => {
     it('should list all micro posts', async () => {
       const mockMicroPosts: MicroPost[] = [
         { id: 1, userId: 1, title: 'Post 1', imagePath: 'path/1.jpg', userName: 'User 1' },
@@ -181,12 +181,12 @@ describe('DatabaseService', () => {
       ];
       mockPool.query.mockResolvedValueOnce({ rows: mockMicroPosts } as MockQueryResult<MicroPost>);
 
-      const result = await service.listMicroPosts();
+      const result = await service.indexMicroPosts();
       expect(result).toEqual(mockMicroPosts);
     });
   });
 
-  describe('listCategories', () => {
+  describe('indexCategories', () => {
     it('should list all categories', async () => {
       const mockCategories: Category[] = [
         { id: 1, title: 'Category 1' },
@@ -194,7 +194,7 @@ describe('DatabaseService', () => {
       ];
       mockPool.query.mockResolvedValueOnce({ rows: mockCategories } as MockQueryResult<Category>);
 
-      const result = await service.listCategories();
+      const result = await service.indexCategories();
       expect(result).toEqual(mockCategories);
     });
   });
@@ -204,7 +204,7 @@ describe('DatabaseService', () => {
       const error = new Error('Database failure');
       mockPool.query.mockRejectedValueOnce(error);
 
-      await expect(service.listUsers()).rejects.toThrow(error);
+      await expect(service.indexUsers()).rejects.toThrow(error);
       expect(mockPool.query).toHaveBeenCalled();
       // This assumes that the Logger.error is mocked and checked elsewhere for being called.
     });

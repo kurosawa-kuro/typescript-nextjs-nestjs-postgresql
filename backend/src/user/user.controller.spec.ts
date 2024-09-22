@@ -10,7 +10,7 @@ describe('UserController', () => {
 
     const mockUserService = {
         create: jest.fn(),
-        listUsers: jest.fn().mockResolvedValue([
+        indexUsers: jest.fn().mockResolvedValue([
             {
                 id: 1,
                 name: 'John Doe',

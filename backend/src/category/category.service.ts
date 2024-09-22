@@ -10,6 +10,6 @@ export class CategoryService {
   }
 
   async list(): Promise<Category[]> {
-    return this.databaseService.listCategories();
+    return this.databaseService.indexCategories();
   }
 }

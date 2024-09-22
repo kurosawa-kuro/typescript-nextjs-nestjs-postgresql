@@ -16,8 +16,8 @@ export class UserService {
     return this.databaseService.findUser(id);
   }
 
-  async listUsers(): Promise<User[]> {
-    return this.databaseService.listUsers();
+  async indexUsers(): Promise<User[]> {
+    return this.databaseService.indexUsers();
   }
 
   private async hashPassword(password: string): Promise<string> {

@@ -9,7 +9,7 @@ describe('MicroPostService', () => {
   beforeEach(async () => {
     mockDatabaseService = {
       createMicroPost: jest.fn(),
-      listMicroPosts: jest.fn(),
+      indexMicroPosts: jest.fn(),
     } as unknown as jest.Mocked<DatabaseService>;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -78,16 +78,16 @@ describe('MicroPostService', () => {
         },
       ];
 
-      mockDatabaseService.listMicroPosts.mockResolvedValue(mockMicroPosts);
+      mockDatabaseService.indexMicroPosts.mockResolvedValue(mockMicroPosts);
 
       const result = await microPostService.list();
 
       expect(result).toEqual(mockMicroPosts);
-      expect(mockDatabaseService.listMicroPosts).toHaveBeenCalled();
+      expect(mockDatabaseService.indexMicroPosts).toHaveBeenCalled();
     });
 
     it('should return an empty array if no microposts exist', async () => {
-      mockDatabaseService.listMicroPosts.mockResolvedValue([]);
+      mockDatabaseService.indexMicroPosts.mockResolvedValue([]);
 
       const result = await microPostService.list();
 
@@ -95,7 +95,7 @@ describe('MicroPostService', () => {
     });
 
     it('should throw an error if query fails', async () => {
-      mockDatabaseService.listMicroPosts.mockRejectedValue(new Error('Query failed'));
+      mockDatabaseService.indexMicroPosts.mockRejectedValue(new Error('Query failed'));
 
       await expect(microPostService.list()).rejects.toThrow('Query failed');
     });

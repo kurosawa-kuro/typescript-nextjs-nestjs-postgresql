@@ -22,6 +22,6 @@ export class UserController {
 
   @Get()
   async findAll() {
-    return await this.userService.listUsers();
+    return await this.userService.indexUsers();
   }
 }

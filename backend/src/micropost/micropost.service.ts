@@ -12,6 +12,6 @@ export class MicroPostService {
   }
 
   async list(): Promise<MicroPost[]> {  // index から list に変更
-    return this.databaseService.listMicroPosts();
+    return this.databaseService.indexMicroPosts();
   }
 }
