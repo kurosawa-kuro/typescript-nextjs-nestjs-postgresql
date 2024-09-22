@@ -19,6 +19,19 @@ DB_PASSWORD=postgres
 DB_PORT=5432
 ```
 
+```
+-- 1. まず、中間テーブルを削除
+DROP TABLE IF EXISTS micropost_category;
+
+-- 2. 次に、外部キーを持つmicropostテーブルを削除
+DROP TABLE IF EXISTS micropost;
+
+-- 3. categoryテーブルを削除（他のテーブルから参照されていない）
+DROP TABLE IF EXISTS category;
+
+-- 4. 最後に、userテーブルを削除
+DROP TABLE IF EXISTS "user";
+```
 
 
 ```

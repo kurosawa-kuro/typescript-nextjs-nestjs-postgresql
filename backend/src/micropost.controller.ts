@@ -40,13 +40,13 @@ export class MicroPostController {
       const micropost = await this.microPostService.createMicroPost(userId, title, imagePath);
       return { message: 'MicroPost created', micropost };
     } catch (error) {
-      this.logger.error(`Failed to create micropost: ${error.message}`, error.stack);
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      if (error.constraint === 'micropost_user_id_fkey') {
-        throw new BadRequestException(`User with id ${userId} does not exist`);
-      }
+      // this.logger.error(`Failed to create micropost: ${error.message}`, error.stack);
+      // if (error instanceof NotFoundException) {
+      //   throw error;
+      // }
+      // if (error.constraint === 'micropost_user_id_fkey') {
+      //   throw new BadRequestException(`User with id ${userId} does not exist`);
+      // }
       throw new InternalServerErrorException('Failed to create micropost');
     }
   }

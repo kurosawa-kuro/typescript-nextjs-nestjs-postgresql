@@ -38,19 +38,20 @@ describe('MicroPostController', () => {
     it('should create a new micropost', async () => {
       const userId = 1;
       const title = 'Test MicroPost';
-      const micropost: MicroPost = { id: 1, userId, title, userName: 'TestUser' };
+      const imagePath = 'path/to/image.jpg';
+      const micropost: MicroPost = { id: 1, userId, title, userName: 'TestUser', imagePath };
 
       userService.getUserById.mockResolvedValue({ id: userId, name: 'TestUser' });
       microPostService.createMicroPost.mockResolvedValue(micropost);
 
-      const result = await microPostController.createMicroPost(userId, title);
+      const result = await microPostController.createMicroPost(userId, title, { path: imagePath } as Express.Multer.File);
 
       expect(result).toEqual({
         message: 'MicroPost created',
         micropost: micropost
       });
       expect(userService.getUserById).toHaveBeenCalledWith(userId);
-      expect(microPostService.createMicroPost).toHaveBeenCalledWith(userId, title);
+      expect(microPostService.createMicroPost).toHaveBeenCalledWith(userId, title, imagePath);
     });
 
     it('should throw InternalServerErrorException when micropost creation fails', async () => {
@@ -67,8 +68,8 @@ describe('MicroPostController', () => {
   describe('getMicroPosts', () => {
     it('should return an array of microposts', async () => {
       const mockMicroposts: MicroPost[] = [
-        { id: 1, userId: 1, title: 'MicroPost 1', userName: 'User1' },
-        { id: 2, userId: 2, title: 'MicroPost 2', userName: 'User2' },
+        { id: 1, userId: 1, title: 'MicroPost 1', userName: 'User1', imagePath: 'path/to/image1.jpg' },
+        { id: 2, userId: 2, title: 'MicroPost 2', userName: 'User2', imagePath: null },
       ];
 
       microPostService.getMicroPosts.mockResolvedValue(mockMicroposts);
