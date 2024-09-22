@@ -1,5 +1,6 @@
+// src/user/user.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserService , User, CreateUserDto} from './user.service';
+import { UserService, User, CreateUserDto, UserCreationData } from './user.service';
 import { DatabaseService } from '../database/database.service';
 import * as bcrypt from 'bcrypt';
 
@@ -56,15 +57,14 @@ describe('UserService', () => {
         fields: []
       });
 
-      const result = await userService.create({
+      const userCreationData: UserCreationData = {
         name: 'John Doe',
         email: 'john@example.com',
         passwordHash: 'hashedPassword',
         isAdmin: false,
-        password: function (password: any): unknown {
-          throw new Error('Function not implemented.');
-        }
-      });
+      };
+
+      const result = await userService.create(userCreationData);
 
       expect(result).toEqual(mockUser);
       expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
@@ -77,17 +77,14 @@ describe('UserService', () => {
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
       mockDatabaseService.executeQuery.mockRejectedValue(new Error('Creation failed'));
 
-      await expect(
-        userService.create({
-          name: 'John Doe',
-          email: 'john@example.com',
-          passwordHash: 'hashedPassword',
-          isAdmin: false,
-          password: function (password: any): unknown {
-            throw new Error('Function not implemented.');
-          }
-        })
-      ).rejects.toThrow('Creation failed');
+      const userCreationData: UserCreationData = {
+        name: 'John Doe',
+        email: 'john@example.com',
+        passwordHash: 'hashedPassword',
+        isAdmin: false,
+      };
+
+      await expect(userService.create(userCreationData)).rejects.toThrow('Creation failed');
     });
   });
 
@@ -172,6 +169,19 @@ describe('UserService', () => {
       mockDatabaseService.executeQuery.mockRejectedValue(new Error('Query failed'));
 
       await expect(userService.index()).rejects.toThrow('Query failed');
+    });
+  });
+
+  describe('hashPassword', () => {
+    it('should hash the password', async () => {
+      const password = 'testPassword';
+      const hashedPassword = 'hashedTestPassword';
+      (bcrypt.hash as jest.Mock).mockResolvedValue(hashedPassword);
+
+      const result = await userService.hashPassword(password);
+
+      expect(result).toBe(hashedPassword);
+      expect(bcrypt.hash).toHaveBeenCalledWith(password, 10);
     });
   });
 });

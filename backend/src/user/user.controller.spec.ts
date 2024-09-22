@@ -66,7 +66,6 @@ describe('UserController', () => {
                 email: createUserDto.email,
                 passwordHash: 'hashedPassword',
                 isAdmin: false,
-                password: expect.any(Function),
             });
             expect(result).toEqual({ message: 'User created', user: mockUser });
         });

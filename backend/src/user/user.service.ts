@@ -2,6 +2,7 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { Pool } from 'pg';
 import { DatabaseService } from '../database/database.service';
+import * as bcrypt from 'bcrypt';
 
 export interface User {
   id: number;
@@ -65,10 +66,7 @@ export class UserService {
   }
 
   async hashPassword(password: string): Promise<string> {
-    // 実際のハッシュ化ロジックを実装する必要があります
-    // 例: bcrypt を使用する場合
-    // const salt = await bcrypt.genSalt();
-    // return bcrypt.hash(password, salt);
-    return 'hashedPassword'; // この行は実際のハッシュ化ロジックに置き換えてください
+    const saltRounds = 10;
+    return bcrypt.hash(password, saltRounds);
   }
 }
