@@ -18,24 +18,14 @@ export class MicroPostService {
     title: string,
     imagePath: string | null,
   ): Promise<MicroPost> {
-    const client = await this.pool.connect();
-    try {
-      await client.query('BEGIN');
-      const query = `
-        INSERT INTO micropost(user_id, title, image_path) 
-        VALUES($1, $2, $3) 
-        RETURNING id, user_id as "userId", title, image_path as "imagePath",
-          (SELECT name FROM "user" WHERE id = $1) as "userName"
-      `;
-      const result = await client.query(query, [userId, title, imagePath]);
-      await client.query('COMMIT');
-      return result.rows[0];
-    } catch (error) {
-      await client.query('ROLLBACK');
-      throw error;
-    } finally {
-      client.release();
-    }
+    const query = `
+      INSERT INTO micropost(user_id, title, image_path) 
+      VALUES($1, $2, $3) 
+      RETURNING id, user_id as "userId", title, image_path as "imagePath",
+        (SELECT name FROM "user" WHERE id = $1) as "userName"
+    `;
+    const result = await this.pool.query(query, [userId, title, imagePath]);
+    return result.rows[0];
   }
 
   async index(): Promise<MicroPost[]> {
