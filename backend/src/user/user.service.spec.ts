@@ -1,4 +1,3 @@
-// user.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService, User } from './user.service';
 import { Pool } from 'pg';
@@ -10,11 +9,14 @@ describe('UserService', () => {
   let userService: UserService;
   let mockPool: jest.Mocked<Pool>;
 
-  beforeEach(async () => {
-    mockPool = {
-      query: jest.fn(),
-    } as unknown as jest.Mocked<Pool>;
+  const mockUser: User = {
+    id: 1,
+    name: 'John Doe',
+    email: 'john@example.com',
+    isAdmin: false,
+  };
 
+  const setupTestingModule = async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UserService,
@@ -26,16 +28,24 @@ describe('UserService', () => {
     }).compile();
 
     userService = module.get<UserService>(UserService);
+  };
+
+  beforeEach(async () => {
+    mockPool = {
+      query: jest.fn(),
+    } as unknown as jest.Mocked<Pool>;
+
+    jest.clearAllMocks(); // テストごとのモッククリア
+    await setupTestingModule();
   });
 
   describe('create', () => {
-    it('should create a new user', async () => {
-      const name = 'John Doe';
-      const email = 'john@example.com';
-      const password = 'password';
-      const isAdmin = false;
-      const mockUser: User = { id: 1, name, email, isAdmin };
+    const name = 'John Doe';
+    const email = 'john@example.com';
+    const password = 'password';
+    const isAdmin = false;
 
+    it('should create a new user', async () => {
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: [mockUser] });
 
@@ -49,32 +59,17 @@ describe('UserService', () => {
     });
 
     it('should throw an error if creation fails', async () => {
-      const name = 'Jane Doe';
-      const email = 'jane@example.com';
-      const password = 'password';
-      const isAdmin = false;
-
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
-      (mockPool.query as jest.Mock).mockRejectedValue(
-        new Error('Creation failed'),
-      );
+      (mockPool.query as jest.Mock).mockRejectedValue(new Error('Creation failed'));
 
-      await expect(
-        userService.create(name, email, password, isAdmin),
-      ).rejects.toThrow('Creation failed');
+      await expect(userService.create(name, email, password, isAdmin)).rejects.toThrow('Creation failed');
     });
   });
 
   describe('find', () => {
-    it('should return a user when found', async () => {
-      const userId = 1;
-      const mockUser: User = {
-        id: userId,
-        name: 'John Doe',
-        email: 'john@example.com',
-        isAdmin: false,
-      };
+    const userId = 1;
 
+    it('should return a user when found', async () => {
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: [mockUser] });
 
       const result = await userService.find(userId);
@@ -87,8 +82,6 @@ describe('UserService', () => {
     });
 
     it('should return null when user is not found', async () => {
-      const userId = 999;
-
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: [] });
 
       const result = await userService.find(userId);
@@ -97,23 +90,19 @@ describe('UserService', () => {
     });
 
     it('should throw an error if query fails', async () => {
-      const userId = 1;
-
-      (mockPool.query as jest.Mock).mockRejectedValue(
-        new Error('Query failed'),
-      );
+      (mockPool.query as jest.Mock).mockRejectedValue(new Error('Query failed'));
 
       await expect(userService.find(userId)).rejects.toThrow('Query failed');
     });
   });
 
   describe('index', () => {
-    it('should return all users', async () => {
-      const mockUsers: User[] = [
-        { id: 1, name: 'John Doe', email: 'john@example.com', isAdmin: false },
-        { id: 2, name: 'Jane Doe', email: 'jane@example.com', isAdmin: true },
-      ];
+    const mockUsers: User[] = [
+      { id: 1, name: 'John Doe', email: 'john@example.com', isAdmin: false },
+      { id: 2, name: 'Jane Doe', email: 'jane@example.com', isAdmin: true },
+    ];
 
+    it('should return all users', async () => {
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: mockUsers });
 
       const result = await userService.index();
@@ -133,9 +122,7 @@ describe('UserService', () => {
     });
 
     it('should throw an error if query fails', async () => {
-      (mockPool.query as jest.Mock).mockRejectedValue(
-        new Error('Query failed'),
-      );
+      (mockPool.query as jest.Mock).mockRejectedValue(new Error('Query failed'));
 
       await expect(userService.index()).rejects.toThrow('Query failed');
     });
