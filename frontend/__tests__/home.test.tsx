@@ -43,8 +43,8 @@ describe('Home', () => {
     mockedAxios.post.mockResolvedValue({
       data: {
         message: 'ファイルが正常にアップロードされました',
-        file: { filename: '1726356094725_test-image.png' },
-        url: 'http://localhost:3001/Images/1726356094725_test-image.png'
+        file: { filename: 'test.png' },
+        url: 'http://localhost:3001/Images/test.png'
       }
     });
 
