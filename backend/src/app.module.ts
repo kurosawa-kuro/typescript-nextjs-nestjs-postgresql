@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { Pool } from 'pg';
 import { UserService } from './user.service';
 import { MicroPostService } from './micropost.service';
@@ -12,6 +14,12 @@ import * as dotenv from 'dotenv';
 dotenv.config({ path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env' });
 
 @Module({
+  imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+    }),
+  ],
   providers: [
     {
       provide: 'DATABASE_POOL',
