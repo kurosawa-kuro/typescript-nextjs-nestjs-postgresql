@@ -42,7 +42,6 @@ describe('AuthController (e2e)', () => {
   });
 
   it('should login an existing user (POST /auth/login)', async () => {
-    // Create a user first using AuthService or test utility function
     const userService = app.get<UserService>(UserService);
     await createTestUser(userService, 'Jane Doe', 'jane.doe@example.com', 'securepassword123');
     
@@ -59,7 +58,6 @@ describe('AuthController (e2e)', () => {
       message: 'Login successful',
     });
 
-    // Check if JWT token is set in the cookie
     expect(response.headers['set-cookie']).toBeDefined();
   });
 
@@ -70,25 +68,28 @@ describe('AuthController (e2e)', () => {
         email: 'nonexistent@example.com',
         password: 'wrongpassword',
       })
-      .expect(200);
+      .expect(401); // Expect 401 Unauthorized
 
     expect(response.body).toEqual({
-      success: false,
-      message: 'Login failed',
+      statusCode: 401,
+      message: 'Invalid credentials',
+      error: 'Unauthorized',
     });
   });
 
   it('should retrieve the user profile with a valid JWT (GET /auth/profile)', async () => {
-    // Create a user and login to get a valid JWT
     const userService = app.get<UserService>(UserService);
     await createTestUser(userService, 'Jane Doe', 'jane.doe@example.com', 'securepassword123');
     const user = await userService.findUserByEmail('jane.doe@example.com');
     const token = jwtService.sign({ sub: user.id, email: user.email });
-
+    console.log('★★★★ Token:', token);
+  
     const response = await request(app.getHttpServer())
       .get('/auth/profile')
       .set('Cookie', [`jwt=${token}`]) // Send the JWT token as a cookie
-      .expect(200);
+      .expect(200); // Expect success if the JWT is valid
+  
+      console.log('★★★★ response:', response);
 
     expect(response.body).toEqual({
       id: user.id,
@@ -98,8 +99,14 @@ describe('AuthController (e2e)', () => {
   });
 
   it('should return 401 for profile request without JWT (GET /auth/profile)', async () => {
-    await request(app.getHttpServer())
+    const response = await request(app.getHttpServer())
       .get('/auth/profile')
-      .expect(401);
+      .expect(401); // Expect 401 Unauthorized
+  
+    expect(response.body).toEqual({
+      statusCode: 401,
+      message: 'JWT token missing',
+      error: 'Unauthorized',
+    });
   });
 });

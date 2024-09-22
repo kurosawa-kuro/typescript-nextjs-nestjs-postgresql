@@ -12,6 +12,8 @@ import * as bcrypt from 'bcrypt';
 
 
 export async function setupTestApp() {
+  process.env.JWT_SECRET = 'your-secret-key'; // Ensure JWT secret is set in test environment
+
   const moduleFixture = await Test.createTestingModule({
     imports: [AppModule],
   }).compile();

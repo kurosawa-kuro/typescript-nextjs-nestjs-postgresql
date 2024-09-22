@@ -7,13 +7,9 @@ import { Request } from 'express';
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor() {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: Request) => {
-          return request?.cookies?.jwt;
-        },
-      ]),
+      jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => request?.cookies?.jwt]),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET || 'your-secret-key',
+      secretOrKey: process.env.JWT_SECRET || 'your-secret-key', // Ensure this matches your app's JWT secret
     });
   }
 
@@ -21,3 +17,4 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     return { userId: payload.sub, email: payload.email, isAdmin: payload.isAdmin };
   }
 }
+
