@@ -11,9 +11,13 @@ export class AuthController {
     @Body('name') name: string,
     @Body('email') email: string,
     @Body('password') password: string
-  ): Promise<{ success: boolean }> {
+  ): Promise<{ success: boolean; message: string }> {
     const success = await this.authService.register(name, email, password);
-    return { success };
+    if (success) {
+      return { success: true, message: 'Registration successful' };
+    } else {
+      return { success: false, message: 'Registration failed' };
+    }
   }
 
   @Post('login')
@@ -21,15 +25,23 @@ export class AuthController {
   async login(
     @Body('email') email: string,
     @Body('password') password: string
-  ): Promise<{ success: boolean }> {
-    const success = await this.authService.login(email, password);
-    return { success };
+  ): Promise<{ success: boolean; message: string; token?: string }> {
+    const result = await this.authService.login(email, password);
+    if (result.success) {
+      return { success: true, message: 'Login successful', token: result.token };
+    } else {
+      return { success: false, message: 'Login failed' };
+    }
   }
 
   @Get('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(): Promise<{ success: boolean }> {
+  async logout(): Promise<{ success: boolean; message: string }> {
     const success = await this.authService.logout();
-    return { success };
+    if (success) {
+      return { success: true, message: 'Successfully logged out' };
+    } else {
+      return { success: false, message: 'Logout failed' };
+    }
   }
 }

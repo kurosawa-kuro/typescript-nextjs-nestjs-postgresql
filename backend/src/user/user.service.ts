@@ -38,15 +38,5 @@ export class UserService {
     return result.rows;
   }
 
-  async authenticate(email: string, password: string): Promise<User | null> {
-    const query = 'SELECT id, name, email, password_hash, is_admin as "isAdmin" FROM "user" WHERE email = $1';
-    const result = await this.pool.query(query, [email]);
-    const user = result.rows[0];
 
-    if (user && await bcrypt.compare(password, user.password_hash)) {
-      const { password_hash, ...secureUser } = user;
-      return secureUser;
-    }
-    return null;
-  }
 }
