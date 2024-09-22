@@ -15,12 +15,12 @@ const API_URL = 'http://localhost:3001/microposts';
 
 export default function Home() {
   const [microposts, setMicroposts] = useState<Micropost[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [image, setImage] = useState<File | null>(null);
+  const [postTitle, setPostTitle] = useState("");
+  const [postContent, setPostContent] = useState("");
+  const [postImage, setPostImage] = useState<File | null>(null);
 
   useEffect(() => {
     fetchMicroposts();
@@ -35,20 +35,20 @@ export default function Home() {
       const data = await response.json();
       setMicroposts(data);
     } catch (err) {
-      setError('Error fetching microposts. Please try again later.');
+      setErrorMessage('Error fetching microposts. Please try again later.');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmitPost = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append('userId', '1'); // この値は適切なユーザーIDに変更する必要があります
-    formData.append('title', title);
-    formData.append('content', content);
-    if (image) {
-      formData.append('image', image);
+    formData.append('title', postTitle);
+    formData.append('content', postContent);
+    if (postImage) {
+      formData.append('image', postImage);
     }
 
     try {
@@ -63,29 +63,29 @@ export default function Home() {
 
       const data = await response.json();
       setMicroposts(prevMicroposts => [data.micropost, ...prevMicroposts]);
-      closeModal();
+      handleCloseModal();
     } catch (err) {
       console.error('Error creating micropost:', err);
-      setError('Error creating micropost. Please try again.');
+      setErrorMessage('Error creating micropost. Please try again.');
     }
   };
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => {
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => {
     setIsModalOpen(false);
-    setTitle("");
-    setContent("");
-    setImage(null);
+    setPostTitle("");
+    setPostContent("");
+    setPostImage(null);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setImage(e.target.files[0]);
+      setPostImage(e.target.files[0]);
     }
   };
 
-  if (loading) return <LoadingSpinner />;
-  if (error) return <ErrorMessage message={error} />;
+  if (isLoading) return <LoadingSpinner />;
+  if (errorMessage) return <ErrorMessage message={errorMessage} />;
 
   return (
     <div className="container mx-auto px-4 py-8 bg-gradient-to-r from-pink-50 to-purple-50 min-h-screen">
@@ -94,7 +94,7 @@ export default function Home() {
       </h1>
       <div className="mb-6 text-center">
         <button
-          onClick={openModal}
+          onClick={handleOpenModal}
           className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
         >
           New Micropost
@@ -103,14 +103,14 @@ export default function Home() {
       <MicropostList microposts={microposts} />
       {isModalOpen && (
         <MicropostModal
-          title={title}
-          setTitle={setTitle}
-          content={content}
-          setContent={setContent}
-          image={image}
+          title={postTitle}
+          setTitle={setPostTitle}
+          content={postContent}
+          setContent={setPostContent}
+          image={postImage}
           onImageChange={handleImageChange}
-          onSubmit={handleSubmit}
-          onClose={closeModal}
+          onSubmit={handleSubmitPost}
+          onClose={handleCloseModal}
         />
       )}
     </div>
