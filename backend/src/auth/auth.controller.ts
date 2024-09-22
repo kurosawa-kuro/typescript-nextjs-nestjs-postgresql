@@ -1,3 +1,4 @@
+// auth.controller.ts
 import {
   Controller,
   Post,
@@ -5,8 +6,13 @@ import {
   HttpCode,
   HttpStatus,
   Get,
+  Res,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -32,27 +38,33 @@ export class AuthController {
   async login(
     @Body('email') email: string,
     @Body('password') password: string,
-  ): Promise<{ success: boolean; message: string; token?: string }> {
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{ success: boolean; message: string }> {
     const result = await this.authService.login(email, password);
     if (result.success) {
-      return {
-        success: true,
-        message: 'Login successful',
-        token: result.token,
-      };
+      res.cookie('jwt', result.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== 'development',
+        sameSite: 'strict',
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      });
+      return { success: true, message: 'Login successful' };
     } else {
       return { success: false, message: 'Login failed' };
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(): Promise<{ success: boolean; message: string }> {
-    const success = await this.authService.logout();
-    if (success) {
-      return { success: true, message: 'Successfully logged out' };
-    } else {
-      return { success: false, message: 'Logout failed' };
-    }
+  async logout(@Res({ passthrough: true }) res: Response): Promise<{ success: boolean; message: string }> {
+    res.clearCookie('jwt');
+    return { success: true, message: 'Successfully logged out' };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  getProfile(@Req() req) {
+    return req.user;
   }
 }

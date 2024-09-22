@@ -1,4 +1,6 @@
-import { Injectable, Logger, Inject } from '@nestjs/common';
+// auth.service.ts
+import { Injectable, Logger, Inject, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { Pool } from 'pg';
@@ -11,6 +13,7 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     @Inject('DATABASE_POOL') private readonly pool: Pool,
+    private readonly jwtService: JwtService,
   ) {}
 
   async register(
@@ -42,23 +45,27 @@ export class AuthService {
       const user = result.rows[0];
 
       if (user && (await bcrypt.compare(password, user.password_hash))) {
+        const payload = { sub: user.id, email: user.email, isAdmin: user.isAdmin };
+        const token = this.jwtService.sign(payload);
         this.logger.log(`User ${user.id} logged in`);
         return {
           success: true,
-          token: 'placeholder-token',
+          token,
           user: { id: user.id, name: user.name, email: user.email },
         };
       } else {
         this.logger.error('Login failed', new Error('Incorrect credentials'));
-        return { success: false };
+        throw new UnauthorizedException('Invalid credentials');
       }
     } catch (error) {
       this.logger.error('Login failed', error);
-      return { success: false };
+      throw new UnauthorizedException('Invalid credentials');
     }
   }
 
   async logout(): Promise<boolean> {
+    // Since we're using JWT, we don't need to do anything server-side for logout
+    // The client should remove the token from the cookie
     this.logger.log('User logged out');
     return true;
   }
