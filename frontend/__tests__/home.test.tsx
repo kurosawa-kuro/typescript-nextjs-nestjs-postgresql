@@ -1,95 +1,100 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import axios from 'axios';
 import Home from '@/app/page';
 
-jest.spyOn(console, 'error').mockImplementation(() => {});
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+// fetchのモック
+global.fetch = jest.fn();
 
 describe('Home', () => {
   beforeEach(() => {
-    mockedAxios.post.mockReset();
     jest.clearAllMocks();
   });
 
+  const mockMicroposts = [
+    { id: 1, userId: 1, title: 'Test Post', content: 'This is a test post', userName: 'Test User' },
+  ];
+
   const setupComponent = () => {
+    (global.fetch as jest.Mock).mockImplementation((url) => {
+      if (url.includes('/microposts')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockMicroposts),
+        });
+      }
+      return Promise.reject(new Error('not found'));
+    });
+
     render(<Home />);
-    const fileInput = screen.getByLabelText('ファイルを選択') as HTMLInputElement;
-    const uploadButton = screen.getByRole('button', { name: /アップロード/i });
-    return { fileInput, uploadButton };
   };
 
-  const createTestFile = () => new File(['test'], 'test.png', { type: 'image/png' });
-
-  it('renders file input and upload button', () => {
-    const { fileInput, uploadButton } = setupComponent();
-    
-    expect(fileInput).toBeInTheDocument();
-    expect(uploadButton).toBeInTheDocument();
-    expect(uploadButton).toBeEnabled();
-  });
-
-  it('allows file selection', () => {
-    const { fileInput } = setupComponent();
-    const file = createTestFile();
-    
-    fireEvent.change(fileInput, { target: { files: [file] } });
-
-    expect(fileInput.files?.[0]).toBe(file);
-  });
-
-  it('uploads file and displays status', async () => {
-    mockedAxios.post.mockResolvedValue({
-      data: {
-        message: 'ファイルが正常にアップロードされました',
-        file: { filename: 'test.png' },
-        url: 'http://localhost:3001/Images/test.png'
-      }
+  it('renders the Microposts heading', async () => {
+    setupComponent();
+    await waitFor(() => {
+      expect(screen.getByText('Microposts')).toBeInTheDocument();
     });
+  });
 
-    const { fileInput, uploadButton } = setupComponent();
-    const file = createTestFile();
+  it('renders the New Micropost button', async () => {
+    setupComponent();
+    await waitFor(() => {
+      expect(screen.getByText('New Micropost')).toBeInTheDocument();
+    });
+  });
 
-    fireEvent.change(fileInput, { target: { files: [file] } });
-    fireEvent.click(uploadButton);
+  it('opens the modal when New Micropost button is clicked', async () => {
+    setupComponent();
+    await waitFor(() => {
+      fireEvent.click(screen.getByText('New Micropost'));
+    });
+    expect(screen.getByText('Create a new Micropost')).toBeInTheDocument();
+  });
+
+  it('renders micropost cards', async () => {
+    setupComponent();
+    await waitFor(() => {
+      expect(screen.getByText('Test Post')).toBeInTheDocument();
+      expect(screen.getByText('This is a test post')).toBeInTheDocument();
+    });
+  });
+
+  it('submits a new micropost', async () => {
+    setupComponent();
+    (global.fetch as jest.Mock).mockImplementation(() => 
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ micropost: { id: 2, userId: 1, title: 'New Post', content: 'New content', userName: 'Test User' } }),
+      })
+    );
 
     await waitFor(() => {
-      const statusElement = screen.getByTestId('upload-status');
-      expect(statusElement).toHaveTextContent('アップロードステータス: ファイルが正常にアップロードされました');
+      fireEvent.click(screen.getByText('New Micropost'));
     });
 
-    const uploadedImage = await screen.findByAltText('Uploaded');
-    expect(uploadedImage).toBeInTheDocument();
-    expect(uploadedImage).toHaveAttribute('src', 'http://localhost:3001/Images/1726356094725_test-image.png');
-  });
+    fireEvent.change(screen.getByLabelText('Title'), { target: { value: 'New Post' } });
+    fireEvent.change(screen.getByLabelText('Content'), { target: { value: 'New content' } });
 
-  it('displays "ファイルが選択されていません" when trying to upload without a file', async () => {
-    const { uploadButton } = setupComponent();
-    
-    fireEvent.click(uploadButton);
-  
-    await waitFor(() => {
-      const statusElement = screen.getByTestId('upload-status');
-      expect(statusElement).toHaveTextContent('アップロードステータス: ファイルが選択されていません');
-    });
-  });
-
-  it('displays error message when upload fails', async () => {
-    const mockError = new Error('Network Error');
-    mockedAxios.post.mockRejectedValue(mockError);
-  
-    const { fileInput, uploadButton } = setupComponent();
-    const file = createTestFile();
-  
+    const file = new File(['test'], 'test.png', { type: 'image/png' });
+    const fileInput = screen.getByLabelText('Choose File') as HTMLInputElement;
     fireEvent.change(fileInput, { target: { files: [file] } });
-    fireEvent.click(uploadButton);
-  
+
+    fireEvent.click(screen.getByText('Post'));
+
     await waitFor(() => {
-      const statusElement = screen.getByTestId('upload-status');
-      expect(statusElement).toHaveTextContent('アップロードステータス: アップロードエラーが発生しました');
+      expect(screen.getByText('New Post')).toBeInTheDocument();
+      expect(screen.getByText('New content')).toBeInTheDocument();
+    }, { timeout: 3000 });
+  });
+
+  it('handles error when fetching microposts fails', async () => {
+    (global.fetch as jest.Mock).mockImplementation(() => 
+      Promise.reject(new Error('Failed to fetch'))
+    );
+
+    render(<Home />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Error fetching microposts. Please try again later.')).toBeInTheDocument();
     });
-  
-    expect(console.error).toHaveBeenCalledWith('アップロードエラー:', mockError);
   });
 });
