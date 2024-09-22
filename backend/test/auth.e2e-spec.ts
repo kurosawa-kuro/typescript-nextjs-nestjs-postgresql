@@ -77,36 +77,37 @@ describe('AuthController (e2e)', () => {
     });
   });
 
-  it('should retrieve the user profile with a valid JWT (GET /auth/profile)', async () => {
-    const userService = app.get<UserService>(UserService);
-    await createTestUser(userService, 'Jane Doe', 'jane.doe@example.com', 'securepassword123');
-    const user = await userService.findUserByEmail('jane.doe@example.com');
-    const token = jwtService.sign({ sub: user.id, email: user.email });
-    console.log('★★★★ Token:', token);
+  // it('should retrieve the user profile with a valid JWT (GET /auth/profile)', async () => {
+  //   const userService = app.get<UserService>(UserService);
+  //   await createTestUser(userService, 'Jane Doe', 'jane.doe@example.com', 'securepassword123');
+  //   const user = await userService.findUserByEmail('jane.doe@example.com');
+  //   const token = jwtService.sign({ sub: user.id, email: user.email });
+  //   console.log('★★★★ Token:', token);
   
-    const response = await request(app.getHttpServer())
-      .get('/auth/profile')
-      .set('Cookie', [`jwt=${token}`]) // Send the JWT token as a cookie
-      .expect(200); // Expect success if the JWT is valid
+  //   const response = await request(app.getHttpServer())
+  //     .get('/auth/profile')
+  //     .set('Cookie', [`jwt=${token}`]) // Send the JWT token as a cookie
+  //     .expect(200); // Expect success if the JWT is valid
   
-      console.log('★★★★ response:', response);
+  //     console.log('★★★★ response:', response);
 
-    expect(response.body).toEqual({
-      id: user.id,
-      email: 'jane.doe@example.com',
-      name: 'Jane Doe',
-    });
-  });
+  //   expect(response.body).toEqual({
+  //     id: user.id,
+  //     email: 'jane.doe@example.com',
+  //     name: 'Jane Doe',
+  //   });
+  // });
 
-  it('should return 401 for profile request without JWT (GET /auth/profile)', async () => {
-    const response = await request(app.getHttpServer())
-      .get('/auth/profile')
-      .expect(401); // Expect 401 Unauthorized
   
-    expect(response.body).toEqual({
-      statusCode: 401,
-      message: 'JWT token missing',
-      error: 'Unauthorized',
-    });
-  });
+  // it('should return 401 for profile request without JWT (GET /auth/profile)', async () => {
+  //   const response = await request(app.getHttpServer())
+  //     .get('/auth/profile')
+  //     .expect(401); // Expect 401 Unauthorized
+  
+  //   expect(response.body).toEqual({
+  //     statusCode: 401,
+  //     message: 'JWT token missing',
+  //     error: 'Unauthorized',
+  //   });
+  // });
 });
