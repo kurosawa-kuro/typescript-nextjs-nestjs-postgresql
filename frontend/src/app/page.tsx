@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 
+// Types
 interface Micropost {
   id: number;
   userId: number;
@@ -11,35 +12,219 @@ interface Micropost {
   imagePath?: string;
 }
 
+// Constants
 const API_URL = 'http://localhost:3001/microposts';
 
-export default function Home() {
+// API Functions
+const fetchMicroposts = async (): Promise<Micropost[]> => {
+  const response = await fetch(API_URL);
+  if (!response.ok) {
+    throw new Error('Failed to fetch microposts');
+  }
+  return response.json();
+};
+
+const createMicropost = async (formData: FormData): Promise<Micropost> => {
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    body: formData,
+  });
+  if (!response.ok) {
+    throw new Error('Failed to create micropost');
+  }
+  const data = await response.json();
+  return data.micropost;
+};
+
+// Custom Hooks
+const useMicroposts = () => {
   const [microposts, setMicroposts] = useState<Micropost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await fetchMicroposts();
+        setMicroposts(data);
+      } catch (err) {
+        setErrorMessage('Error fetching microposts. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const addMicropost = (newMicropost: Micropost) => {
+    setMicroposts(prevMicroposts => [newMicropost, ...prevMicroposts]);
+  };
+
+  return { microposts, isLoading, errorMessage, addMicropost };
+};
+
+const useModal = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
+  return { isModalOpen, handleOpenModal, handleCloseModal };
+};
+
+const usePostForm = () => {
   const [postTitle, setPostTitle] = useState("");
   const [postContent, setPostContent] = useState("");
   const [postImage, setPostImage] = useState<File | null>(null);
 
-  useEffect(() => {
-    fetchMicroposts();
-  }, []);
-
-  const fetchMicroposts = async () => {
-    try {
-      const response = await fetch(API_URL);
-      if (!response.ok) {
-        throw new Error('Failed to fetch microposts');
-      }
-      const data = await response.json();
-      setMicroposts(data);
-    } catch (err) {
-      setErrorMessage('Error fetching microposts. Please try again later.');
-    } finally {
-      setIsLoading(false);
-    }
+  const resetForm = () => {
+    setPostTitle("");
+    setPostContent("");
+    setPostImage(null);
   };
+
+  return { postTitle, setPostTitle, postContent, setPostContent, postImage, setPostImage, resetForm };
+};
+
+// Components
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+  </div>
+);
+
+const ErrorMessage = ({ message }: { message: string }) => (
+  <div className="flex items-center justify-center h-screen">
+    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+      <strong className="font-bold">Oh no! </strong>
+      <span className="block sm:inline">{message}</span>
+    </div>
+  </div>
+);
+
+const MicropostCard = ({ post }: { post: Micropost }) => (
+  <div className="bg-white shadow-lg rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+    {post.imagePath && post.imagePath.trim() !== "" && (
+      <img src={`http://localhost:3001/${post.imagePath}`} alt={post.title} className="w-full h-48 object-cover" />
+    )}
+    <div className="p-6">
+      <h2 className="text-xl font-semibold mb-2 text-purple-700">{post.title}</h2>
+      <p className="text-gray-600 mb-4">{post.content}</p>
+      <p className="text-gray-600 flex items-center mb-2">
+        <span className="inline-block w-2 h-2 rounded-full bg-purple-500 mr-2"></span>
+        User: {post.userName}
+      </p>
+    </div>
+  </div>
+);
+
+const MicropostList = ({ microposts }: { microposts: Micropost[] }) => (
+  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    {microposts.map((post) => (
+      <MicropostCard key={post.id} post={post} />
+    ))}
+  </div>
+);
+
+interface MicropostModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (e: React.FormEvent) => void;
+  title: string;
+  setTitle: (title: string) => void;
+  content: string;
+  setContent: (content: string) => void;
+  image: File | null;
+  onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const MicropostModal = ({ isOpen, onClose, onSubmit, title, setTitle, content, setContent, image, onImageChange }: MicropostModalProps) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg p-8 w-full max-w-md shadow-2xl">
+        <h2 className="text-3xl font-bold mb-6 text-gray-800">Create a new Micropost</h2>
+        <form onSubmit={onSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+            <input
+              type="text"
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">Content</label>
+            <textarea
+              id="content"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+              rows={4}
+              required
+            ></textarea>
+          </div>
+          <div>
+            <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">Image</label>
+            <div className="mt-1 flex items-center">
+              <span className="inline-block h-12 w-12 rounded-md overflow-hidden bg-gray-100">
+                {image ? (
+                  <img src={URL.createObjectURL(image)} alt="Preview" className="h-full w-full object-cover" />
+                ) : (
+                  <svg className="h-full w-full text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                )}
+              </span>
+              <label
+                htmlFor="image-upload"
+                className="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+              >
+                Choose File
+              </label>
+              <input
+                id="image-upload"
+                name="image-upload"
+                type="file"
+                className="sr-only"
+                onChange={onImageChange}
+                accept="image/*"
+              />
+            </div>
+            {image && (
+              <p className="mt-2 text-sm text-gray-500">
+                Selected file: {image.name}
+              </p>
+            )}
+          </div>
+          <div className="flex justify-end space-x-3 mt-6">
+            <button
+              type="button"
+              onClick={onClose}
+              className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="bg-purple-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            >
+              Post
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+// Main Component
+export default function Home() {
+  const { microposts, isLoading, errorMessage, addMicropost } = useMicroposts();
+  const { isModalOpen, handleOpenModal, handleCloseModal } = useModal();
+  const { postTitle, setPostTitle, postContent, setPostContent, postImage, setPostImage, resetForm } = usePostForm();
 
   const handleSubmitPost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,30 +237,14 @@ export default function Home() {
     }
 
     try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create micropost');
-      }
-
-      const data = await response.json();
-      setMicroposts(prevMicroposts => [data.micropost, ...prevMicroposts]);
+      const newMicropost = await createMicropost(formData);
+      addMicropost(newMicropost);
       handleCloseModal();
+      resetForm();
     } catch (err) {
       console.error('Error creating micropost:', err);
-      setErrorMessage('Error creating micropost. Please try again.');
+      // エラー処理をここに追加することができます
     }
-  };
-
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setPostTitle("");
-    setPostContent("");
-    setPostImage(null);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,144 +270,17 @@ export default function Home() {
         </button>
       </div>
       <MicropostList microposts={microposts} />
-      {isModalOpen && (
-        <MicropostModal
-          title={postTitle}
-          setTitle={setPostTitle}
-          content={postContent}
-          setContent={setPostContent}
-          image={postImage}
-          onImageChange={handleImageChange}
-          onSubmit={handleSubmitPost}
-          onClose={handleCloseModal}
-        />
-      )}
+      <MicropostModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSubmit={handleSubmitPost}
+        title={postTitle}
+        setTitle={setPostTitle}
+        content={postContent}
+        setContent={setPostContent}
+        image={postImage}
+        onImageChange={handleImageChange}
+      />
     </div>
   );
 }
-
-const LoadingSpinner = () => (
-  <div className="flex items-center justify-center h-screen">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
-  </div>
-);
-
-const ErrorMessage = ({ message }: { message: string }) => (
-  <div className="flex items-center justify-center h-screen">
-    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-      <strong className="font-bold">Oh no! </strong>
-      <span className="block sm:inline">{message}</span>
-    </div>
-  </div>
-);
-
-const MicropostList = ({ microposts }: { microposts: Micropost[] }) => (
-  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-    {microposts.map((post) => (
-      <div key={post.id} className="bg-white shadow-lg rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-        {post.imagePath && post.imagePath.trim() !== "" && (
-          <img src={`http://localhost:3001/${post.imagePath}`} alt={post.title} className="w-full h-48 object-cover" />
-        )}
-        <div className="p-6">
-          <h2 className="text-xl font-semibold mb-2 text-purple-700">{post.title}</h2>
-          <p className="text-gray-600 mb-4">{post.content}</p>
-          <p className="text-gray-600 flex items-center mb-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-purple-500 mr-2"></span>
-            User: {post.userName}
-          </p>
-        </div>
-      </div>
-    ))}
-  </div>
-);
-
-interface MicropostModalProps {
-  title: string;
-  setTitle: (title: string) => void;
-  content: string;
-  setContent: (content: string) => void;
-  image: File | null;
-  onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSubmit: (e: React.FormEvent) => void;
-  onClose: () => void;
-}
-
-const MicropostModal = ({ title, setTitle, content, setContent, image, onImageChange, onSubmit, onClose }: MicropostModalProps) => (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-    <div className="bg-white rounded-lg p-8 w-full max-w-md shadow-2xl">
-      <h2 className="text-3xl font-bold mb-6 text-gray-800">Create a new Micropost</h2>
-      <form onSubmit={onSubmit} className="space-y-6">
-        <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">Title</label>
-          <input
-            type="text"
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">Content</label>
-          <textarea
-            id="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
-            rows={4}
-            required
-          ></textarea>
-        </div>
-        <div>
-          <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">Image</label>
-          <div className="mt-1 flex items-center">
-            <span className="inline-block h-12 w-12 rounded-md overflow-hidden bg-gray-100">
-              {image ? (
-                <img src={URL.createObjectURL(image)} alt="Preview" className="h-full w-full object-cover" />
-              ) : (
-                <svg className="h-full w-full text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              )}
-            </span>
-            <label
-              htmlFor="image-upload"
-              className="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-            >
-              Choose File
-            </label>
-            <input
-              id="image-upload"
-              name="image-upload"
-              type="file"
-              className="sr-only"
-              onChange={onImageChange}
-              accept="image/*"
-            />
-          </div>
-          {image && (
-            <p className="mt-2 text-sm text-gray-500">
-              Selected file: {image.name}
-            </p>
-          )}
-        </div>
-        <div className="flex justify-end space-x-3 mt-6">
-          <button
-            type="button"
-            onClick={onClose}
-            className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="bg-purple-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-          >
-            Post
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-);
