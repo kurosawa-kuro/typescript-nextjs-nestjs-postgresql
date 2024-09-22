@@ -209,4 +209,20 @@ describe('DatabaseService', () => {
       // This assumes that the Logger.error is mocked and checked elsewhere for being called.
     });
   });
+
+  describe('clearAllTables', () => {
+    it('should clear all tables in the database', async () => {
+      // Mock the query method to simply resolve when called
+      mockPool.query.mockResolvedValueOnce({ rows: [] } as MockQueryResult<any>);
+  
+      await service.clearAllTables();
+  
+      // Check that the query was called with the correct SQL statements
+      expect(mockPool.query).toHaveBeenCalledWith('DELETE FROM "micropost_category"');
+      expect(mockPool.query).toHaveBeenCalledWith('DELETE FROM "category"');
+      expect(mockPool.query).toHaveBeenCalledWith('DELETE FROM "micropost"');
+      expect(mockPool.query).toHaveBeenCalledWith('DELETE FROM "user"');
+    });
+  });
+  
 });
