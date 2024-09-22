@@ -1,4 +1,4 @@
-// backend/src/user/user.service.ts
+// src/user/user.service.ts
 
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { Pool } from 'pg';
@@ -12,7 +12,6 @@ export interface User {
 }
 
 export interface UserCreationData {
-  password(password: any): unknown;
   name: string;
   email: string;
   passwordHash: string;
@@ -31,35 +30,46 @@ export class UserService {
 
   constructor(private databaseService: DatabaseService) {} 
 
-  async create(userData: UserCreationData): Promise<User> {
+  async create(userCreationData: UserCreationData): Promise<User> {
     const query = `
-      INSERT INTO "user"(name, email, password_hash, is_admin)
-      VALUES($1, $2, $3, $4) RETURNING id, name, email, is_admin as "isAdmin"
+      INSERT INTO "user" (name, email, password_hash, is_admin)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id, name, email, is_admin AS "isAdmin"
     `;
-    const values = [userData.name, userData.email, userData.passwordHash, userData.isAdmin];
-    return this.databaseService.executeQuery(query, values).then(rows => rows[0]); 
+    const values = [
+      userCreationData.name,
+      userCreationData.email,
+      userCreationData.passwordHash,
+      userCreationData.isAdmin
+    ];
+    
+    const result = await this.databaseService.executeQuery(query, values);
+    return result.rows[0];
   }
 
   async find(id: number): Promise<User | null> {
-    const query = 'SELECT id, name, email, is_admin as "isAdmin" FROM "user" WHERE id = $1';
-    return this.databaseService.executeQuery(query, [id]).then(rows => rows[0] || null);
+    const query = 'SELECT id, name, email, is_admin AS "isAdmin" FROM "user" WHERE id = $1';
+    const result = await this.databaseService.executeQuery(query, [id]);
+    return result.rows[0] || null;
   }
 
   async index(): Promise<User[]> {
-    const query = 'SELECT id, name, email, is_admin as "isAdmin" FROM "user"';
-    return this.databaseService.executeQuery(query).then(result => result.rows);
+    const query = 'SELECT id, name, email, is_admin AS "isAdmin" FROM "user"';
+    const result = await this.databaseService.executeQuery(query);
+    return result.rows;
   }
 
   async findUserByEmail(email: string): Promise<User | null> {
-    const query = 'SELECT id, name, email, password_hash, is_admin as "isAdmin" FROM "user" WHERE email = $1';
-    return this.databaseService.executeQuery(query, [email]).then(rows => rows[0] || null);
+    const query = 'SELECT id, name, email, password_hash, is_admin AS "isAdmin" FROM "user" WHERE email = $1';
+    const result = await this.databaseService.executeQuery(query, [email]);
+    return result.rows[0] || null;
   }
 
   async hashPassword(password: string): Promise<string> {
-
-    // Implementation for hashing the password
-
-    return 'hashedPassword'; // Replace with actual hashing logic
-
-}
+    // 実際のハッシュ化ロジックを実装する必要があります
+    // 例: bcrypt を使用する場合
+    // const salt = await bcrypt.genSalt();
+    // return bcrypt.hash(password, salt);
+    return 'hashedPassword'; // この行は実際のハッシュ化ロジックに置き換えてください
+  }
 }

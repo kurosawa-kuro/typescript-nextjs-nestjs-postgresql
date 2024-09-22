@@ -1,7 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { DatabaseService } from '../src/database/database.service';
-import { setupTestApp, clearDatabase, createTestUser } from './test-utils';
 import { UserService } from '../src/user/user.service';
 
 describe('MicroPostController (e2e)', () => {

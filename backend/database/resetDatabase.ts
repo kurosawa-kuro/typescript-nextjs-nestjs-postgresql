@@ -30,12 +30,12 @@ DROP TABLE IF EXISTS "user";
 `;
 
 const createTablesSql = `
-CREATE TABLE "user" (
+CREATE TABLE IF NOT EXISTS "user" (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
-  email VARCHAR(255) NOT NULL UNIQUE,
+  email VARCHAR(255) UNIQUE NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
-  is_admin BOOLEAN NOT NULL DEFAULT false
+  is_admin BOOLEAN DEFAULT false
 );
 
 CREATE TABLE micropost (
@@ -137,5 +137,5 @@ async function main(): Promise<void> {
 }
 
 // 使用例
-// setEnvironment('test');  // テスト環境に切り替える場合はこの行のコメントを解除
+setEnvironment('test');  // テスト環境に切り替える場合はこの行のコメントを解除
 main();

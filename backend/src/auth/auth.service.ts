@@ -22,9 +22,6 @@ export class AuthService {
       const passwordHash = await bcrypt.hash(password, 10);
       const createUserDto: UserCreationData = {
         name, email, passwordHash, isAdmin: false,
-        password: function (password: any): unknown {
-          throw new Error('Function not implemented.');
-        }
       };
       await this.userService.create(createUserDto);
       return true;

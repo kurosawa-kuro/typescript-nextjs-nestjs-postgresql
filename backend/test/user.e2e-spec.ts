@@ -1,3 +1,4 @@
+// test/user.e2e-spec.ts
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { UserService } from '../src/user/user.service';
@@ -31,20 +32,17 @@ describe('UserController (e2e)', () => {
       })
       .expect(201);
   
-    expect(response.body).toEqual(
-      expect.objectContaining({
-        message: 'User created',
-        user: expect.objectContaining({
-          id: expect.any(Number),
-          name: 'John Doe',
-          email: 'john@example.com',
-          isAdmin: false,
-        }),
+    expect(response.body).toEqual({
+      message: 'User created',
+      user: expect.objectContaining({
+        id: expect.any(Number),
+        name: 'John Doe',
+        email: 'john@example.com',
+        isAdmin: false,
       }),
-    );
+    });
   });
   
-
   it('should retrieve all users (GET /users)', async () => {
     await createTestUser(
       userService,
