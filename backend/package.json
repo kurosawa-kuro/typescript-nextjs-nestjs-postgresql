@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "resetDatabase": "ts-node ./database/resetDatabase.ts",
     "build": "nest build",
     "format": "prettier --write \"src/*s*/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
