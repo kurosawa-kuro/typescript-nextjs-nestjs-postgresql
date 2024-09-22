@@ -115,4 +115,32 @@ describe('AuthController', () => {
       expect(mockResponse.clearCookie).toHaveBeenCalledWith('jwt');
     });
   });
+
+  describe('getProfile', () => {
+    it('should return the user profile from the request', () => {
+      // Mock request object with user attached
+      const mockRequest = {
+        user: { id: 1, name: 'John Doe', email: 'john.doe@example.com' },
+      };
+  
+      const result = controller.getProfile(mockRequest as any);
+      
+      expect(result).toEqual({
+        id: 1,
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+      });
+    });
+  
+    it('should return undefined if user is not attached to the request', () => {
+      // Mock request object without user
+      const mockRequest = {
+        user: undefined,
+      };
+  
+      const result = controller.getProfile(mockRequest as any);
+      
+      expect(result).toBeUndefined();
+    });
+  });
 });
