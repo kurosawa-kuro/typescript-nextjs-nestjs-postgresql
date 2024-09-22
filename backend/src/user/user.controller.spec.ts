@@ -78,6 +78,28 @@ describe('UserController', () => {
             };
             await expect(userController.create(invalidUserDto)).rejects.toThrow(BadRequestException);
         });
+
+        it('should throw BadRequestException if user creation fails', async () => {
+            const createUserDto: CreateUserDto = {
+                name: 'John Doe',
+                email: 'john@example.com',
+                password: 'password',
+            };
+
+            mockUserService.hashPassword.mockResolvedValue('hashedPassword');
+            mockUserService.create.mockRejectedValue(new Error('Database error'));
+
+            await expect(userController.create(createUserDto)).rejects.toThrow(BadRequestException);
+            await expect(userController.create(createUserDto)).rejects.toThrow('Failed to create user');
+
+            expect(userService.hashPassword).toHaveBeenCalledWith(createUserDto.password);
+            expect(userService.create).toHaveBeenCalledWith({
+                name: createUserDto.name,
+                email: createUserDto.email,
+                passwordHash: 'hashedPassword',
+                isAdmin: false,
+            });
+        });
     });
 
     describe('index', () => {
