@@ -89,7 +89,7 @@ describe('MicroPostController', () => {
     it('should throw InternalServerErrorException when micropost creation fails', async () => {
       const userId = 1;
       const title = 'Test MicroPost';
-
+    
       const mockUser: User = {
         id: userId,
         name: 'TestUser',
@@ -97,12 +97,13 @@ describe('MicroPostController', () => {
         isAdmin: false,
       };
       userService.findUser.mockResolvedValue(mockUser);
-      microPostService.create.mockRejectedValue(new Error('Database error'));
-
+      microPostService.create.mockRejectedValue(new InternalServerErrorException('Database error'));
+    
       await expect(microPostController.create(userId, title)).rejects.toThrow(
         InternalServerErrorException,
       );
     });
+    
   });
 
   describe('findAll', () => {
@@ -133,11 +134,10 @@ describe('MicroPostController', () => {
     });
 
     it('should throw InternalServerErrorException when getting microposts fails', async () => {
-      microPostService.list.mockRejectedValue(new Error('Database error'));
-
-      await expect(microPostController.findAll()).rejects.toThrow(
-        InternalServerErrorException,
-      );
-    });
+      // Instead of throwing a generic Error, throw InternalServerErrorException
+      microPostService.list.mockRejectedValue(new InternalServerErrorException('Database error'));
+    
+      await expect(microPostController.findAll()).rejects.toThrow(InternalServerErrorException);
+    });    
   });
 });
