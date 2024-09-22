@@ -1,25 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CategoryService } from './category.service';
-import { Pool } from 'pg';
+import { DatabaseService } from '../database/database.service';
 
 describe('CategoryService', () => {
   let categoryService: CategoryService;
-  let mockPool: jest.Mocked<Pool>;
+  let mockDatabaseService: jest.Mocked<DatabaseService>;
 
   beforeEach(async () => {
-    // Poolのモックを作成
-    mockPool = {
-      query: jest.fn(),
-      connect: jest.fn(),
-      end: jest.fn(),
-    } as unknown as jest.Mocked<Pool>;
+    mockDatabaseService = {
+      executeQuery: jest.fn(),
+      createCategory: jest.fn(),
+      listCategories: jest.fn(),
+    } as unknown as jest.Mocked<DatabaseService>;
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CategoryService,
         {
-          provide: 'DATABASE_POOL',
-          useValue: mockPool,
+          provide: DatabaseService,
+          useValue: mockDatabaseService,
         },
       ],
     }).compile();
@@ -30,56 +29,47 @@ describe('CategoryService', () => {
   describe('create', () => {
     it('should insert a new category', async () => {
       const title = 'Test Category';
-      (mockPool.query as jest.Mock).mockResolvedValue({ rowCount: 1 });
+      mockDatabaseService.createCategory.mockResolvedValue({ id: 1, title });
 
       await categoryService.create(title);
 
-      expect(mockPool.query).toHaveBeenCalledWith(
-        'INSERT INTO category(title) VALUES($1)',
-        [title],
-      );
+      expect(mockDatabaseService.createCategory).toHaveBeenCalledWith(title);
     });
 
     it('should throw an error if insertion fails', async () => {
       const title = 'Failed Category';
-      (mockPool.query as jest.Mock).mockRejectedValue(
-        new Error('Insertion failed'),
-      );
+      mockDatabaseService.createCategory.mockRejectedValue(new Error('Insertion failed'));
 
-      await expect(categoryService.create(title)).rejects.toThrow(
-        'Insertion failed',
-      );
+      await expect(categoryService.create(title)).rejects.toThrow('Insertion failed');
     });
   });
 
-  describe('index', () => {
+  describe('list', () => {
     it('should return all categories', async () => {
       const mockCategories = [
         { id: 1, title: 'Category 1' },
         { id: 2, title: 'Category 2' },
       ];
-      (mockPool.query as jest.Mock).mockResolvedValue({ rows: mockCategories });
+      mockDatabaseService.listCategories.mockResolvedValue(mockCategories);
 
-      const result = await categoryService.index();
+      const result = await categoryService.list();
 
       expect(result).toEqual(mockCategories);
-      expect(mockPool.query).toHaveBeenCalledWith('SELECT * FROM category');
+      expect(mockDatabaseService.listCategories).toHaveBeenCalled();
     });
 
     it('should return an empty array if no categories exist', async () => {
-      (mockPool.query as jest.Mock).mockResolvedValue({ rows: [] });
+      mockDatabaseService.listCategories.mockResolvedValue([]);
 
-      const result = await categoryService.index();
+      const result = await categoryService.list();
 
       expect(result).toEqual([]);
     });
 
     it('should throw an error if query fails', async () => {
-      (mockPool.query as jest.Mock).mockRejectedValue(
-        new Error('Query failed'),
-      );
+      mockDatabaseService.listCategories.mockRejectedValue(new Error('Query failed'));
 
-      await expect(categoryService.index()).rejects.toThrow('Query failed');
+      await expect(categoryService.list()).rejects.toThrow('Query failed');
     });
   });
 });

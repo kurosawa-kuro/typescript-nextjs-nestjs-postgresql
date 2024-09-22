@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, ParseIntPipe, BadRequestException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from '../database/database.service';
 
@@ -8,8 +8,11 @@ export class UserController {
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
+    if (!createUserDto.name || !createUserDto.email || !createUserDto.password) {
+      throw new BadRequestException('Name, email, and password are required');
+    }
     const user = await this.userService.create(createUserDto);
-    return user;
+    return { message: 'User created', user };
   }
 
   @Get(':id')

@@ -33,10 +33,13 @@ describe('UserController (e2e)', () => {
 
     expect(response.body).toEqual(
       expect.objectContaining({
-        id: expect.any(Number),
-        name: 'John Doe',
-        email: 'john@example.com',
-        isAdmin: false,
+        message: 'User created',
+        user: expect.objectContaining({
+          id: expect.any(Number),
+          name: 'John Doe',
+          email: 'john@example.com',
+          isAdmin: false,
+        }),
       }),
     );
   });

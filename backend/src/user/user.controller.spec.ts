@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { BadRequestException } from '@nestjs/common';
+import { CreateUserDto } from '../database/database.service';
 
 describe('UserController', () => {
   let userController: UserController;
@@ -9,7 +10,7 @@ describe('UserController', () => {
 
   const mockUserService = {
     create: jest.fn(),
-    index: jest.fn().mockResolvedValue([
+    listUsers: jest.fn().mockResolvedValue([
       {
         id: 1,
         name: 'John Doe',
@@ -35,7 +36,7 @@ describe('UserController', () => {
   };
 
   beforeEach(async () => {
-    jest.clearAllMocks(); // テスト間でモックをクリア
+    jest.clearAllMocks();
     await setupTestingModule();
   });
 
@@ -49,31 +50,30 @@ describe('UserController', () => {
       };
       (userService.create as jest.Mock).mockResolvedValue(mockUser);
 
-      const result = await userController.create(
-        'John Doe',
-        'john@example.com',
-        'password',
-        false,
-      );
-      expect(userService.create).toHaveBeenCalledWith(
-        'John Doe',
-        'john@example.com',
-        'password',
-        false,
-      );
+      const createUserDto: CreateUserDto = {
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'password',
+      };
+
+      const result = await userController.create(createUserDto);
+      expect(userService.create).toHaveBeenCalledWith(createUserDto);
       expect(result).toEqual({ message: 'User created', user: mockUser });
     });
 
     it('should throw BadRequestException if required fields are missing', async () => {
-      await expect(userController.create('', '', '', false)).rejects.toThrow(
-        BadRequestException,
-      );
+      const invalidUserDto: CreateUserDto = {
+        name: '',
+        email: '',
+        password: '',
+      };
+      await expect(userController.create(invalidUserDto)).rejects.toThrow(BadRequestException);
     });
   });
 
-  describe('index', () => {
+  describe('findAll', () => {
     it('should return an array of users', async () => {
-      const result = await userController.index();
+      const result = await userController.findAll();
       expect(result).toEqual([
         { id: 1, name: 'John Doe', email: 'john@example.com', isAdmin: false },
       ]);
