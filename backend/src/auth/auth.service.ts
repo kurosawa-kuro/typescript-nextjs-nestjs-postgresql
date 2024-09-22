@@ -24,21 +24,23 @@ export class AuthService {
 
   async login(email: string, password: string): Promise<{ success: boolean, token?: string, user?: object }> {
     try {
-      const query = 'SELECT id, name, email, password_hash, is_admin as "isAdmin" FROM "user" WHERE email = $1';
-      const result = await this.pool.query(query, [email]);
-      const user = result.rows[0];
+        const query = 'SELECT id, name, email, password_hash, is_admin as "isAdmin" FROM "user" WHERE email = $1';
+        const result = await this.pool.query(query, [email]);
+        const user = result.rows[0];
 
-      if (user && await bcrypt.compare(password, user.password_hash)) {
-        this.logger.log(`User ${user.id} logged in`);
-        // Placeholder for token generation logic
-        return { success: true, token: "placeholder-token", user: { id: user.id, name: user.name, email: user.email } };
-      }
-      return { success: false };
+        if (user && await bcrypt.compare(password, user.password_hash)) {
+            this.logger.log(`User ${user.id} logged in`);
+            return { success: true, token: "placeholder-token", user: { id: user.id, name: user.name, email: user.email } };
+        } else {
+            this.logger.error('Login failed', new Error('Incorrect credentials'));
+            return { success: false };
+        }
     } catch (error) {
-      this.logger.error('Login failed', error);
-      return { success: false };
+        this.logger.error('Login failed', error);
+        return { success: false };
     }
-  }
+}
+
 
   async logout(): Promise<boolean> {
     this.logger.log('User logged out');
