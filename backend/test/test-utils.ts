@@ -6,29 +6,34 @@ import { MicroPostService } from '../src/micropost/micropost.service';
 import { CategoryService } from '../src/category/category.service';
 import { DatabaseService } from '../src/database/database.service';
 import { MicropostCategoryService } from '../src/micropost-category/micropost-category.service';
+import { AuthService } from '../src/auth/auth.service';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
+
 export async function setupTestApp() {
-  const moduleFixture: TestingModule = await Test.createTestingModule({
+  const moduleFixture = await Test.createTestingModule({
     imports: [AppModule],
   }).compile();
 
   const app = moduleFixture.createNestApplication();
   await app.init();
 
-  const userService = moduleFixture.get<UserService>(UserService);
-  const micropostService = moduleFixture.get<MicroPostService>(MicroPostService);
-  const categoryService = moduleFixture.get<CategoryService>(CategoryService);
-  const micropostCategoryService = moduleFixture.get<MicropostCategoryService>(MicropostCategoryService);
+  const authService = moduleFixture.get<AuthService>(AuthService);
+  const userService = moduleFixture.get<UserService>(UserService); // Get UserService
+  const categoryService = moduleFixture.get<CategoryService>(CategoryService); // Get CategoryService
+  const micropostService = moduleFixture.get<MicroPostService>(MicroPostService); // Get MicroPostService
   const databaseService = moduleFixture.get<DatabaseService>(DatabaseService);
+  const jwtService = moduleFixture.get<JwtService>(JwtService);
 
   return {
     app,
-    userService,
-    micropostService,
-    categoryService,
-    micropostCategoryService,
+    authService,
+    userService, // Return UserService
+    categoryService, // Return CategoryService
+    micropostService, // Return MicroPostService
     databaseService,
+    jwtService,
   };
 }
 
