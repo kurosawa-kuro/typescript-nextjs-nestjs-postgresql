@@ -17,9 +17,13 @@ Content-Type: application/json
   "password": "securepassword123"
 }
 
+### Get User Profile (Protected Route)
+GET http://localhost:3001/auth/profile
+Cookie: jwt=your_jwt_token_here
+
 ### Logout User
 GET http://localhost:3001/auth/logout
-
+Cookie: jwt=your_jwt_token_here
 
 ### ユーザーを作成する
 POST http://localhost:3001/users
