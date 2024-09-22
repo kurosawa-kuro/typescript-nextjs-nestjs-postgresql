@@ -1,5 +1,3 @@
-// src/app.module.ts
-
 import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -8,6 +6,7 @@ import { MicropostModule } from './micropost/micropost.module';
 import { CategoryModule } from './category/category.module';
 import { MicropostCategoryModule } from './micropost-category/micropost-category.module';
 import { DatabaseModule } from './database/database.module';
+import { AuthModule } from './auth/auth.module'; // Import AuthModule
 
 @Module({
   imports: [
@@ -20,6 +19,7 @@ import { DatabaseModule } from './database/database.module';
     MicropostModule,
     CategoryModule,
     MicropostCategoryModule,
+    AuthModule, // Add AuthModule here
   ],
 })
 export class AppModule {}
