@@ -35,7 +35,7 @@ describe('UserService', () => {
       query: jest.fn(),
     } as unknown as jest.Mocked<Pool>;
 
-    jest.clearAllMocks(); // テストごとのモッククリア
+    jest.clearAllMocks();
     await setupTestingModule();
   });
 
@@ -109,7 +109,7 @@ describe('UserService', () => {
 
       expect(result).toEqual(mockUsers);
       expect(mockPool.query).toHaveBeenCalledWith(
-        'SELECT id, name, email, is_admin as "isAdmin" FROM "user"',
+        'SELECT id, name, email, is_admin as "isAdmin" FROM "user"'
       );
     });
 
