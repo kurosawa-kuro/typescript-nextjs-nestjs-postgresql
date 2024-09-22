@@ -184,4 +184,50 @@ describe('UserService', () => {
       expect(bcrypt.hash).toHaveBeenCalledWith(password, 10);
     });
   });
+
+  describe('findUserByEmail', () => {
+    const userEmail = 'john@example.com';
+
+    it('should return a user when found', async () => {
+      const mockUserWithPasswordHash = {
+        ...mockUser,
+        password_hash: 'hashedPassword',
+      };
+      mockDatabaseService.executeQuery.mockResolvedValue({
+        command: 'SELECT',
+        rowCount: 1,
+        oid: null,
+        rows: [mockUserWithPasswordHash],
+        fields: []
+      });
+
+      const result = await userService.findUserByEmail(userEmail);
+
+      expect(result).toEqual(mockUserWithPasswordHash);
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
+        expect.any(String),
+        [userEmail]
+      );
+    });
+
+    it('should return null when user is not found', async () => {
+      mockDatabaseService.executeQuery.mockResolvedValue({
+        command: 'SELECT',
+        rowCount: 0,
+        oid: null,
+        rows: [],
+        fields: []
+      });
+
+      const result = await userService.findUserByEmail(userEmail);
+
+      expect(result).toBeNull();
+    });
+
+    it('should throw an error if query fails', async () => {
+      mockDatabaseService.executeQuery.mockRejectedValue(new Error('Query failed'));
+
+      await expect(userService.findUserByEmail(userEmail)).rejects.toThrow('Query failed');
+    });
+  });
 });
