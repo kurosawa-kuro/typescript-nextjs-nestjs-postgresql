@@ -78,9 +78,8 @@ export class DatabaseService implements OnModuleDestroy {
 
   async createCategory(title: string): Promise<Category> {
     const query = 'INSERT INTO category(title) VALUES($1) RETURNING id, title';
-    const result = await this.executeQuery(query, [title]);
-    return result.rows[0];
-  }
+    return this.executeQuery(query, [title]).then(result => result.rows[0]);
+  }  
 
   async indexCategories(): Promise<Category[]> {
     const query = 'SELECT * FROM category';
