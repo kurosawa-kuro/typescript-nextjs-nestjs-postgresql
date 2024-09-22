@@ -26,9 +26,10 @@ export async function setupTestApp() {
 
 
 export async function clearDatabase(pool: Pool) {
+  await pool.query('DELETE FROM "micropost_category"');
+  await pool.query('DELETE FROM "category"');
   await pool.query('DELETE FROM "micropost"');
   await pool.query('DELETE FROM "user"');
-  await pool.query('DELETE FROM "category"');
 }
 
 export async function createTestUser(userService: UserService, name: string, email: string, password: string) {
