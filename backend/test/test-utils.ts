@@ -3,8 +3,9 @@ import { AppModule } from '../src/app.module';
 import { UserService } from '../src/user/user.service';
 import { MicroPostService } from '../src/micropost/micropost.service';
 import { CategoryService } from '../src/category/category.service';
-import { Pool } from 'pg';
+import { DatabaseService } from '../src/database/database.service';
 import { MicropostCategoryService } from '../src/micropost-category/micropost-category.service';
+import { CreateUserDto } from '../src/database/database.service';
 
 export async function setupTestApp() {
   const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -15,13 +16,10 @@ export async function setupTestApp() {
   await app.init();
 
   const userService = moduleFixture.get<UserService>(UserService);
-  const micropostService =
-    moduleFixture.get<MicroPostService>(MicroPostService);
+  const micropostService = moduleFixture.get<MicroPostService>(MicroPostService);
   const categoryService = moduleFixture.get<CategoryService>(CategoryService);
-  const micropostCategoryService = moduleFixture.get<MicropostCategoryService>(
-    MicropostCategoryService,
-  );
-  const pool = moduleFixture.get('DATABASE_POOL'); // Update to use 'DATABASE_POOL'
+  const micropostCategoryService = moduleFixture.get<MicropostCategoryService>(MicropostCategoryService);
+  const databaseService = moduleFixture.get<DatabaseService>(DatabaseService);
 
   return {
     app,
@@ -29,15 +27,12 @@ export async function setupTestApp() {
     micropostService,
     categoryService,
     micropostCategoryService,
-    pool,
+    databaseService,
   };
 }
 
-export async function clearDatabase(pool: Pool) {
-  await pool.query('DELETE FROM "micropost_category"');
-  await pool.query('DELETE FROM "category"');
-  await pool.query('DELETE FROM "micropost"');
-  await pool.query('DELETE FROM "user"');
+export async function clearDatabase(databaseService: DatabaseService) {
+  await databaseService.clearAllTables();
 }
 
 export async function createTestUser(
@@ -46,7 +41,8 @@ export async function createTestUser(
   email: string,
   password: string,
 ) {
-  return await userService.create(name, email, password);
+  const createUserDto: CreateUserDto = { name, email, password };
+  return await userService.create(createUserDto);
 }
 
 export async function createTestMicropost(

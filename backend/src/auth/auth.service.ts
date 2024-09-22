@@ -2,6 +2,7 @@ import { Injectable, Logger, Inject } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { Pool } from 'pg';
+import { CreateUserDto } from '../database/database.service';
 
 @Injectable()
 export class AuthService {
@@ -9,7 +10,7 @@ export class AuthService {
 
   constructor(
     private readonly userService: UserService,
-    @Inject('DATABASE_POOL') private readonly pool: Pool, // Ensure database access for authentication
+    @Inject('DATABASE_POOL') private readonly pool: Pool,
   ) {}
 
   async register(
@@ -18,7 +19,8 @@ export class AuthService {
     password: string,
   ): Promise<boolean> {
     try {
-      await this.userService.create(name, email, password);
+      const createUserDto: CreateUserDto = { name, email, password };
+      await this.userService.create(createUserDto);
       return true;
     } catch (error) {
       this.logger.error('Registration failed', error);

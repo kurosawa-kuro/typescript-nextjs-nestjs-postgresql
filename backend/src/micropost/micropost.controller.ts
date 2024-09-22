@@ -1,131 +1,54 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  InternalServerErrorException,
-  Logger,
-  NotFoundException,
-  UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, ParseIntPipe, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MicroPost, MicroPostService } from './micropost.service';
 import { UserService } from '../user/user.service';
-import { MicropostCategoryService } from '../micropost-category/micropost-category.service';
-import * as multer from 'multer';
-import * as path from 'path';
-
-const storage = multer.diskStorage({
-  destination: './uploads',
-  filename: (req, file, cb) => {
-    /* istanbul ignore next */
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    /* istanbul ignore next */
-    cb(
-      null,
-      file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname),
-    );
-  },
-});
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('microposts')
 export class MicroPostController {
-  private readonly logger = new Logger(MicroPostController.name);
-
   constructor(
     private readonly microPostService: MicroPostService,
     private readonly userService: UserService,
-    private readonly micropostCategoryService: MicropostCategoryService,
   ) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('image', { storage: storage }))
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          return cb(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
   async create(
-    @Body('userId') userId: number,
+    @Body('userId', ParseIntPipe) userId: number,
     @Body('title') title: string,
     @UploadedFile() file?: Express.Multer.File,
-  ) {
-    try {
-      const user = await this.userService.find(userId);
-      if (!user) {
-        throw new NotFoundException(`User with id ${userId} not found`);
-      }
-      const imagePath = file ? file.path : null;
-      const micropost = await this.microPostService.create(
-        userId,
-        title,
-        imagePath,
-      );
-      return { message: 'MicroPost created', micropost };
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      this.logger.error(
-        `Failed to create micropost: ${error.message}`,
-        error.stack,
-      );
-      throw new InternalServerErrorException('Failed to create micropost');
+  ): Promise<MicroPost> {
+    if (!title) {
+      throw new BadRequestException('Title is required');
     }
+
+    const user = await this.userService.findUser(userId);  // find から findUser に変更
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    const imagePath = file ? file.path : null;
+
+    return this.microPostService.create(userId, title, imagePath);
   }
 
   @Get()
-  async index(): Promise<MicroPost[]> {
-    try {
-      const microposts = await this.microPostService.index();
-      return microposts.map((post) => ({
-        id: post.id,
-        userId: post.userId,
-        title: post.title,
-        userName: post.userName,
-        imagePath: post.imagePath,
-      }));
-    } catch (error) {
-      this.logger.error(
-        `Failed to get microposts: ${error.message}`,
-        error.stack,
-      );
-      throw new InternalServerErrorException('Failed to get microposts');
-    }
-  }
-
-  @Get(':id/categories')
-  async categories(@Param('id') id: string) {
-    try {
-      const micropostId = parseInt(id, 10);
-      const categories =
-        await this.micropostCategoryService.categories(micropostId);
-      return categories;
-    } catch (error) {
-      this.logger.error(
-        `Failed to get categories for micropost: ${error.message}`,
-        error.stack,
-      );
-      throw new InternalServerErrorException(
-        'Failed to get categories for micropost',
-      );
-    }
-  }
-
-  @Post(':id/categories')
-  async add_category(
-    @Param('id') id: string,
-    @Body('categoryId') categoryId: number,
-  ) {
-    try {
-      const micropostId = parseInt(id, 10);
-      await this.micropostCategoryService.add_category(micropostId, categoryId);
-      return { message: 'Category added to micropost' };
-    } catch (error) {
-      this.logger.error(
-        `Failed to add category to micropost: ${error.message}`,
-        error.stack,
-      );
-      throw new InternalServerErrorException(
-        'Failed to add category to micropost',
-      );
-    }
+  async findAll(): Promise<MicroPost[]> {
+    const microposts = await this.microPostService.list();  // index から list に変更
+    return microposts;
   }
 }

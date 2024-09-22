@@ -1,40 +1,17 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { Pool } from 'pg';
+import { Injectable } from '@nestjs/common';
+import { DatabaseService, MicroPost } from '../database/database.service';
 
-export interface MicroPost {
-  id: number;
-  userId: number;
-  title: string;
-  userName: string;
-  imagePath: string | null;
-}
+export { MicroPost };  // MicroPost インターフェースをエクスポート
 
 @Injectable()
 export class MicroPostService {
-  constructor(@Inject('DATABASE_POOL') private readonly pool: Pool) {}
+  constructor(private databaseService: DatabaseService) {}
 
-  async create(
-    userId: number,
-    title: string,
-    imagePath: string | null,
-  ): Promise<MicroPost> {
-    const query = `
-      INSERT INTO micropost(user_id, title, image_path) 
-      VALUES($1, $2, $3) 
-      RETURNING id, user_id as "userId", title, image_path as "imagePath",
-        (SELECT name FROM "user" WHERE id = $1) as "userName"
-    `;
-    const result = await this.pool.query(query, [userId, title, imagePath]);
-    return result.rows[0];
+  async create(userId: number, title: string, imagePath: string | null): Promise<MicroPost> {
+    return this.databaseService.createMicroPost(userId, title, imagePath);
   }
 
-  async index(): Promise<MicroPost[]> {
-    const query = `
-      SELECT m.id, m.user_id as "userId", m.title, m.image_path as "imagePath", u.name as "userName"
-      FROM micropost m
-      JOIN "user" u ON m.user_id = u.id
-    `;
-    const result = await this.pool.query(query);
-    return result.rows;
+  async list(): Promise<MicroPost[]> {  // index から list に変更
+    return this.databaseService.listMicroPosts();
   }
 }

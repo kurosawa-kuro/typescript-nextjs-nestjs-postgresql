@@ -36,7 +36,7 @@ export class CategoryController {
   @Get()
   async index() {
     try {
-      const categories = await this.categoryService.index();
+      const categories = await this.categoryService.list();
       return categories;
     } catch (error) {
       this.logger.error(

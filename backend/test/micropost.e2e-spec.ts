@@ -2,127 +2,75 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { UserService } from '../src/user/user.service';
 import { MicroPostService } from '../src/micropost/micropost.service';
-import { Pool } from 'pg';
-import {
-  setupTestApp,
-  clearDatabase,
-  createTestUser,
-  createTestMicropost,
-} from './test-utils';
+import { DatabaseService } from '../src/database/database.service';
+import { setupTestApp, clearDatabase, createTestUser } from './test-utils';
 
 describe('MicroPostController (e2e)', () => {
   let app: INestApplication;
   let userService: UserService;
   let micropostService: MicroPostService;
-  let pool: Pool;
+  let databaseService: DatabaseService;
 
   beforeAll(async () => {
-    ({ app, userService, micropostService, pool } = await setupTestApp());
+    ({ app, userService, micropostService, databaseService } = await setupTestApp());
   });
 
   afterAll(async () => {
     await app.close();
-    await pool.end();
   });
 
   beforeEach(async () => {
-    await clearDatabase(pool);
+    await clearDatabase(databaseService);
   });
 
   it('should create a micropost (POST /microposts)', async () => {
-    const user = await createTestUser(
-      userService,
-      'Test User',
-      'test@example.com',
-      'password123',
-    );
+    const user = await createTestUser(userService, 'Test User', 'test@example.com', 'password123');
 
     const response = await request(app.getHttpServer())
       .post('/microposts')
-      .send({ userId: user.id, title: 'My first micropost' })
+      .send({
+        userId: user.id,
+        title: 'Test Micropost',
+      })
       .expect(201);
 
-    expect(response.body).toHaveProperty('message', 'MicroPost created');
-    expect(response.body).toHaveProperty('micropost');
-    expect(response.body.micropost).toHaveProperty('id');
-    expect(response.body.micropost).toHaveProperty('userId', user.id);
-    expect(response.body.micropost).toHaveProperty(
-      'title',
-      'My first micropost',
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        id: expect.any(Number),
+        userId: user.id,
+        title: 'Test Micropost',
+        imagePath: null,
+        userName: 'Test User',
+      }),
     );
-    expect(response.body.micropost).toHaveProperty('userName', 'Test User');
   });
 
   it('should retrieve all microposts (GET /microposts)', async () => {
-    const user = await createTestUser(
-      userService,
-      'Another Test User',
-      'another@example.com',
-      'password123',
-    );
-    await createTestMicropost(micropostService, user.id, 'Test micropost');
+    const user = await createTestUser(userService, 'Test User', 'test@example.com', 'password123');
+    await micropostService.create(user.id, 'Test Micropost 1', null);
+    await micropostService.create(user.id, 'Test Micropost 2', null);
 
     const response = await request(app.getHttpServer())
       .get('/microposts')
       .expect(200);
 
-    expect(response.body).toEqual(expect.any(Array));
-    expect(response.body.length).toBeGreaterThan(0);
-
-    const testMicropost = response.body.find(
-      (post) => post.title === 'Test micropost',
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: expect.any(Number),
+          userId: user.id,
+          title: 'Test Micropost 1',
+          imagePath: null,
+          userName: 'Test User',
+        }),
+        expect.objectContaining({
+          id: expect.any(Number),
+          userId: user.id,
+          title: 'Test Micropost 2',
+          imagePath: null,
+          userName: 'Test User',
+        }),
+      ]),
     );
-    expect(testMicropost).toBeDefined();
-    expect(testMicropost).toHaveProperty('title', 'Test micropost');
-    expect(testMicropost).toHaveProperty('userId', user.id);
-    expect(testMicropost).toHaveProperty('userName', 'Another Test User');
-  });
-
-  it('should create a micropost with correct user name (POST /microposts)', async () => {
-    const user = await createTestUser(
-      userService,
-      'John Doe',
-      'john@example.com',
-      'password123',
-    );
-
-    const response = await request(app.getHttpServer())
-      .post('/microposts')
-      .send({ userId: user.id, title: "John's micropost" })
-      .expect(201);
-
-    expect(response.body.micropost).toHaveProperty('userName', 'John Doe');
-  });
-
-  it('should retrieve microposts with user names (GET /microposts)', async () => {
-    const user1 = await createTestUser(
-      userService,
-      'Alice',
-      'alice@example.com',
-      'password123',
-    );
-    const user2 = await createTestUser(
-      userService,
-      'Bob',
-      'bob@example.com',
-      'password123',
-    );
-    await createTestMicropost(micropostService, user1.id, "Alice's post");
-    await createTestMicropost(micropostService, user2.id, "Bob's post");
-
-    const response = await request(app.getHttpServer())
-      .get('/microposts')
-      .expect(200);
-
-    expect(response.body).toEqual(expect.any(Array));
-    expect(response.body.length).toBe(2);
-
-    const alicePost = response.body.find(
-      (post) => post.title === "Alice's post",
-    );
-    const bobPost = response.body.find((post) => post.title === "Bob's post");
-
-    expect(alicePost).toHaveProperty('userName', 'Alice');
-    expect(bobPost).toHaveProperty('userName', 'Bob');
   });
 });

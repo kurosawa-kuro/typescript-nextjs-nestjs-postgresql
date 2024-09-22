@@ -1,18 +1,15 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { Pool } from 'pg';
+import { Injectable } from '@nestjs/common';
+import { DatabaseService, Category } from '../database/database.service';
 
 @Injectable()
 export class CategoryService {
-  constructor(@Inject('DATABASE_POOL') private readonly pool: Pool) {}
+  constructor(private databaseService: DatabaseService) {}
 
-  async create(title: string): Promise<void> {
-    const query = 'INSERT INTO category(title) VALUES($1)';
-    await this.pool.query(query, [title]);
+  async create(title: string): Promise<Category> {
+    return this.databaseService.createCategory(title);
   }
 
-  async index(): Promise<any[]> {
-    const query = 'SELECT * FROM category';
-    const result = await this.pool.query(query);
-    return result.rows;
+  async list(): Promise<Category[]> {
+    return this.databaseService.listCategories();
   }
 }
