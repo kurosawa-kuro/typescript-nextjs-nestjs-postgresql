@@ -104,6 +104,7 @@ describe('AuthService', () => {
       new Error('Incorrect credentials'),
     );
   });
+
   it('should log an error if a database error occurs during login', async () => {
     // データベースクエリが失敗するようにモック
     const mockError = new Error('Database error');

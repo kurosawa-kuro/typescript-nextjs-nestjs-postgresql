@@ -10,12 +10,11 @@ describe('MicropostCategoryService', () => {
   let service: MicropostCategoryService;
   let mockPool: MockPool;
 
-  beforeEach(async () => {
-    // Create a mock pool
-    mockPool = {
-      query: jest.fn(),
-    };
+  const createMockPool = (): MockPool => ({
+    query: jest.fn(),
+  });
 
+  const setupTestingModule = async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         MicropostCategoryService,
@@ -27,6 +26,11 @@ describe('MicropostCategoryService', () => {
     }).compile();
 
     service = module.get<MicropostCategoryService>(MicropostCategoryService);
+  };
+
+  beforeEach(async () => {
+    mockPool = createMockPool();
+    await setupTestingModule();
   });
 
   it('should be defined', () => {
@@ -75,9 +79,7 @@ describe('MicropostCategoryService', () => {
     it('should throw an error if the insertion fails', async () => {
       mockPool.query.mockRejectedValue(new Error('Insertion failed'));
 
-      await expect(service.add_category(1, 1)).rejects.toThrow(
-        'Insertion failed',
-      );
+      await expect(service.add_category(1, 1)).rejects.toThrow('Insertion failed');
     });
   });
 });
