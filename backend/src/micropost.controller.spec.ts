@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MicroPostController } from './micropost.controller';
 import { MicroPostService, MicroPost } from './micropost.service';
-import { UserService } from './user.service';
+import { UserService, User } from './user.service';
 import { MicropostCategoryService } from './micropost-category.service';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
@@ -46,23 +46,25 @@ describe('MicroPostController', () => {
   });
 
   describe('createMicroPost', () => {
-    it('should create a new micropost', async () => {
+    it('should create a micropost', async () => {
       const userId = 1;
-      const title = 'Test MicroPost';
-      const imagePath = 'path/to/image.jpg';
-      const micropost: MicroPost = { id: 1, userId, title, userName: 'TestUser', imagePath };
+      const title = 'Test Post';
+      const file = { path: 'uploads/test.jpg' } as Express.Multer.File;
 
-      userService.getUserById.mockResolvedValue({ id: userId, name: 'TestUser' });
-      microPostService.createMicroPost.mockResolvedValue(micropost);
+      const mockUser: User = { id: userId, name: 'TestUser', email: 'test@example.com', isAdmin: false };
+      userService.getUserById.mockResolvedValue(mockUser);
 
-      const result = await microPostController.createMicroPost(userId, title, { path: imagePath } as Express.Multer.File);
+      const mockMicroPost: MicroPost = { id: 1, userId, title, userName: mockUser.name, imagePath: file.path };
+      microPostService.createMicroPost.mockResolvedValue(mockMicroPost);
+
+      const result = await microPostController.createMicroPost(userId, title, file);
 
       expect(result).toEqual({
         message: 'MicroPost created',
-        micropost: micropost
+        micropost: mockMicroPost
       });
       expect(userService.getUserById).toHaveBeenCalledWith(userId);
-      expect(microPostService.createMicroPost).toHaveBeenCalledWith(userId, title, imagePath);
+      expect(microPostService.createMicroPost).toHaveBeenCalledWith(userId, title, file.path);
     });
 
     it('should throw NotFoundException when user is not found', async () => {
@@ -79,7 +81,8 @@ describe('MicroPostController', () => {
       const userId = 1;
       const title = 'Test MicroPost';
 
-      userService.getUserById.mockResolvedValue({ id: userId, name: 'TestUser' });
+      const mockUser: User = { id: userId, name: 'TestUser', email: 'test@example.com', isAdmin: false };
+      userService.getUserById.mockResolvedValue(mockUser);
       microPostService.createMicroPost.mockRejectedValue(new Error('Database error'));
 
       await expect(microPostController.createMicroPost(userId, title)).rejects.toThrow(InternalServerErrorException);
