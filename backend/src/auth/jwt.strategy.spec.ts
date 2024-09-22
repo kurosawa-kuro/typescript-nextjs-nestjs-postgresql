@@ -6,8 +6,8 @@ import { ExtractJwt } from 'passport-jwt';
 jest.mock('passport-jwt', () => ({
   Strategy: jest.fn(),
   ExtractJwt: {
-    fromExtractors: jest.fn()
-  }
+    fromExtractors: jest.fn(),
+  },
 }));
 
 describe('JwtStrategy', () => {
@@ -49,12 +49,17 @@ describe('JwtStrategy', () => {
 
   describe('constructor', () => {
     it('should use the correct options', () => {
+      // モックが設定されたことを確認
       expect(ExtractJwt.fromExtractors).toHaveBeenCalled();
+
+      // Extractor 関数をテスト
       const extractorFn = (ExtractJwt.fromExtractors as jest.Mock).mock.calls[0][0][0];
-      
+
+      // JWT を含むリクエストをテスト
       const mockRequestWithJwt = { cookies: { jwt: 'test.jwt.token' } };
       expect(extractorFn(mockRequestWithJwt)).toBe('test.jwt.token');
 
+      // JWT を含まないリクエストをテスト
       const mockRequestWithoutJwt = { cookies: {} };
       expect(extractorFn(mockRequestWithoutJwt)).toBeUndefined();
     });
