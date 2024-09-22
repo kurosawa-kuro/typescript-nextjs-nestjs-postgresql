@@ -1,5 +1,56 @@
+# バックエンドのセットアップと実行手順
 
-.env
+## データベースのセットアップ
+
+データベースをリセットするには、以下のコマンドを実行します：
+
+```
+npm run resetDatabase
+```
+
+または
+
+```
+npx ts-node ./database/resetDatabase.ts
+```
+
+## アプリケーションの起動
+
+開発モードでアプリケーションを起動するには、以下のコマンドを使用します：
+
+```
+npm run start:dev
+```
+
+これは内部的に以下のコマンドを実行します：
+
+```
+$env:NODE_ENV='development'; nest start --watch
+```
+
+## テストの実行
+
+カバレッジレポート付きでテストを実行するには：
+
+```
+npm run test:cov
+```
+
+E2Eテストを実行するには：
+
+```
+npm run test:e2e
+```
+
+これは内部的に以下のコマンドを実行します：
+
+```
+$env:NODE_ENV='test'; npx jest --config ./test/jest-e2e.json --verbose --runInBand --detectOpenHandles
+```
+
+## 環境設定
+
+### 開発環境 (.env)
 
 ```
 DB_USER=postgres
@@ -9,7 +60,7 @@ DB_PASSWORD=postgres
 DB_PORT=5432
 ```
 
-.env.test
+### テスト環境 (.env.test)
 
 ```
 DB_USER=postgres
@@ -19,75 +70,4 @@ DB_PASSWORD=postgres
 DB_PORT=5432
 ```
 
-```
--- 1. まず、中間テーブルを削除
-DROP TABLE IF EXISTS micropost_category;
-
--- 2. 次に、外部キーを持つmicropostテーブルを削除
-DROP TABLE IF EXISTS micropost;
-
--- 3. categoryテーブルを削除（他のテーブルから参照されていない）
-DROP TABLE IF EXISTS category;
-
--- 4. 最後に、userテーブルを削除
-DROP TABLE IF EXISTS "user";
-```
-
-
-```
--- ユーザーテーブル
-CREATE TABLE "user" (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL
-);
-
--- マイクロポストテーブル
-CREATE TABLE micropost (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES "user"(id) ON DELETE CASCADE,
-  title VARCHAR(255) NOT NULL,
-  image_path VARCHAR(255)
-);
-
--- カテゴリーテーブル
-CREATE TABLE category (
-  id SERIAL PRIMARY KEY,
-  title VARCHAR(255) NOT NULL
-);
-
--- マイクロポストとカテゴリーの多対多の関係を表す中間テーブル
-CREATE TABLE micropost_category (
-  micropost_id INTEGER REFERENCES micropost(id) ON DELETE CASCADE,
-  category_id INTEGER REFERENCES category(id) ON DELETE CASCADE,
-  PRIMARY KEY (micropost_id, category_id)
-);
-```
-
-```
--- ユーザーシードデータ
-INSERT INTO public."user" (name) VALUES 
-  ('Alice'),
-  ('Bob'),
-  ('Charlie');
-
--- カテゴリーシードデータ
-INSERT INTO category (title) VALUES
-  ('Technology'),
-  ('Science'),
-  ('Art');
-
--- マイクロポストシードデータ
-INSERT INTO micropost (user_id, title) VALUES
-  (1, 'Alice''s first post'),
-  (1, 'Alice''s second post'),
-  (2, 'Bob''s post'),
-  (3, 'Charlie''s post');
-
--- マイクロポストとカテゴリーの多対多関係を作成するシードデータ
-INSERT INTO micropost_category (micropost_id, category_id) VALUES
-  (1, 1),
-  (1, 2),
-  (2, 3),
-  (3, 1),
-  (4, 3);
-```
+注意：テスト環境では、データベース名が `web_app_db_integration_test` に設定されています。これにより、テスト実行時に本番データベースに影響を与えることなくテストを行うことができます。

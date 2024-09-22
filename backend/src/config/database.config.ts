@@ -6,13 +6,19 @@ export class DatabaseConfig {
 
   static getPool(): Pool {
     if (!this.pool) {
-      // 環境変数の読み込み（環境に依存しない）
+      // 環境変数の読み込み
       dotenv.config();
       
+      const dbName = process.env.NODE_ENV === 'test' 
+        ? 'web_app_db_integration_test' 
+        : (process.env.DB_NAME || 'web_app_db_development');
+
+        // 今どの環境で動いているかを確認
+        console.log('process.env.NODE_ENV:', process.env.NODE_ENV);
       this.pool = new Pool({
         user: process.env.DB_USER,
         host: process.env.DB_HOST,
-        database: process.env.DB_NAME,
+        database: dbName,
         password: process.env.DB_PASSWORD,
         port: parseInt(process.env.DB_PORT, 10),
       });
