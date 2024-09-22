@@ -6,6 +6,8 @@ import { Pool } from 'pg';
 import { Logger } from '@nestjs/common';
 import { CreateUserDto, UserCreationData } from '../user/user.service';
 
+jest.mock('bcrypt');
+
 describe('AuthService', () => {
   let service: AuthService;
   let mockUserService: Partial<UserService>;
@@ -52,6 +54,9 @@ describe('AuthService', () => {
   });
 
   it('should register a user successfully', async () => {
+    const mockHashedPassword = 'hashedPassword123';
+    (bcrypt.hash as jest.Mock).mockResolvedValue(mockHashedPassword);
+
     expect(
       await service.register('John Doe', 'john@example.com', 'password123'),
     ).toBe(true);
@@ -59,7 +64,8 @@ describe('AuthService', () => {
       expect.objectContaining({
         name: 'John Doe',
         email: 'john@example.com',
-        password: 'password123',
+        passwordHash: mockHashedPassword,
+        isAdmin: false,
       })
     );
   });
@@ -78,6 +84,7 @@ describe('AuthService', () => {
   });
 
   it('should login successfully', async () => {
+    (bcrypt.compare as jest.Mock).mockResolvedValue(true);
     const loginResult = await service.login('test@example.com', 'password');
     expect(loginResult).toEqual({
       success: true,
@@ -90,9 +97,7 @@ describe('AuthService', () => {
   });
 
   it('should fail login if the password does not match', async () => {
-    jest
-      .spyOn(bcrypt, 'compare')
-      .mockImplementation(() => Promise.resolve(false));
+    (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
     const result = await service.login('test@example.com', 'wrongpassword');
 

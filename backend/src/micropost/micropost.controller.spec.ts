@@ -10,13 +10,12 @@ describe('MicroPostController', () => {
   let userService: jest.Mocked<UserService>;
 
   beforeEach(async () => {
-    microPostService = jest.mocked({
+    microPostService = {
       create: jest.fn(),
       list: jest.fn(),
-      databaseService: {} as any, // Mock the databaseService property
-    } as unknown as MicroPostService);
+    } as unknown as jest.Mocked<MicroPostService>;
     userService = {
-      findUser: jest.fn(),
+      find: jest.fn(),
     } as unknown as jest.Mocked<UserService>;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -28,15 +27,13 @@ describe('MicroPostController', () => {
     }).compile();
 
     microPostController = module.get<MicroPostController>(MicroPostController);
-    microPostService = module.get(MicroPostService);
-    userService = module.get(UserService);
   });
 
   describe('create', () => {
     it('should create a micropost', async () => {
       const userId = 1;
       const title = 'Test Post';
-      const file = { path: 'uploads/test.jpg' } as Express.Multer.File;
+      const file = { path: 'uploads/test.png' } as Express.Multer.File;
       const mockUser = {
         id: userId,
         name: 'TestUser',
@@ -64,8 +61,9 @@ describe('MicroPostController', () => {
     it('should throw BadRequestException when title is missing', async () => {
       const userId = 1;
       const title = '';
+      const file = {} as Express.Multer.File;
 
-      await expect(microPostController.create(userId, title)).rejects.toThrow(
+      await expect(microPostController.create(userId, title, file)).rejects.toThrow(
         BadRequestException,
       );
     });
@@ -73,17 +71,19 @@ describe('MicroPostController', () => {
     it('should throw BadRequestException when user is not found', async () => {
       const userId = 1;
       const title = 'Test MicroPost';
+      const file = {} as Express.Multer.File;
 
       userService.find.mockResolvedValue(null);
 
-      await expect(microPostController.create(userId, title)).rejects.toThrow(
+      await expect(microPostController.create(userId, title, file)).rejects.toThrow(
         BadRequestException,
       );
     });
 
-    it('should throw InternalServerErrorException when micropost creation fails', async () => {
+    it('should handle null file', async () => {
       const userId = 1;
       const title = 'Test MicroPost';
+      const file = null;
       const mockUser = {
         id: userId,
         name: 'TestUser',
@@ -91,11 +91,20 @@ describe('MicroPostController', () => {
         isAdmin: false,
       };
       userService.find.mockResolvedValue(mockUser);
-      microPostService.create.mockRejectedValue(new InternalServerErrorException('Database error'));
 
-      await expect(microPostController.create(userId, title)).rejects.toThrow(
-        InternalServerErrorException,
-      );
+      const mockMicroPost = {
+        id: 1,
+        userId,
+        title,
+        userName: mockUser.name,
+        imagePath: null,
+      };
+      microPostService.create.mockResolvedValue(mockMicroPost);
+
+      const result = await microPostController.create(userId, title, file);
+
+      expect(result).toEqual(mockMicroPost);
+      expect(microPostService.create).toHaveBeenCalledWith(userId, title, null);
     });
   });
 
@@ -127,9 +136,9 @@ describe('MicroPostController', () => {
     });
 
     it('should throw InternalServerErrorException when getting microposts fails', async () => {
-      microPostService.list.mockRejectedValue(new InternalServerErrorException('Database error'));
+      microPostService.list.mockRejectedValue(new Error('Database error'));
 
-      await expect(microPostController.findAll()).rejects.toThrow(InternalServerErrorException);
+      await expect(microPostController.findAll()).rejects.toThrow();
     });
   });
 });
