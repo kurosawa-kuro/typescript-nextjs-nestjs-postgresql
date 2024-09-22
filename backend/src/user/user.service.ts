@@ -1,5 +1,4 @@
 // src/user/user.service.ts
-
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { Pool } from 'pg';
 import { DatabaseService } from '../database/database.service';

@@ -1,14 +1,17 @@
+// test/micropost.e2e-spec.ts
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { DatabaseService } from '../src/database/database.service';
 import { UserService } from '../src/user/user.service';
+import { setupTestApp, clearDatabase, createTestUser } from './test-utils';
 
 describe('MicroPostController (e2e)', () => {
   let app: INestApplication;
   let databaseService: DatabaseService;
+  let userService: UserService;
 
   beforeAll(async () => {
-    ({ app, databaseService } = await setupTestApp());
+    ({ app, databaseService, userService } = await setupTestApp());
   });
 
   afterAll(async () => {
@@ -24,11 +27,9 @@ describe('MicroPostController (e2e)', () => {
 
     const response = await request(app.getHttpServer())
       .post('/microposts')
-      .send({
-        userId: user.id,
-        title: 'Test Micropost',
-        imagePath: 'uploads/test.jpg'
-      })
+      .field('userId', user.id.toString())
+      .field('title', 'Test Micropost')
+      .attach('image', 'test/testimage.jpg')
       .expect(201);
 
     expect(response.body).toEqual(
@@ -36,20 +37,20 @@ describe('MicroPostController (e2e)', () => {
         id: expect.any(Number),
         userId: user.id,
         title: 'Test Micropost',
-        imagePath: 'uploads/test.jpg',
+        imagePath: expect.stringContaining('uploads/'),
         userName: 'Test User',
       }),
     );
   });
 
   it('should retrieve all microposts (GET /microposts)', async () => {
-    const user = await createTestUser(databaseService, 'Test User', 'test@example.com', 'password123');
+    const user = await createTestUser(userService, 'Test User', 'test@example.com', 'password123');
     await databaseService.executeQuery(
-      'INSERT INTO microposts (user_id, title, image_path) VALUES ($1, $2, $3)',
+      'INSERT INTO micropost (user_id, title, image_path) VALUES ($1, $2, $3)',
       [user.id, 'Test Micropost 1', 'uploads/image1.jpg']
     );
     await databaseService.executeQuery(
-      'INSERT INTO microposts (user_id, title, image_path) VALUES ($1, $2, $3)',
+      'INSERT INTO micropost (user_id, title, image_path) VALUES ($1, $2, $3)',
       [user.id, 'Test Micropost 2', 'uploads/image2.jpg']
     );
 
