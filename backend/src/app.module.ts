@@ -3,7 +3,7 @@ import { Pool } from 'pg';
 import { UserService } from './user.service';
 import { MicroPostService } from './micropost.service';
 import { CategoryService } from './category.service';
-import { MicropostCategoryService } from './micropost-category.service';  // 追加
+import { MicropostCategoryService } from './micropost-category.service';
 import { UserController } from './user.controller';
 import { MicroPostController } from './micropost.controller';
 import { CategoryController } from './category.controller';
@@ -29,7 +29,7 @@ dotenv.config({ path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env' });
     UserService,
     MicroPostService,
     CategoryService,
-    MicropostCategoryService,  // 追加
+    MicropostCategoryService,
   ],
   controllers: [
     UserController, 

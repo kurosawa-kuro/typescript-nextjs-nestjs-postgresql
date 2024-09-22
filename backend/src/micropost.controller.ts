@@ -1,7 +1,18 @@
-import { Controller, Get, Post, Body, Param, InternalServerErrorException, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, InternalServerErrorException, Logger, NotFoundException, BadRequestException, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { MicroPost, MicroPostService } from './micropost.service';
 import { UserService } from './user.service';
 import { MicropostCategoryService } from './micropost-category.service';
+import * as multer from 'multer';
+import * as path from 'path';
+
+const storage = multer.diskStorage({
+  destination: './uploads',
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
 
 @Controller('microposts')
 export class MicroPostController {
@@ -14,16 +25,19 @@ export class MicroPostController {
   ) {}
 
   @Post()
+  @UseInterceptors(FileInterceptor('image', { storage: storage }))
   async createMicroPost(
     @Body('userId') userId: number,
     @Body('title') title: string,
+    @UploadedFile() file?: Express.Multer.File
   ) {
     try {
       const user = await this.userService.getUserById(userId);
       if (!user) {
         throw new NotFoundException(`User with id ${userId} not found`);
       }
-      const micropost = await this.microPostService.createMicroPost(userId, title);
+      const imagePath = file ? file.path : null;
+      const micropost = await this.microPostService.createMicroPost(userId, title, imagePath);
       return { message: 'MicroPost created', micropost };
     } catch (error) {
       this.logger.error(`Failed to create micropost: ${error.message}`, error.stack);
@@ -45,7 +59,8 @@ export class MicroPostController {
         id: post.id,
         userId: post.userId,
         title: post.title,
-        userName: post.userName
+        userName: post.userName,
+        imagePath: post.imagePath
       }));
     } catch (error) {
       this.logger.error(`Failed to get microposts: ${error.message}`, error.stack);

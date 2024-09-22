@@ -32,7 +32,8 @@ CREATE TABLE "user" (
 CREATE TABLE micropost (
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES "user"(id) ON DELETE CASCADE,
-  title VARCHAR(255) NOT NULL
+  title VARCHAR(255) NOT NULL,
+  image_path VARCHAR(255)
 );
 
 -- カテゴリーテーブル
