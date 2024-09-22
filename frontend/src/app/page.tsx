@@ -136,7 +136,7 @@ const MicropostList = ({ microposts }: { microposts: Micropost[] }) => (
   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
     {microposts.map((post) => (
       <div key={post.id} className="bg-white shadow-lg rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-        {post.imagePath && (
+        {post.imagePath && post.imagePath.trim() !== "" && (
           <img src={`http://localhost:3001/${post.imagePath}`} alt={post.title} className="w-full h-48 object-cover" />
         )}
         <div className="p-6">
