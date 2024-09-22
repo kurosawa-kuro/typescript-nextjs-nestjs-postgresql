@@ -31,13 +31,13 @@ export class UserController {
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async show(@Param('id', ParseIntPipe) id: number) {
     const user = await this.userService.find(id);
     return user ? user : { message: 'User not found' };
   }
 
   @Get()
-  async findAll() {
+  async index() {
     return await this.userService.index();
   }
 }

@@ -48,7 +48,7 @@ export class MicroPostController {
   }
 
   @Get()
-  async findAll(): Promise<MicroPost[]> {
+  async index(): Promise<MicroPost[]> {
     const microposts = await this.microPostService.list();
     return microposts;
   }

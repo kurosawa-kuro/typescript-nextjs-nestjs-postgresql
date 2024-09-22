@@ -108,7 +108,7 @@ describe('MicroPostController', () => {
     });
   });
 
-  describe('findAll', () => {
+  describe('index', () => {
     it('should return an array of microposts', async () => {
       const mockMicroposts = [
         {
@@ -129,7 +129,7 @@ describe('MicroPostController', () => {
 
       microPostService.list.mockResolvedValue(mockMicroposts);
 
-      const result = await microPostController.findAll();
+      const result = await microPostController.index();
 
       expect(result).toEqual(mockMicroposts);
       expect(microPostService.list).toHaveBeenCalled();
@@ -138,7 +138,7 @@ describe('MicroPostController', () => {
     it('should throw InternalServerErrorException when getting microposts fails', async () => {
       microPostService.list.mockRejectedValue(new Error('Database error'));
 
-      await expect(microPostController.findAll()).rejects.toThrow();
+      await expect(microPostController.index()).rejects.toThrow();
     });
   });
 });

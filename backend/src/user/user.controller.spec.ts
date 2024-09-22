@@ -80,9 +80,9 @@ describe('UserController', () => {
         });
     });
 
-    describe('findAll', () => {
+    describe('index', () => {
         it('should return an array of users', async () => {
-            const result = await userController.findAll();
+            const result = await userController.index();
             expect(result).toEqual([
                 { id: 1, name: 'John Doe', email: 'john@example.com', isAdmin: false },
             ]);
@@ -90,7 +90,7 @@ describe('UserController', () => {
         });
     });
 
-    describe('findOne', () => {
+    describe('show', () => {
         it('should return a user by id', async () => {
             const mockUser = {
                 id: 1,
@@ -100,14 +100,14 @@ describe('UserController', () => {
             };
             mockUserService.find.mockResolvedValue(mockUser);
 
-            const result = await userController.findOne(1);
+            const result = await userController.show(1);
             expect(userService.find).toHaveBeenCalledWith(1);
             expect(result).toEqual(mockUser);
         });
 
         it('should return not found message when user does not exist', async () => {
             mockUserService.find.mockResolvedValue(null);
-            const result = await userController.findOne(1);
+            const result = await userController.show(1);
             expect(result).toEqual({ message: 'User not found' });
         });
     });
