@@ -35,7 +35,7 @@ describe('MicroPostController (e2e)', () => {
   });
 
   it('should create a micropost (POST /microposts)', async () => {
-    const user = await userService.createUser('Test User');
+    const user = await userService.createUser('Test User', 'test@example.com', 'password123');
 
     const response = await request(app.getHttpServer())
       .post('/microposts')
@@ -51,8 +51,8 @@ describe('MicroPostController (e2e)', () => {
   });
 
   it('should retrieve all microposts (GET /microposts)', async () => {
-    const user = await userService.createUser('Another Test User');
-    await micropostService.createMicroPost(user.id, 'Test micropost');
+    const user = await userService.createUser('Another Test User', 'another@example.com', 'password123');
+    await micropostService.createMicroPost(user.id, 'Test micropost', null);
 
     const response = await request(app.getHttpServer())
       .get('/microposts')
@@ -69,7 +69,7 @@ describe('MicroPostController (e2e)', () => {
   });
 
   it('should create a micropost with correct user name (POST /microposts)', async () => {
-    const user = await userService.createUser('John Doe');
+    const user = await userService.createUser('John Doe', 'john@example.com', 'password123');
 
     const response = await request(app.getHttpServer())
       .post('/microposts')
@@ -80,10 +80,10 @@ describe('MicroPostController (e2e)', () => {
   });
 
   it('should retrieve microposts with user names (GET /microposts)', async () => {
-    const user1 = await userService.createUser('Alice');
-    const user2 = await userService.createUser('Bob');
-    await micropostService.createMicroPost(user1.id, 'Alice\'s post');
-    await micropostService.createMicroPost(user2.id, 'Bob\'s post');
+    const user1 = await userService.createUser('Alice', 'alice@example.com', 'password123');
+    const user2 = await userService.createUser('Bob', 'bob@example.com', 'password123');
+    await micropostService.createMicroPost(user1.id, 'Alice\'s post', null);
+    await micropostService.createMicroPost(user2.id, 'Bob\'s post', null);
 
     const response = await request(app.getHttpServer())
       .get('/microposts')
