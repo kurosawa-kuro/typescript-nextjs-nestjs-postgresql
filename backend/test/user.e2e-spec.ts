@@ -30,7 +30,7 @@ describe('UserController (e2e)', () => {
         password: 'password123',
       })
       .expect(201);
-
+  
     expect(response.body).toEqual(
       expect.objectContaining({
         message: 'User created',
@@ -43,6 +43,7 @@ describe('UserController (e2e)', () => {
       }),
     );
   });
+  
 
   it('should retrieve all users (GET /users)', async () => {
     await createTestUser(

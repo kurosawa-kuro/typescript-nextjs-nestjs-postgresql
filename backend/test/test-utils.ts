@@ -1,11 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
-import { UserCreationData, UserService } from '../src/user/user.service';
+import { UserService } from '../src/user/user.service';
 import { MicroPostService } from '../src/micropost/micropost.service';
 import { CategoryService } from '../src/category/category.service';
 import { DatabaseService } from '../src/database/database.service';
 import { MicropostCategoryService } from '../src/micropost-category/micropost-category.service';
+import * as bcrypt from 'bcrypt';
 
+// Function to setup the test application
 export async function setupTestApp() {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
@@ -30,15 +32,15 @@ export async function setupTestApp() {
   };
 }
 
+// Function to clear the database
 export async function clearDatabase(databaseService: DatabaseService) {
-  await this.executeQuery('DELETE FROM "micropost_category"');
-  await this.executeQuery('DELETE FROM "category"');
-  await this.executeQuery('DELETE FROM "micropost"');
-  await this.executeQuery('DELETE FROM "user"');
+  await databaseService.executeQuery('DELETE FROM "micropost_category"');
+  await databaseService.executeQuery('DELETE FROM "category"');
+  await databaseService.executeQuery('DELETE FROM "micropost"');
+  await databaseService.executeQuery('DELETE FROM "user"');
 }
 
-import * as bcrypt from 'bcrypt';
-
+// Function to create a test user
 export async function createTestUser(
   userService: UserService,
   name: string,
@@ -46,7 +48,7 @@ export async function createTestUser(
   password: string,
 ) {
   const passwordHash = await bcrypt.hash(password, 10);
-  const userCreationData: UserCreationData = {
+  const userCreationData = {
     name, email, passwordHash, isAdmin: false,
     password: function (password: any): unknown {
       throw new Error('Function not implemented.');
@@ -55,17 +57,4 @@ export async function createTestUser(
   return await userService.create(userCreationData);
 }
 
-export async function createTestMicropost(
-  micropostService: MicroPostService,
-  userId: number,
-  title: string,
-) {
-  return await micropostService.create(userId, title, null);
-}
-
-export async function createTestCategory(
-  categoryService: CategoryService,
-  title: string,
-) {
-  return await categoryService.create(title);
-}
+// Additional utility functions can also be included here if necessary

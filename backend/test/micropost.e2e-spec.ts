@@ -1,18 +1,15 @@
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { UserService } from '../src/user/user.service';
-import { MicroPostService } from '../src/micropost/micropost.service';
 import { DatabaseService } from '../src/database/database.service';
 import { setupTestApp, clearDatabase, createTestUser } from './test-utils';
+import { UserService } from '../src/user/user.service';
 
 describe('MicroPostController (e2e)', () => {
   let app: INestApplication;
-  let userService: UserService;
-  let micropostService: MicroPostService;
   let databaseService: DatabaseService;
 
   beforeAll(async () => {
-    ({ app, userService, micropostService, databaseService } = await setupTestApp());
+    ({ app, databaseService } = await setupTestApp());
   });
 
   afterAll(async () => {
@@ -31,6 +28,7 @@ describe('MicroPostController (e2e)', () => {
       .send({
         userId: user.id,
         title: 'Test Micropost',
+        imagePath: 'uploads/test.jpg'
       })
       .expect(201);
 
@@ -39,16 +37,22 @@ describe('MicroPostController (e2e)', () => {
         id: expect.any(Number),
         userId: user.id,
         title: 'Test Micropost',
-        imagePath: null,
+        imagePath: 'uploads/test.jpg',
         userName: 'Test User',
       }),
     );
   });
 
   it('should retrieve all microposts (GET /microposts)', async () => {
-    const user = await createTestUser(userService, 'Test User', 'test@example.com', 'password123');
-    await micropostService.create(user.id, 'Test Micropost 1', null);
-    await micropostService.create(user.id, 'Test Micropost 2', null);
+    const user = await createTestUser(databaseService, 'Test User', 'test@example.com', 'password123');
+    await databaseService.executeQuery(
+      'INSERT INTO microposts (user_id, title, image_path) VALUES ($1, $2, $3)',
+      [user.id, 'Test Micropost 1', 'uploads/image1.jpg']
+    );
+    await databaseService.executeQuery(
+      'INSERT INTO microposts (user_id, title, image_path) VALUES ($1, $2, $3)',
+      [user.id, 'Test Micropost 2', 'uploads/image2.jpg']
+    );
 
     const response = await request(app.getHttpServer())
       .get('/microposts')
@@ -60,14 +64,14 @@ describe('MicroPostController (e2e)', () => {
           id: expect.any(Number),
           userId: user.id,
           title: 'Test Micropost 1',
-          imagePath: null,
+          imagePath: 'uploads/image1.jpg',
           userName: 'Test User',
         }),
         expect.objectContaining({
           id: expect.any(Number),
           userId: user.id,
           title: 'Test Micropost 2',
-          imagePath: null,
+          imagePath: 'uploads/image2.jpg',
           userName: 'Test User',
         }),
       ]),
