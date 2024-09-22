@@ -6,11 +6,11 @@ import { DatabaseModule } from '../database/database.module';
 
 @Module({
   imports: [
-    UserModule,      // Import UserModule to use UserService
-    DatabaseModule   // Import DatabaseModule for database connection
+    UserModule, // Import UserModule to use UserService
+    DatabaseModule, // Import DatabaseModule for database connection
   ],
   providers: [AuthService],
   controllers: [AuthController],
-  exports: [AuthService]  // Optionally export AuthService if it's going to be used elsewhere
+  exports: [AuthService], // Optionally export AuthService if it's going to be used elsewhere
 })
 export class AuthModule {}

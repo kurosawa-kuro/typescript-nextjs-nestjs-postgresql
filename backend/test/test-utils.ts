@@ -15,14 +15,23 @@ export async function setupTestApp() {
   await app.init();
 
   const userService = moduleFixture.get<UserService>(UserService);
-  const micropostService = moduleFixture.get<MicroPostService>(MicroPostService);
+  const micropostService =
+    moduleFixture.get<MicroPostService>(MicroPostService);
   const categoryService = moduleFixture.get<CategoryService>(CategoryService);
-  const micropostCategoryService = moduleFixture.get<MicropostCategoryService>(MicropostCategoryService);
+  const micropostCategoryService = moduleFixture.get<MicropostCategoryService>(
+    MicropostCategoryService,
+  );
   const pool = moduleFixture.get('DATABASE_POOL'); // Update to use 'DATABASE_POOL'
 
-  return { app, userService, micropostService, categoryService, micropostCategoryService, pool };
+  return {
+    app,
+    userService,
+    micropostService,
+    categoryService,
+    micropostCategoryService,
+    pool,
+  };
 }
-
 
 export async function clearDatabase(pool: Pool) {
   await pool.query('DELETE FROM "micropost_category"');
@@ -31,14 +40,26 @@ export async function clearDatabase(pool: Pool) {
   await pool.query('DELETE FROM "user"');
 }
 
-export async function createTestUser(userService: UserService, name: string, email: string, password: string) {
+export async function createTestUser(
+  userService: UserService,
+  name: string,
+  email: string,
+  password: string,
+) {
   return await userService.create(name, email, password);
 }
 
-export async function createTestMicropost(micropostService: MicroPostService, userId: number, title: string) {
+export async function createTestMicropost(
+  micropostService: MicroPostService,
+  userId: number,
+  title: string,
+) {
   return await micropostService.create(userId, title, null);
 }
 
-export async function createTestCategory(categoryService: CategoryService, title: string) {
+export async function createTestCategory(
+  categoryService: CategoryService,
+  title: string,
+) {
   return await categoryService.create(title);
 }

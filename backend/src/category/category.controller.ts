@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { MicropostCategoryService } from '../micropost-category/micropost-category.service';
 
@@ -8,7 +16,7 @@ export class CategoryController {
 
   constructor(
     private readonly categoryService: CategoryService,
-    private readonly micropostCategoryService: MicropostCategoryService
+    private readonly micropostCategoryService: MicropostCategoryService,
   ) {}
 
   @Post()
@@ -17,7 +25,10 @@ export class CategoryController {
       await this.categoryService.create(title);
       return { message: 'Category created' };
     } catch (error) {
-      this.logger.error(`Failed to create category: ${error.message}`, error.stack);
+      this.logger.error(
+        `Failed to create category: ${error.message}`,
+        error.stack,
+      );
       throw new InternalServerErrorException('Failed to create category');
     }
   }
@@ -28,7 +39,10 @@ export class CategoryController {
       const categories = await this.categoryService.index();
       return categories;
     } catch (error) {
-      this.logger.error(`Failed to get categories: ${error.message}`, error.stack);
+      this.logger.error(
+        `Failed to get categories: ${error.message}`,
+        error.stack,
+      );
       throw new InternalServerErrorException('Failed to get categories');
     }
   }
@@ -37,11 +51,17 @@ export class CategoryController {
   async microposts(@Param('id') id: string) {
     try {
       const categoryId = parseInt(id, 10);
-      const microposts = await this.micropostCategoryService.microposts(categoryId);
+      const microposts =
+        await this.micropostCategoryService.microposts(categoryId);
       return microposts;
     } catch (error) {
-      this.logger.error(`Failed to get microposts for category: ${error.message}`, error.stack);
-      throw new InternalServerErrorException('Failed to get microposts for category');
+      this.logger.error(
+        `Failed to get microposts for category: ${error.message}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException(
+        'Failed to get microposts for category',
+      );
     }
   }
 }

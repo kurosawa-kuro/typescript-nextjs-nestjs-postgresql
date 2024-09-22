@@ -11,11 +11,13 @@ export interface MicroPost {
 
 @Injectable()
 export class MicroPostService {
-  constructor(
-    @Inject('DATABASE_POOL') private readonly pool: Pool,
-  ) {}
+  constructor(@Inject('DATABASE_POOL') private readonly pool: Pool) {}
 
-  async create(userId: number, title: string, imagePath: string | null): Promise<MicroPost> {
+  async create(
+    userId: number,
+    title: string,
+    imagePath: string | null,
+  ): Promise<MicroPost> {
     const client = await this.pool.connect();
     try {
       await client.query('BEGIN');

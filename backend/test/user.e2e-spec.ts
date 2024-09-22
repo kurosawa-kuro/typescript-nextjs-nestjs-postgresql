@@ -25,21 +25,32 @@ describe('UserController (e2e)', () => {
   it('should create a user (POST /users)', async () => {
     const response = await request(app.getHttpServer())
       .post('/users')
-      .send({ name: 'John Doe', email: 'john@example.com', password: 'password123' })
-      .expect(201);
-
-    expect(response.body).toEqual(expect.objectContaining({
-      message: 'User created',
-      user: expect.objectContaining({
+      .send({
         name: 'John Doe',
         email: 'john@example.com',
-        isAdmin: false
+        password: 'password123',
       })
-    }));
+      .expect(201);
+
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        message: 'User created',
+        user: expect.objectContaining({
+          name: 'John Doe',
+          email: 'john@example.com',
+          isAdmin: false,
+        }),
+      }),
+    );
   });
 
   it('should retrieve all users (GET /users)', async () => {
-    await createTestUser(userService, 'John Doe', 'john@example.com', 'password123');
+    await createTestUser(
+      userService,
+      'John Doe',
+      'john@example.com',
+      'password123',
+    );
 
     const response = await request(app.getHttpServer())
       .get('/users')
@@ -47,10 +58,12 @@ describe('UserController (e2e)', () => {
 
     expect(response.body).toEqual(expect.any(Array));
     expect(response.body.length).toBeGreaterThan(0);
-    expect(response.body[0]).toEqual(expect.objectContaining({
-      name: 'John Doe',
-      email: 'john@example.com',
-      isAdmin: false
-    }));
+    expect(response.body[0]).toEqual(
+      expect.objectContaining({
+        name: 'John Doe',
+        email: 'john@example.com',
+        isAdmin: false,
+      }),
+    );
   });
 });

@@ -44,7 +44,7 @@ describe('UserService', () => {
       expect(result).toEqual(mockUser);
       expect(mockPool.query).toHaveBeenCalledWith(
         'INSERT INTO "user"(name, email, password_hash, is_admin) VALUES($1, $2, $3, $4) RETURNING id, name, email, is_admin as "isAdmin"',
-        [name, email, 'hashedPassword', isAdmin]
+        [name, email, 'hashedPassword', isAdmin],
       );
     });
 
@@ -55,16 +55,25 @@ describe('UserService', () => {
       const isAdmin = false;
 
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
-      (mockPool.query as jest.Mock).mockRejectedValue(new Error('Creation failed'));
+      (mockPool.query as jest.Mock).mockRejectedValue(
+        new Error('Creation failed'),
+      );
 
-      await expect(userService.create(name, email, password, isAdmin)).rejects.toThrow('Creation failed');
+      await expect(
+        userService.create(name, email, password, isAdmin),
+      ).rejects.toThrow('Creation failed');
     });
   });
 
   describe('find', () => {
     it('should return a user when found', async () => {
       const userId = 1;
-      const mockUser: User = { id: userId, name: 'John Doe', email: 'john@example.com', isAdmin: false };
+      const mockUser: User = {
+        id: userId,
+        name: 'John Doe',
+        email: 'john@example.com',
+        isAdmin: false,
+      };
 
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: [mockUser] });
 
@@ -73,7 +82,7 @@ describe('UserService', () => {
       expect(result).toEqual(mockUser);
       expect(mockPool.query).toHaveBeenCalledWith(
         'SELECT id, name, email, is_admin as "isAdmin" FROM "user" WHERE id = $1',
-        [userId]
+        [userId],
       );
     });
 
@@ -90,7 +99,9 @@ describe('UserService', () => {
     it('should throw an error if query fails', async () => {
       const userId = 1;
 
-      (mockPool.query as jest.Mock).mockRejectedValue(new Error('Query failed'));
+      (mockPool.query as jest.Mock).mockRejectedValue(
+        new Error('Query failed'),
+      );
 
       await expect(userService.find(userId)).rejects.toThrow('Query failed');
     });
@@ -108,7 +119,9 @@ describe('UserService', () => {
       const result = await userService.index();
 
       expect(result).toEqual(mockUsers);
-      expect(mockPool.query).toHaveBeenCalledWith('SELECT id, name, email, is_admin as "isAdmin" FROM "user"');
+      expect(mockPool.query).toHaveBeenCalledWith(
+        'SELECT id, name, email, is_admin as "isAdmin" FROM "user"',
+      );
     });
 
     it('should return an empty array if no users exist', async () => {
@@ -120,7 +133,9 @@ describe('UserService', () => {
     });
 
     it('should throw an error if query fails', async () => {
-      (mockPool.query as jest.Mock).mockRejectedValue(new Error('Query failed'));
+      (mockPool.query as jest.Mock).mockRejectedValue(
+        new Error('Query failed'),
+      );
 
       await expect(userService.index()).rejects.toThrow('Query failed');
     });

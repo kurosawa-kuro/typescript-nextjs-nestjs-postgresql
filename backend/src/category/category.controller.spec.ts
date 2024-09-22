@@ -49,7 +49,9 @@ describe('CategoryController', () => {
       const title = 'Technology';
       categoryService.create.mockRejectedValue(new Error('Database error'));
 
-      await expect(categoryController.create(title)).rejects.toThrow(InternalServerErrorException);
+      await expect(categoryController.create(title)).rejects.toThrow(
+        InternalServerErrorException,
+      );
     });
   });
 
@@ -66,14 +68,18 @@ describe('CategoryController', () => {
     it('should throw InternalServerErrorException when index fails', async () => {
       categoryService.index.mockRejectedValue(new Error('Database error'));
 
-      await expect(categoryController.index()).rejects.toThrow(InternalServerErrorException);
+      await expect(categoryController.index()).rejects.toThrow(
+        InternalServerErrorException,
+      );
     });
   });
 
   describe('microposts', () => {
     it('should return microposts for a given category', async () => {
       const categoryId = '1';
-      const mockMicroposts = [{ id: 1, title: 'Micropost 1', user_id: 1, user_name: 'User 1' }];
+      const mockMicroposts = [
+        { id: 1, title: 'Micropost 1', user_id: 1, user_name: 'User 1' },
+      ];
       micropostCategoryService.microposts.mockResolvedValue(mockMicroposts);
 
       const result = await categoryController.microposts(categoryId);
@@ -84,9 +90,13 @@ describe('CategoryController', () => {
 
     it('should throw InternalServerErrorException when microposts fails', async () => {
       const categoryId = '1';
-      micropostCategoryService.microposts.mockRejectedValue(new Error('Database error'));
+      micropostCategoryService.microposts.mockRejectedValue(
+        new Error('Database error'),
+      );
 
-      await expect(categoryController.microposts(categoryId)).rejects.toThrow(InternalServerErrorException);
+      await expect(categoryController.microposts(categoryId)).rejects.toThrow(
+        InternalServerErrorException,
+      );
     });
   });
 });

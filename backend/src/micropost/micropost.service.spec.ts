@@ -37,7 +37,13 @@ describe('MicroPostService', () => {
       const title = 'Test MicroPost';
       const imagePath = 'path/to/image.jpg';
       const userName = 'TestUser';
-      const mockMicroPost: MicroPost = { id: 1, userId, title, userName, imagePath };
+      const mockMicroPost: MicroPost = {
+        id: 1,
+        userId,
+        title,
+        userName,
+        imagePath,
+      };
 
       (mockClient.query as jest.Mock).mockImplementation((query) => {
         if (query === 'BEGIN' || query === 'COMMIT') {
@@ -52,8 +58,10 @@ describe('MicroPostService', () => {
       expect(mockPool.connect).toHaveBeenCalled();
       expect(mockClient.query).toHaveBeenCalledWith('BEGIN');
       expect(mockClient.query).toHaveBeenCalledWith(
-        expect.stringContaining('INSERT INTO micropost(user_id, title, image_path)'),
-        [userId, title, imagePath]
+        expect.stringContaining(
+          'INSERT INTO micropost(user_id, title, image_path)',
+        ),
+        [userId, title, imagePath],
       );
       expect(mockClient.query).toHaveBeenCalledWith('COMMIT');
       expect(mockClient.release).toHaveBeenCalled();
@@ -74,7 +82,9 @@ describe('MicroPostService', () => {
         return Promise.reject(new Error('Insertion failed'));
       });
 
-      await expect(microPostService.create(userId, title, imagePath)).rejects.toThrow('Insertion failed');
+      await expect(
+        microPostService.create(userId, title, imagePath),
+      ).rejects.toThrow('Insertion failed');
 
       expect(mockPool.connect).toHaveBeenCalled();
       expect(mockClient.query).toHaveBeenCalledWith('BEGIN');
@@ -86,8 +96,20 @@ describe('MicroPostService', () => {
   describe('index', () => {
     it('should return all microposts', async () => {
       const mockMicroPosts: MicroPost[] = [
-        { id: 1, userId: 1, title: 'MicroPost 1', userName: 'User1', imagePath: 'path/to/image1.jpg' },
-        { id: 2, userId: 2, title: 'MicroPost 2', userName: 'User2', imagePath: null },
+        {
+          id: 1,
+          userId: 1,
+          title: 'MicroPost 1',
+          userName: 'User1',
+          imagePath: 'path/to/image1.jpg',
+        },
+        {
+          id: 2,
+          userId: 2,
+          title: 'MicroPost 2',
+          userName: 'User2',
+          imagePath: null,
+        },
       ];
 
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: mockMicroPosts });
@@ -96,7 +118,9 @@ describe('MicroPostService', () => {
 
       expect(result).toEqual(mockMicroPosts);
       expect(mockPool.query).toHaveBeenCalledWith(
-        expect.stringContaining('SELECT m.id, m.user_id as "userId", m.title, m.image_path as "imagePath", u.name as "userName"')
+        expect.stringContaining(
+          'SELECT m.id, m.user_id as "userId", m.title, m.image_path as "imagePath", u.name as "userName"',
+        ),
       );
     });
 
@@ -109,7 +133,9 @@ describe('MicroPostService', () => {
     });
 
     it('should throw an error if query fails', async () => {
-      (mockPool.query as jest.Mock).mockRejectedValue(new Error('Query failed'));
+      (mockPool.query as jest.Mock).mockRejectedValue(
+        new Error('Query failed'),
+      );
 
       await expect(microPostService.index()).rejects.toThrow('Query failed');
     });

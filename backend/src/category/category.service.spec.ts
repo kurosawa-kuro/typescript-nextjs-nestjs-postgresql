@@ -36,15 +36,19 @@ describe('CategoryService', () => {
 
       expect(mockPool.query).toHaveBeenCalledWith(
         'INSERT INTO category(title) VALUES($1)',
-        [title]
+        [title],
       );
     });
 
     it('should throw an error if insertion fails', async () => {
       const title = 'Failed Category';
-      (mockPool.query as jest.Mock).mockRejectedValue(new Error('Insertion failed'));
+      (mockPool.query as jest.Mock).mockRejectedValue(
+        new Error('Insertion failed'),
+      );
 
-      await expect(categoryService.create(title)).rejects.toThrow('Insertion failed');
+      await expect(categoryService.create(title)).rejects.toThrow(
+        'Insertion failed',
+      );
     });
   });
 
@@ -71,7 +75,9 @@ describe('CategoryService', () => {
     });
 
     it('should throw an error if query fails', async () => {
-      (mockPool.query as jest.Mock).mockRejectedValue(new Error('Query failed'));
+      (mockPool.query as jest.Mock).mockRejectedValue(
+        new Error('Query failed'),
+      );
 
       await expect(categoryService.index()).rejects.toThrow('Query failed');
     });

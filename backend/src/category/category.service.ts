@@ -3,9 +3,7 @@ import { Pool } from 'pg';
 
 @Injectable()
 export class CategoryService {
-  constructor(
-    @Inject('DATABASE_POOL') private readonly pool: Pool,
-  ) {}
+  constructor(@Inject('DATABASE_POOL') private readonly pool: Pool) {}
 
   async create(title: string): Promise<void> {
     const query = 'INSERT INTO category(title) VALUES($1)';

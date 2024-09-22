@@ -13,19 +13,29 @@ export interface User {
 export class UserService {
   private readonly logger = new Logger(UserService.name);
 
-  constructor(
-    @Inject('DATABASE_POOL') private readonly pool: Pool,
-  ) {}
+  constructor(@Inject('DATABASE_POOL') private readonly pool: Pool) {}
 
-  async create(name: string, email: string, password: string, isAdmin: boolean = false): Promise<User> {
+  async create(
+    name: string,
+    email: string,
+    password: string,
+    isAdmin: boolean = false,
+  ): Promise<User> {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const query = 'INSERT INTO "user"(name, email, password_hash, is_admin) VALUES($1, $2, $3, $4) RETURNING id, name, email, is_admin as "isAdmin"';
-    const result = await this.pool.query(query, [name, email, hashedPassword, isAdmin]);
+    const query =
+      'INSERT INTO "user"(name, email, password_hash, is_admin) VALUES($1, $2, $3, $4) RETURNING id, name, email, is_admin as "isAdmin"';
+    const result = await this.pool.query(query, [
+      name,
+      email,
+      hashedPassword,
+      isAdmin,
+    ]);
     return result.rows[0];
   }
 
   async find(id: number): Promise<User | null> {
-    const query = 'SELECT id, name, email, is_admin as "isAdmin" FROM "user" WHERE id = $1';
+    const query =
+      'SELECT id, name, email, is_admin as "isAdmin" FROM "user" WHERE id = $1';
     const result = await this.pool.query(query, [id]);
     return result.rows[0] || null;
   }
@@ -37,6 +47,4 @@ export class UserService {
     this.logger.debug(`Retrieved ${result.rows.length} users from database`);
     return result.rows;
   }
-
-
 }

@@ -3,7 +3,10 @@ import { MicroPostController } from './micropost.controller';
 import { MicroPostService, MicroPost } from './micropost.service';
 import { UserService, User } from '../user/user.service';
 import { MicropostCategoryService } from '../micropost-category/micropost-category.service';
-import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Logger } from '@nestjs/common';
 
 describe('MicroPostController', () => {
@@ -34,7 +37,10 @@ describe('MicroPostController', () => {
       providers: [
         { provide: MicroPostService, useValue: mockMicroPostService },
         { provide: UserService, useValue: mockUserService },
-        { provide: MicropostCategoryService, useValue: mockMicropostCategoryService },
+        {
+          provide: MicropostCategoryService,
+          useValue: mockMicropostCategoryService,
+        },
         { provide: Logger, useValue: mockLogger },
       ],
     }).compile();
@@ -51,20 +57,35 @@ describe('MicroPostController', () => {
       const title = 'Test Post';
       const file = { path: 'uploads/test.jpg' } as Express.Multer.File;
 
-      const mockUser: User = { id: userId, name: 'TestUser', email: 'test@example.com', isAdmin: false };
+      const mockUser: User = {
+        id: userId,
+        name: 'TestUser',
+        email: 'test@example.com',
+        isAdmin: false,
+      };
       userService.find.mockResolvedValue(mockUser);
 
-      const mockMicroPost: MicroPost = { id: 1, userId, title, userName: mockUser.name, imagePath: file.path };
+      const mockMicroPost: MicroPost = {
+        id: 1,
+        userId,
+        title,
+        userName: mockUser.name,
+        imagePath: file.path,
+      };
       microPostService.create.mockResolvedValue(mockMicroPost);
 
       const result = await microPostController.create(userId, title, file);
 
       expect(result).toEqual({
         message: 'MicroPost created',
-        micropost: mockMicroPost
+        micropost: mockMicroPost,
       });
       expect(userService.find).toHaveBeenCalledWith(userId);
-      expect(microPostService.create).toHaveBeenCalledWith(userId, title, file.path);
+      expect(microPostService.create).toHaveBeenCalledWith(
+        userId,
+        title,
+        file.path,
+      );
     });
 
     it('should throw NotFoundException when user is not found', async () => {
@@ -73,7 +94,9 @@ describe('MicroPostController', () => {
 
       userService.find.mockResolvedValue(null);
 
-      await expect(microPostController.create(userId, title)).rejects.toThrow(NotFoundException);
+      await expect(microPostController.create(userId, title)).rejects.toThrow(
+        NotFoundException,
+      );
       expect(mockLogger.error).not.toHaveBeenCalled();
     });
 
@@ -81,19 +104,38 @@ describe('MicroPostController', () => {
       const userId = 1;
       const title = 'Test MicroPost';
 
-      const mockUser: User = { id: userId, name: 'TestUser', email: 'test@example.com', isAdmin: false };
+      const mockUser: User = {
+        id: userId,
+        name: 'TestUser',
+        email: 'test@example.com',
+        isAdmin: false,
+      };
       userService.find.mockResolvedValue(mockUser);
       microPostService.create.mockRejectedValue(new Error('Database error'));
 
-      await expect(microPostController.create(userId, title)).rejects.toThrow(InternalServerErrorException);
+      await expect(microPostController.create(userId, title)).rejects.toThrow(
+        InternalServerErrorException,
+      );
     });
   });
 
   describe('index', () => {
     it('should return an array of microposts', async () => {
       const mockMicroposts: MicroPost[] = [
-        { id: 1, userId: 1, title: 'MicroPost 1', userName: 'User1', imagePath: 'path/to/image1.jpg' },
-        { id: 2, userId: 2, title: 'MicroPost 2', userName: 'User2', imagePath: null },
+        {
+          id: 1,
+          userId: 1,
+          title: 'MicroPost 1',
+          userName: 'User1',
+          imagePath: 'path/to/image1.jpg',
+        },
+        {
+          id: 2,
+          userId: 2,
+          title: 'MicroPost 2',
+          userName: 'User2',
+          imagePath: null,
+        },
       ];
 
       microPostService.index.mockResolvedValue(mockMicroposts);
@@ -107,14 +149,19 @@ describe('MicroPostController', () => {
     it('should throw InternalServerErrorException when getting microposts fails', async () => {
       microPostService.index.mockRejectedValue(new Error('Database error'));
 
-      await expect(microPostController.index()).rejects.toThrow(InternalServerErrorException);
+      await expect(microPostController.index()).rejects.toThrow(
+        InternalServerErrorException,
+      );
     });
   });
 
   describe('categories', () => {
     it('should return categories for a micropost', async () => {
       const micropostId = '1';
-      const mockCategories = [{ id: 1, name: 'Category 1' }, { id: 2, name: 'Category 2' }];
+      const mockCategories = [
+        { id: 1, name: 'Category 1' },
+        { id: 2, name: 'Category 2' },
+      ];
 
       micropostCategoryService.categories.mockResolvedValue(mockCategories);
 
@@ -127,9 +174,13 @@ describe('MicroPostController', () => {
     it('should throw InternalServerErrorException when getting categories fails', async () => {
       const micropostId = '1';
 
-      micropostCategoryService.categories.mockRejectedValue(new Error('Database error'));
+      micropostCategoryService.categories.mockRejectedValue(
+        new Error('Database error'),
+      );
 
-      await expect(microPostController.categories(micropostId)).rejects.toThrow(InternalServerErrorException);
+      await expect(microPostController.categories(micropostId)).rejects.toThrow(
+        InternalServerErrorException,
+      );
     });
   });
 
@@ -140,19 +191,29 @@ describe('MicroPostController', () => {
 
       micropostCategoryService.add_category.mockResolvedValue(undefined);
 
-      const result = await microPostController.add_category(micropostId, categoryId);
+      const result = await microPostController.add_category(
+        micropostId,
+        categoryId,
+      );
 
       expect(result).toEqual({ message: 'Category added to micropost' });
-      expect(micropostCategoryService.add_category).toHaveBeenCalledWith(1, categoryId);
+      expect(micropostCategoryService.add_category).toHaveBeenCalledWith(
+        1,
+        categoryId,
+      );
     });
 
     it('should throw InternalServerErrorException when adding category fails', async () => {
       const micropostId = '1';
       const categoryId = 2;
 
-      micropostCategoryService.add_category.mockRejectedValue(new Error('Database error'));
+      micropostCategoryService.add_category.mockRejectedValue(
+        new Error('Database error'),
+      );
 
-      await expect(microPostController.add_category(micropostId, categoryId)).rejects.toThrow(InternalServerErrorException);
+      await expect(
+        microPostController.add_category(micropostId, categoryId),
+      ).rejects.toThrow(InternalServerErrorException);
     });
   });
 });
