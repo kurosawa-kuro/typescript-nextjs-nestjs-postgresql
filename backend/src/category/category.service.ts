@@ -1,15 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseService, Category } from '../database/database.service';
+import { DatabaseService  } from '../database/database.service';
+
+export interface Category {
+  id: number;
+  title: string;
+}
 
 @Injectable()
 export class CategoryService {
   constructor(private databaseService: DatabaseService) {}
 
   async create(title: string): Promise<Category> {
-    return this.databaseService.createCategory(title);
+    const query = 'INSERT INTO category(title) VALUES($1) RETURNING id, title';
+  //   return this.executeQuery(query, [title]).then(result => result.rows[0]);
+    return this.databaseService.executeQuery(query, [title]).then(result => result.rows[0]);
   }
 
   async list(): Promise<Category[]> {
-    return this.databaseService.indexCategories();
+    const query = 'SELECT * FROM category';
+  //   return this.executeQuery(query).then(result => result.rows);
+  return this.databaseService.executeQuery(query).then(result => result.rows);
   }
 }

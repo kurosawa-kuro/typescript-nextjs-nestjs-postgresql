@@ -1,11 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
-import { UserService } from '../src/user/user.service';
+import { UserCreationData, UserService } from '../src/user/user.service';
 import { MicroPostService } from '../src/micropost/micropost.service';
 import { CategoryService } from '../src/category/category.service';
 import { DatabaseService } from '../src/database/database.service';
 import { MicropostCategoryService } from '../src/micropost-category/micropost-category.service';
-import { CreateUserDto } from '../src/database/database.service';
 
 export async function setupTestApp() {
   const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -32,8 +31,13 @@ export async function setupTestApp() {
 }
 
 export async function clearDatabase(databaseService: DatabaseService) {
-  await databaseService.clearAllTables();
+  await this.executeQuery('DELETE FROM "micropost_category"');
+  await this.executeQuery('DELETE FROM "category"');
+  await this.executeQuery('DELETE FROM "micropost"');
+  await this.executeQuery('DELETE FROM "user"');
 }
+
+import * as bcrypt from 'bcrypt';
 
 export async function createTestUser(
   userService: UserService,
@@ -41,8 +45,14 @@ export async function createTestUser(
   email: string,
   password: string,
 ) {
-  const createUserDto: CreateUserDto = { name, email, password };
-  return await userService.create(createUserDto);
+  const passwordHash = await bcrypt.hash(password, 10);
+  const userCreationData: UserCreationData = {
+    name, email, passwordHash, isAdmin: false,
+    password: function (password: any): unknown {
+      throw new Error('Function not implemented.');
+    }
+  };
+  return await userService.create(userCreationData);
 }
 
 export async function createTestMicropost(
