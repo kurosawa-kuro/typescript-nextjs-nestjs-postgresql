@@ -1,7 +1,9 @@
+// src/app.module.ts
+
 import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { Pool } from 'pg';
+import { DatabaseConfig } from './config/database.config';
 import { UserService } from './user.service';
 import { MicroPostService } from './micropost.service';
 import { CategoryService } from './category.service';
@@ -9,9 +11,6 @@ import { MicropostCategoryService } from './micropost-category.service';
 import { UserController } from './user.controller';
 import { MicroPostController } from './micropost.controller';
 import { CategoryController } from './category.controller';
-import * as dotenv from 'dotenv';
-
-dotenv.config({ path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env' });
 
 @Module({
   imports: [
@@ -23,16 +22,7 @@ dotenv.config({ path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env' });
   providers: [
     {
       provide: 'DATABASE_POOL',
-      useFactory: async () => {
-        const pool = new Pool({
-          user: process.env.DB_USER,
-          host: process.env.DB_HOST,
-          database: process.env.DB_NAME,
-          password: process.env.DB_PASSWORD,
-          port: parseInt(process.env.DB_PORT, 10),
-        });
-        return pool;
-      },
+      useFactory: () => DatabaseConfig.getPool(),
     },
     UserService,
     MicroPostService,

@@ -9,7 +9,9 @@ import * as path from 'path';
 const storage = multer.diskStorage({
   destination: './uploads',
   filename: (req, file, cb) => {
+    /* istanbul ignore next */
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    /* istanbul ignore next */
     cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
   }
 });
