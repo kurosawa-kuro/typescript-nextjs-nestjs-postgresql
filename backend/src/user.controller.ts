@@ -1,9 +1,10 @@
-// user.controller.ts
-import { Controller, Get, Post, Body, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, BadRequestException, Logger } from '@nestjs/common';
 import { UserService } from './user.service';
 
 @Controller('users')
 export class UserController {
+  private readonly logger = new Logger(UserController.name);
+
   constructor(private readonly userService: UserService) {}
 
   @Post()
@@ -22,7 +23,9 @@ export class UserController {
 
   @Get()
   async getUsers() {
+    this.logger.debug('getUsers method called');
     const users = await this.userService.getUsers();
+    this.logger.debug(`Retrieved ${users.length} users`);
     return users.map(user => ({ id: user.id, name: user.name, email: user.email, isAdmin: user.isAdmin }));
   }
 }

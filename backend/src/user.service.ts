@@ -1,5 +1,4 @@
-// user.service.ts
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 import { Pool } from 'pg';
 import * as bcrypt from 'bcrypt';
 
@@ -12,6 +11,8 @@ export interface User {
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
+
   constructor(
     @Inject('DATABASE_POOL') private readonly pool: Pool,
   ) {}
@@ -30,8 +31,10 @@ export class UserService {
   }
 
   async getUsers(): Promise<User[]> {
+    this.logger.debug('getUsers method called in UserService');
     const query = 'SELECT id, name, email, is_admin as "isAdmin" FROM "user"';
     const result = await this.pool.query(query);
+    this.logger.debug(`Retrieved ${result.rows.length} users from database`);
     return result.rows;
   }
 

@@ -118,11 +118,8 @@ async function setupDatabase(): Promise<void> {
     await executeSql(client, dropTablesSql, 'Dropping tables');
     await executeSql(client, createTablesSql, 'Creating tables');
     await executeSql(client, insertAdminSql, 'Inserting admin user');
-    
-    if (env === 'development') {
-      await executeSql(client, insertUsersSql, 'Inserting regular users');
-      await executeSql(client, insertOtherDataSql, 'Inserting other data');
-    }
+    await executeSql(client, insertUsersSql, 'Inserting regular users');
+    await executeSql(client, insertOtherDataSql, 'Inserting other data');
   });
 }
 
@@ -140,5 +137,5 @@ async function main(): Promise<void> {
 }
 
 // 使用例
-setEnvironment('test');  // テスト環境に切り替える場合はこの行のコメントを解除
+// setEnvironment('test');  // テスト環境に切り替える場合はこの行のコメントを解除
 main();
