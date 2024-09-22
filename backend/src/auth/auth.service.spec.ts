@@ -4,7 +4,7 @@ import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { Pool } from 'pg';
 import { Logger } from '@nestjs/common';
-import { CreateUserDto } from '../database/database.service';
+import { CreateUserDto, UserCreationData } from '../user/user.service';
 
 describe('AuthService', () => {
   let service: AuthService;

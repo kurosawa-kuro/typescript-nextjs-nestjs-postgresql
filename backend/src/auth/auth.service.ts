@@ -2,7 +2,7 @@ import { Injectable, Logger, Inject } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { Pool } from 'pg';
-import { CreateUserDto } from '../database/database.service';
+import { CreateUserDto, UserCreationData } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +19,13 @@ export class AuthService {
     password: string,
   ): Promise<boolean> {
     try {
-      const createUserDto: CreateUserDto = { name, email, password };
+      const passwordHash = await bcrypt.hash(password, 10);
+      const createUserDto: UserCreationData = {
+        name, email, passwordHash, isAdmin: false,
+        password: function (password: any): unknown {
+          throw new Error('Function not implemented.');
+        }
+      };
       await this.userService.create(createUserDto);
       return true;
     } catch (error) {

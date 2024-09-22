@@ -8,8 +8,7 @@ describe('MicroPostService', () => {
 
   beforeEach(async () => {
     mockDatabaseService = {
-      createMicroPost: jest.fn(),
-      indexMicroPosts: jest.fn(),
+      executeQuery: jest.fn(),
     } as unknown as jest.Mocked<DatabaseService>;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -38,12 +37,26 @@ describe('MicroPostService', () => {
         imagePath,
       };
 
-      mockDatabaseService.createMicroPost.mockResolvedValue(mockMicroPost);
+      mockDatabaseService.executeQuery.mockResolvedValue({
+        rows: [mockMicroPost],
+        command: '',
+        rowCount: 1,
+        oid: 0,
+        fields: []
+      });
 
       const result = await microPostService.create(userId, title, imagePath);
 
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
+        `
+      INSERT INTO micropost(user_id, title, image_path) 
+      VALUES($1, $2, $3) 
+      RETURNING id, user_id as "userId", title, image_path as "imagePath",
+        (SELECT name FROM "user" WHERE id = $1) as "userName"
+    `,
+        [userId, title, imagePath]
+      );
       expect(result).toEqual(mockMicroPost);
-      expect(mockDatabaseService.createMicroPost).toHaveBeenCalledWith(userId, title, imagePath);
     });
 
     it('should throw error if creation fails', async () => {
@@ -51,7 +64,7 @@ describe('MicroPostService', () => {
       const title = 'Failed MicroPost';
       const imagePath = null;
 
-      mockDatabaseService.createMicroPost.mockRejectedValue(new Error('Creation failed'));
+      mockDatabaseService.executeQuery.mockRejectedValue(new Error('Creation failed'));
 
       await expect(
         microPostService.create(userId, title, imagePath),
@@ -78,16 +91,34 @@ describe('MicroPostService', () => {
         },
       ];
 
-      mockDatabaseService.indexMicroPosts.mockResolvedValue(mockMicroPosts);
+      mockDatabaseService.executeQuery.mockResolvedValue({
+        rows: mockMicroPosts,
+        command: '',
+        rowCount: mockMicroPosts.length,
+        oid: 0,
+        fields: []
+      });
 
       const result = await microPostService.list();
 
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
+        `
+      SELECT m.id, m.user_id as "userId", m.title, m.image_path as "imagePath", u.name as "userName"
+      FROM micropost m
+      JOIN "user" u ON m.user_id = u.id
+    `
+      );
       expect(result).toEqual(mockMicroPosts);
-      expect(mockDatabaseService.indexMicroPosts).toHaveBeenCalled();
     });
 
     it('should return an empty array if no microposts exist', async () => {
-      mockDatabaseService.indexMicroPosts.mockResolvedValue([]);
+      mockDatabaseService.executeQuery.mockResolvedValue({
+        rows: [],
+        command: '',
+        rowCount: 0,
+        oid: 0,
+        fields: []
+      });
 
       const result = await microPostService.list();
 
@@ -95,7 +126,7 @@ describe('MicroPostService', () => {
     });
 
     it('should throw an error if query fails', async () => {
-      mockDatabaseService.indexMicroPosts.mockRejectedValue(new Error('Query failed'));
+      mockDatabaseService.executeQuery.mockRejectedValue(new Error('Query failed'));
 
       await expect(microPostService.list()).rejects.toThrow('Query failed');
     });

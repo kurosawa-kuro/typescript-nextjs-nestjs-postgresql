@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from '../database/database.service';
+import { BadRequestException } from '@nestjs/common';
+import { CreateUserDto, UserCreationData } from './user.service';
 
 describe('UserController', () => {
     let userController: UserController;
@@ -10,7 +10,7 @@ describe('UserController', () => {
 
     const mockUserService = {
         create: jest.fn(),
-        indexUsers: jest.fn().mockResolvedValue([
+        index: jest.fn().mockResolvedValue([
             {
                 id: 1,
                 name: 'John Doe',
@@ -18,7 +18,8 @@ describe('UserController', () => {
                 isAdmin: false,
             },
         ]),
-        findUser: jest.fn(), // Ensure this is mocked
+        find: jest.fn(),
+        hashPassword: jest.fn(),
     };
 
     const setupTestingModule = async () => {
@@ -49,7 +50,8 @@ describe('UserController', () => {
                 email: 'john@example.com',
                 isAdmin: false,
             };
-            (userService.create as jest.Mock).mockResolvedValue(mockUser);
+            mockUserService.hashPassword.mockResolvedValue('hashedPassword');
+            mockUserService.create.mockResolvedValue(mockUser);
 
             const createUserDto: CreateUserDto = {
                 name: 'John Doe',
@@ -58,7 +60,14 @@ describe('UserController', () => {
             };
 
             const result = await userController.create(createUserDto);
-            expect(userService.create).toHaveBeenCalledWith(createUserDto);
+            expect(userService.hashPassword).toHaveBeenCalledWith(createUserDto.password);
+            expect(userService.create).toHaveBeenCalledWith({
+                name: createUserDto.name,
+                email: createUserDto.email,
+                passwordHash: 'hashedPassword',
+                isAdmin: false,
+                password: expect.any(Function),
+            });
             expect(result).toEqual({ message: 'User created', user: mockUser });
         });
 
@@ -78,6 +87,7 @@ describe('UserController', () => {
             expect(result).toEqual([
                 { id: 1, name: 'John Doe', email: 'john@example.com', isAdmin: false },
             ]);
+            expect(userService.index).toHaveBeenCalled();
         });
     });
 
@@ -89,11 +99,17 @@ describe('UserController', () => {
                 email: 'john@example.com',
                 isAdmin: false,
             };
-            (userService.findUser as jest.Mock).mockResolvedValue(mockUser);
+            mockUserService.find.mockResolvedValue(mockUser);
 
             const result = await userController.findOne(1);
-            expect(userService.findUser).toHaveBeenCalledWith(1);
+            expect(userService.find).toHaveBeenCalledWith(1);
             expect(result).toEqual(mockUser);
+        });
+
+        it('should return not found message when user does not exist', async () => {
+            mockUserService.find.mockResolvedValue(null);
+            const result = await userController.findOne(1);
+            expect(result).toEqual({ message: 'User not found' });
         });
     });
 });

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserService } from './user.service';
-import { DatabaseService, User, CreateUserDto } from '../database/database.service';
+import { UserService , User, CreateUserDto} from './user.service';
+import { DatabaseService } from '../database/database.service';
 import * as bcrypt from 'bcrypt';
 
 jest.mock('bcrypt');
@@ -32,9 +32,7 @@ describe('UserService', () => {
 
   beforeEach(async () => {
     mockDatabaseService = {
-      createUser: jest.fn(),
-      findUser: jest.fn(),
-      indexUsers: jest.fn(),
+      executeQuery: jest.fn(),
     } as unknown as jest.Mocked<DatabaseService>;
 
     jest.clearAllMocks();
@@ -50,81 +48,130 @@ describe('UserService', () => {
 
     it('should create a new user', async () => {
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
-      mockDatabaseService.createUser.mockResolvedValue(mockUser);
+      mockDatabaseService.executeQuery.mockResolvedValue({ 
+        command: 'SELECT',
+        rowCount: 1,
+        oid: null,
+        rows: [mockUser],
+        fields: []
+      });
 
-      const result = await userService.create(createUserDto);
-
-      expect(result).toEqual(mockUser);
-      expect(mockDatabaseService.createUser).toHaveBeenCalledWith({
+      const result = await userService.create({
         name: 'John Doe',
         email: 'john@example.com',
         passwordHash: 'hashedPassword',
         isAdmin: false,
+        password: function (password: any): unknown {
+          throw new Error('Function not implemented.');
+        }
       });
+
+      expect(result).toEqual(mockUser);
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.arrayContaining(['John Doe', 'john@example.com', 'hashedPassword', false])
+      );
     });
 
     it('should throw an error if creation fails', async () => {
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
-      mockDatabaseService.createUser.mockRejectedValue(new Error('Creation failed'));
+      mockDatabaseService.executeQuery.mockRejectedValue(new Error('Creation failed'));
 
-      await expect(userService.create(createUserDto)).rejects.toThrow('Creation failed');
+      await expect(
+        userService.create({
+          name: 'John Doe',
+          email: 'john@example.com',
+          passwordHash: 'hashedPassword',
+          isAdmin: false,
+          password: function (password: any): unknown {
+            throw new Error('Function not implemented.');
+          }
+        })
+      ).rejects.toThrow('Creation failed');
     });
   });
 
-  describe('findUser', () => {
+  describe('find', () => {
     const userId = 1;
 
     it('should return a user when found', async () => {
-      mockDatabaseService.findUser.mockResolvedValue(mockUser);
+      mockDatabaseService.executeQuery.mockResolvedValue({
+        command: 'SELECT',
+        rowCount: 1,
+        oid: null,
+        rows: [mockUser],
+        fields: []
+      });
 
-      const result = await userService.findUser(userId);
+      const result = await userService.find(userId);
 
       expect(result).toEqual(mockUser);
-      expect(mockDatabaseService.findUser).toHaveBeenCalledWith(userId);
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
+        expect.any(String),
+        [userId]
+      );
     });
 
     it('should return null when user is not found', async () => {
-      mockDatabaseService.findUser.mockResolvedValue(null);
+      mockDatabaseService.executeQuery.mockResolvedValue({
+        command: 'SELECT',
+        rowCount: 0,
+        oid: null,
+        rows: [],
+        fields: []
+      });
 
-      const result = await userService.findUser(userId);
+      const result = await userService.find(userId);
 
       expect(result).toBeNull();
     });
 
     it('should throw an error if query fails', async () => {
-      mockDatabaseService.findUser.mockRejectedValue(new Error('Query failed'));
+      mockDatabaseService.executeQuery.mockRejectedValue(new Error('Query failed'));
 
-      await expect(userService.findUser(userId)).rejects.toThrow('Query failed');
+      await expect(userService.find(userId)).rejects.toThrow('Query failed');
     });
   });
 
-  describe('indexUsers', () => {
+  describe('index', () => {
     const mockUsers: User[] = [
       { id: 1, name: 'John Doe', email: 'john@example.com', isAdmin: false },
       { id: 2, name: 'Jane Doe', email: 'jane@example.com', isAdmin: true },
     ];
 
     it('should return all users', async () => {
-      mockDatabaseService.indexUsers.mockResolvedValue(mockUsers);
+      mockDatabaseService.executeQuery.mockResolvedValue({
+        command: 'SELECT',
+        rowCount: mockUsers.length,
+        oid: null,
+        rows: mockUsers,
+        fields: []
+      });
 
-      const result = await userService.indexUsers();
+      const result = await userService.index();
 
       expect(result).toEqual(mockUsers);
-      expect(mockDatabaseService.indexUsers).toHaveBeenCalled();
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalled();
     });
 
     it('should return an empty array if no users exist', async () => {
-      mockDatabaseService.indexUsers.mockResolvedValue([]);
+      mockDatabaseService.executeQuery.mockResolvedValue({
+        command: 'SELECT',
+        rowCount: 0,
+        oid: null,
+        rows: [],
+        fields: []
+      });
 
-      const result = await userService.indexUsers();
+      const result = await userService.index();
 
       expect(result).toEqual([]);
     });
 
     it('should throw an error if query fails', async () => {
-      mockDatabaseService.indexUsers.mockRejectedValue(new Error('Query failed'));
+      mockDatabaseService.executeQuery.mockRejectedValue(new Error('Query failed'));
 
-      await expect(userService.indexUsers()).rejects.toThrow('Query failed');
+      await expect(userService.index()).rejects.toThrow('Query failed');
     });
   });
 });

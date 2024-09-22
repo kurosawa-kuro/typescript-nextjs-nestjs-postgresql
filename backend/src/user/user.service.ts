@@ -54,4 +54,12 @@ export class UserService {
     const query = 'SELECT id, name, email, password_hash, is_admin as "isAdmin" FROM "user" WHERE email = $1';
     return this.databaseService.executeQuery(query, [email]).then(rows => rows[0] || null);
   }
+
+  async hashPassword(password: string): Promise<string> {
+
+    // Implementation for hashing the password
+
+    return 'hashedPassword'; // Replace with actual hashing logic
+
+}
 }

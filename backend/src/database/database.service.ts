@@ -4,11 +4,6 @@ import { Injectable, Inject, Logger, OnModuleDestroy } from '@nestjs/common';
 import { Pool, QueryResult } from 'pg';
 
 
-
-
-
-
-
 @Injectable()
 export class DatabaseService implements OnModuleDestroy {
   private readonly logger = new Logger(DatabaseService.name);

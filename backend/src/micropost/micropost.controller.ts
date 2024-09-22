@@ -39,7 +39,7 @@ export class MicroPostController {
       throw new BadRequestException('Title is required');
     }
 
-    const user = await this.userService.findUser(userId);  // find から findUser に変更
+    const user = await this.userService.find(userId);  // find から findUser に変更
     if (!user) {
       throw new BadRequestException('User not found');
     }
