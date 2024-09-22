@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { NotFoundException } from '@nestjs/common';
 import { DatabaseService, User, MicroPost, Category } from './database.service';
 import { Pool } from 'pg';
 
-// 新しい型定義を追加
 type MockQueryResult<T> = {
   rows: T[];
 };
@@ -146,6 +146,67 @@ describe('DatabaseService', () => {
     it('should end the pool connection', async () => {
       await service.onModuleDestroy();
       expect(mockPool.end).toHaveBeenCalled();
+    });
+  });
+
+  // Additional tests
+  describe('findUserByEmail', () => {
+    it('should find a user by email', async () => {
+      const mockUser: User = {
+        id: 1,
+        name: 'Test User',
+        email: 'test@example.com',
+        isAdmin: false,
+      };
+      mockPool.query.mockResolvedValueOnce({ rows: [mockUser] } as MockQueryResult<User>);
+
+      const result = await service.findUserByEmail('test@example.com');
+      expect(result).toEqual(mockUser);
+      expect(mockPool.query).toHaveBeenCalledWith(expect.stringContaining('WHERE email = $1'), ['test@example.com']);
+    });
+
+    it('should return null if user not found by email', async () => {
+      mockPool.query.mockResolvedValueOnce({ rows: [] } as MockQueryResult<User>);
+
+      const result = await service.findUserByEmail('nonexistent@example.com');
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('listMicroPosts', () => {
+    it('should list all micro posts', async () => {
+      const mockMicroPosts: MicroPost[] = [
+        { id: 1, userId: 1, title: 'Post 1', imagePath: 'path/1.jpg', userName: 'User 1' },
+        { id: 2, userId: 1, title: 'Post 2', imagePath: null, userName: 'User 1' }
+      ];
+      mockPool.query.mockResolvedValueOnce({ rows: mockMicroPosts } as MockQueryResult<MicroPost>);
+
+      const result = await service.listMicroPosts();
+      expect(result).toEqual(mockMicroPosts);
+    });
+  });
+
+  describe('listCategories', () => {
+    it('should list all categories', async () => {
+      const mockCategories: Category[] = [
+        { id: 1, title: 'Category 1' },
+        { id: 2, title: 'Category 2' }
+      ];
+      mockPool.query.mockResolvedValueOnce({ rows: mockCategories } as MockQueryResult<Category>);
+
+      const result = await service.listCategories();
+      expect(result).toEqual(mockCategories);
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('should log and rethrow an error when query fails', async () => {
+      const error = new Error('Database failure');
+      mockPool.query.mockRejectedValueOnce(error);
+
+      await expect(service.listUsers()).rejects.toThrow(error);
+      expect(mockPool.query).toHaveBeenCalled();
+      // This assumes that the Logger.error is mocked and checked elsewhere for being called.
     });
   });
 });
