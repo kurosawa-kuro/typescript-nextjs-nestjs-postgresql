@@ -1,11 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException } from '@nestjs/common';
-import { DatabaseService  } from './database.service';
-import { Pool, QueryResult } from 'pg';
+// backend\src\database\database.service.spec.ts
 
-type MockQueryResult<T> = {
-  rows: T[];
-};
+import { Test, TestingModule } from '@nestjs/testing';
+import { DatabaseService } from './database.service';
+import { Pool, QueryResult } from 'pg';
 
 describe('DatabaseService', () => {
   let service: DatabaseService;
@@ -38,7 +35,7 @@ describe('DatabaseService', () => {
       const mockResult: QueryResult = {
         rows: [{ id: 1, name: 'Test' }],
         command: '',
-        rowCount: 0,
+        rowCount: 1,
         oid: 0,
         fields: []
       };
@@ -50,13 +47,28 @@ describe('DatabaseService', () => {
       expect(result).toEqual(mockResult);
     });
 
+    it('should execute a query with parameters successfully', async () => {
+      const mockResult: QueryResult = {
+        rows: [{ id: 1, name: 'Test' }],
+        command: '',
+        rowCount: 1,
+        oid: 0,
+        fields: []
+      };
+      mockPool.query.mockResolvedValueOnce(mockResult);
+
+      const result = await service.executeQuery('SELECT * FROM test WHERE id = $1', [1]);
+
+      expect(mockPool.query).toHaveBeenCalledWith('SELECT * FROM test WHERE id = $1', [1]);
+      expect(result).toEqual(mockResult);
+    });
+
     it('should log and rethrow an error when query fails', async () => {
       const error = new Error('Database failure');
       mockPool.query.mockRejectedValueOnce(error);
 
       await expect(service.executeQuery('SELECT * FROM test')).rejects.toThrow(error);
       expect(mockPool.query).toHaveBeenCalledWith('SELECT * FROM test', []);
-      // This assumes that the Logger.error is mocked and checked elsewhere for being called.
     });
   });
 
@@ -66,8 +78,4 @@ describe('DatabaseService', () => {
       expect(mockPool.end).toHaveBeenCalled();
     });
   });
-
-  // Your other specific method tests would be updated in a similar pattern,
-  // utilizing `executeQuery` in your service methods and ensuring that each
-  // test case reflects the right SQL and parameters passed to `executeQuery`.
 });

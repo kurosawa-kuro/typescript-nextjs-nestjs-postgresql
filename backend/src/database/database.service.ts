@@ -3,7 +3,6 @@
 import { Injectable, Inject, Logger, OnModuleDestroy } from '@nestjs/common';
 import { Pool, QueryResult } from 'pg';
 
-
 @Injectable()
 export class DatabaseService implements OnModuleDestroy {
   private readonly logger = new Logger(DatabaseService.name);
@@ -12,9 +11,7 @@ export class DatabaseService implements OnModuleDestroy {
 
   async executeQuery(query: string, values: any[] = []): Promise<QueryResult> {
     try {
-      return values.length > 0
-        ? await this.pool.query(query, values)
-        : await this.pool.query(query);
+      return await this.pool.query(query, values);
     } catch (error) {
       this.logger.error(`Database query failed: ${error.message}`, error.stack);
       throw error;
