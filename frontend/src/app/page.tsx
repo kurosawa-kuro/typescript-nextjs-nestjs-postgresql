@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 
-// Types
+// 1. 型定義
 interface Micropost {
   id: number;
   userId: number;
@@ -12,10 +12,22 @@ interface Micropost {
   imagePath?: string;
 }
 
-// Constants
+interface MicropostModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (e: React.FormEvent) => void;
+  title: string;
+  setTitle: (title: string) => void;
+  content: string;
+  setContent: (content: string) => void;
+  image: File | null;
+  onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+// 2. 定数
 const API_URL = 'http://localhost:3001/microposts';
 
-// API Functions
+// 3. API関連の関数
 const fetchMicroposts = async (): Promise<Micropost[]> => {
   const response = await fetch(API_URL);
   if (!response.ok) {
@@ -36,7 +48,7 @@ const createMicropost = async (formData: FormData): Promise<Micropost> => {
   return data.micropost;
 };
 
-// Custom Hooks
+// 4. カスタムフック
 const useMicroposts = () => {
   const [microposts, setMicroposts] = useState<Micropost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -84,7 +96,15 @@ const usePostForm = () => {
   return { postTitle, setPostTitle, postContent, setPostContent, postImage, setPostImage, resetForm };
 };
 
-// Components
+// 5. ユーティリティ関数
+const getImagePreviewUrl = (file: File | null) => {
+  if (file && typeof URL !== 'undefined' && URL.createObjectURL) {
+    return URL.createObjectURL(file);
+  }
+  return '/dummy-image-url.jpg'; // テスト環境用のダミーURL
+};
+
+// 6. UI コンポーネント
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center h-screen">
     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
@@ -124,28 +144,8 @@ const MicropostList = ({ microposts }: { microposts: Micropost[] }) => (
   </div>
 );
 
-interface MicropostModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (e: React.FormEvent) => void;
-  title: string;
-  setTitle: (title: string) => void;
-  content: string;
-  setContent: (content: string) => void;
-  image: File | null;
-  onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
-
 const MicropostModal = ({ isOpen, onClose, onSubmit, title, setTitle, content, setContent, image, onImageChange }: MicropostModalProps) => {
   if (!isOpen) return null;
-
-  // URL.createObjectURLの代わりに、ダミーの画像URLを使用
-  const getImagePreviewUrl = (file: File | null) => {
-    if (file && typeof URL !== 'undefined' && URL.createObjectURL) {
-      return URL.createObjectURL(file);
-    }
-    return '/dummy-image-url.jpg'; // テスト環境用のダミーURL
-  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -228,7 +228,7 @@ const MicropostModal = ({ isOpen, onClose, onSubmit, title, setTitle, content, s
   );
 };
 
-// Main Component
+// 7. メインコンポーネント
 export default function Home() {
   const { microposts, isLoading, errorMessage, addMicropost } = useMicroposts();
   const { isModalOpen, handleOpenModal, handleCloseModal } = useModal();
