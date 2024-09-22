@@ -3,7 +3,12 @@ import { JwtStrategy } from './jwt.strategy';
 import { UnauthorizedException } from '@nestjs/common';
 import { ExtractJwt } from 'passport-jwt';
 
-jest.mock('passport-jwt');
+jest.mock('passport-jwt', () => ({
+  Strategy: jest.fn(),
+  ExtractJwt: {
+    fromExtractors: jest.fn()
+  }
+}));
 
 describe('JwtStrategy', () => {
   let strategy: JwtStrategy;
@@ -44,26 +49,14 @@ describe('JwtStrategy', () => {
 
   describe('constructor', () => {
     it('should use the correct options', () => {
-      // Reset the mock to clear any previous calls
-      (ExtractJwt.fromExtractors as jest.Mock).mockClear();
-
-      // Create a new instance of JwtStrategy
-      new JwtStrategy();
+      expect(ExtractJwt.fromExtractors).toHaveBeenCalled();
+      const extractorFn = (ExtractJwt.fromExtractors as jest.Mock).mock.calls[0][0][0];
       
-      // Check if ExtractJwt.fromExtractors was called with the correct argument
-      expect(ExtractJwt.fromExtractors).toHaveBeenCalledWith([
-        expect.any(Function)
-      ]);
-
-      // Get the extractor function
-      const extractorFunction = (ExtractJwt.fromExtractors as jest.Mock).mock.calls[0][0][0];
-
-      // Test the extractor function
       const mockRequestWithJwt = { cookies: { jwt: 'test.jwt.token' } };
-      expect(extractorFunction(mockRequestWithJwt)).toBe('test.jwt.token');
+      expect(extractorFn(mockRequestWithJwt)).toBe('test.jwt.token');
 
       const mockRequestWithoutJwt = { cookies: {} };
-      expect(extractorFunction(mockRequestWithoutJwt)).toBeUndefined();
+      expect(extractorFn(mockRequestWithoutJwt)).toBeUndefined();
     });
   });
 });
