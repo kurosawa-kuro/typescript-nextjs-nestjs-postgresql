@@ -6,6 +6,7 @@ interface Micropost {
   id: number;
   userId: number;
   title: string;
+  content: string;
   userName: string;
 }
 
@@ -50,6 +51,7 @@ export default function Home() {
         body: JSON.stringify({
           userId: 1, // この値は適切なユーザーIDに変更する必要があります
           title: title,
+          content: content,
         }),
       });
 
@@ -134,6 +136,7 @@ const MicropostList = ({ microposts }: { microposts: Micropost[] }) => (
       <div key={post.id} className="bg-white shadow-lg rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
         <div className="p-6">
           <h2 className="text-xl font-semibold mb-2 text-purple-700">{post.title}</h2>
+          <p className="text-gray-600 mb-4">{post.content}</p>
           <p className="text-gray-600 flex items-center mb-2">
             <span className="inline-block w-2 h-2 rounded-full bg-purple-500 mr-2"></span>
             User: {post.userName}
@@ -167,7 +170,7 @@ const MicropostModal = ({ title, setTitle, content, setContent, image, onImageCh
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
             required
           />
         </div>
@@ -177,7 +180,7 @@ const MicropostModal = ({ title, setTitle, content, setContent, image, onImageCh
             id="content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
             rows={4}
             required
           ></textarea>
