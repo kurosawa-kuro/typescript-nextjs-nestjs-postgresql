@@ -19,10 +19,11 @@ export async function setupTestApp() {
   const micropostService = moduleFixture.get<MicroPostService>(MicroPostService);
   const categoryService = moduleFixture.get<CategoryService>(CategoryService);
   const micropostCategoryService = moduleFixture.get<MicropostCategoryService>(MicropostCategoryService);
-  const pool = moduleFixture.get<Pool>(Pool);
+  const pool = moduleFixture.get('DATABASE_POOL'); // Update to use 'DATABASE_POOL'
 
   return { app, userService, micropostService, categoryService, micropostCategoryService, pool };
 }
+
 
 export async function clearDatabase(pool: Pool) {
   await pool.query('DELETE FROM "micropost"');
