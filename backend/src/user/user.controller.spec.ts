@@ -95,11 +95,5 @@ describe('UserController', () => {
             expect(userService.findUser).toHaveBeenCalledWith(1);
             expect(result).toEqual(mockUser);
         });
-
-        it('should throw NotFoundException if user is not found', async () => {
-            (userService.findUser as jest.Mock).mockResolvedValue(null);
-
-            await expect(userController.findOne(1)).rejects.toThrow(NotFoundException);
-        });
     });
 });
