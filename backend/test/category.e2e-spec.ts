@@ -1,42 +1,46 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
+import { CategoryService } from './../src/category.service';
+import { Pool } from 'pg';
+import { setupTestApp, clearDatabase } from './test-utils';
 
 describe('CategoryController (e2e)', () => {
   let app: INestApplication;
+  let categoryService: CategoryService;
+  let pool: Pool;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],  // AppModuleはデータベース接続やカテゴリーサービスを含む
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
+    const testApp = await setupTestApp();
+    app = testApp.app;
+    categoryService = testApp.categoryService;
+    pool = testApp.pool;
   });
 
   afterAll(async () => {
     await app.close();
+    await pool.end();
+  });
+
+  beforeEach(async () => {
+    await clearDatabase(pool);
   });
 
   it('should create a category (POST /categories)', async () => {
     const response = await request(app.getHttpServer())
       .post('/categories')
       .send({ title: 'New Category' })
-      .expect(201);  // HTTPステータスコード201を期待
+      .expect(201);
 
     expect(response.body).toEqual({ message: 'Category created' });
   });
 
   it('should retrieve all categories (GET /categories)', async () => {
-    await request(app.getHttpServer())
-      .post('/categories')
-      .send({ title: 'New Category' })  // 初期データのセットアップ
-      .expect(201);
+    // カテゴリーサービスを使用してテストデータを作成
+    await categoryService.createCategory('New Category');
 
     const response = await request(app.getHttpServer())
       .get('/categories')
-      .expect(200);  // HTTPステータスコード200を期待
+      .expect(200);
 
     expect(response.body).toEqual(expect.any(Array));
     expect(response.body.length).toBeGreaterThan(0);

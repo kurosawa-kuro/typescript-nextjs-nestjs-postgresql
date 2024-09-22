@@ -1,9 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
 import { UserService } from './../src/user.service';
 import { Pool } from 'pg';
+import { setupTestApp, clearDatabase, createTestUser } from './test-utils';
 
 describe('UserController (e2e)', () => {
   let app: INestApplication;
@@ -11,14 +10,7 @@ describe('UserController (e2e)', () => {
   let pool: Pool;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    userService = moduleFixture.get<UserService>(UserService);
-    pool = moduleFixture.get<Pool>('DATABASE_POOL');
-    await app.init();
+    ({ app, userService, pool } = await setupTestApp());
   });
 
   afterAll(async () => {
@@ -27,7 +19,7 @@ describe('UserController (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await pool.query('DELETE FROM "user"');
+    await clearDatabase(pool);
   });
 
   it('should create a user (POST /users)', async () => {
@@ -47,8 +39,7 @@ describe('UserController (e2e)', () => {
   });
 
   it('should retrieve all users (GET /users)', async () => {
-    // Create test data
-    await userService.createUser('John Doe', 'john@example.com', 'password123');
+    await createTestUser(userService, 'John Doe', 'john@example.com', 'password123');
 
     const response = await request(app.getHttpServer())
       .get('/users')

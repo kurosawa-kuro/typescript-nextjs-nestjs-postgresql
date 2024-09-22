@@ -1,10 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
 import { UserService } from './../src/user.service';
 import { MicroPostService } from './../src/micropost.service';
 import { Pool } from 'pg';
+import { setupTestApp, clearDatabase, createTestUser, createTestMicropost } from './test-utils';
 
 describe('MicroPostController (e2e)', () => {
   let app: INestApplication;
@@ -13,15 +12,7 @@ describe('MicroPostController (e2e)', () => {
   let pool: Pool;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    userService = moduleFixture.get<UserService>(UserService);
-    micropostService = moduleFixture.get<MicroPostService>(MicroPostService);
-    pool = moduleFixture.get<Pool>('DATABASE_POOL');
-    await app.init();
+    ({ app, userService, micropostService, pool } = await setupTestApp());
   });
 
   afterAll(async () => {
@@ -30,12 +21,11 @@ describe('MicroPostController (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await pool.query('DELETE FROM "micropost"');
-    await pool.query('DELETE FROM "user"');
+    await clearDatabase(pool);
   });
 
   it('should create a micropost (POST /microposts)', async () => {
-    const user = await userService.createUser('Test User', 'test@example.com', 'password123');
+    const user = await createTestUser(userService, 'Test User', 'test@example.com', 'password123');
 
     const response = await request(app.getHttpServer())
       .post('/microposts')
@@ -51,8 +41,8 @@ describe('MicroPostController (e2e)', () => {
   });
 
   it('should retrieve all microposts (GET /microposts)', async () => {
-    const user = await userService.createUser('Another Test User', 'another@example.com', 'password123');
-    await micropostService.createMicroPost(user.id, 'Test micropost', null);
+    const user = await createTestUser(userService, 'Another Test User', 'another@example.com', 'password123');
+    await createTestMicropost(micropostService, user.id, 'Test micropost');
 
     const response = await request(app.getHttpServer())
       .get('/microposts')
@@ -69,7 +59,7 @@ describe('MicroPostController (e2e)', () => {
   });
 
   it('should create a micropost with correct user name (POST /microposts)', async () => {
-    const user = await userService.createUser('John Doe', 'john@example.com', 'password123');
+    const user = await createTestUser(userService, 'John Doe', 'john@example.com', 'password123');
 
     const response = await request(app.getHttpServer())
       .post('/microposts')
@@ -80,10 +70,10 @@ describe('MicroPostController (e2e)', () => {
   });
 
   it('should retrieve microposts with user names (GET /microposts)', async () => {
-    const user1 = await userService.createUser('Alice', 'alice@example.com', 'password123');
-    const user2 = await userService.createUser('Bob', 'bob@example.com', 'password123');
-    await micropostService.createMicroPost(user1.id, 'Alice\'s post', null);
-    await micropostService.createMicroPost(user2.id, 'Bob\'s post', null);
+    const user1 = await createTestUser(userService, 'Alice', 'alice@example.com', 'password123');
+    const user2 = await createTestUser(userService, 'Bob', 'bob@example.com', 'password123');
+    await createTestMicropost(micropostService, user1.id, 'Alice\'s post');
+    await createTestMicropost(micropostService, user2.id, 'Bob\'s post');
 
     const response = await request(app.getHttpServer())
       .get('/microposts')
