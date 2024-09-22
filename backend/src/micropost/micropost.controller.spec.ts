@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MicroPostController } from './micropost.controller';
 import { MicroPostService, MicroPost } from './micropost.service';
-import { UserService, User } from './user.service';
-import { MicropostCategoryService } from './micropost-category.service';
+import { UserService, User } from '../user/user.service';
+import { MicropostCategoryService } from '../micropost-category/micropost-category.service';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
 

@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { CategoryService } from './../src/category.service';
+import { CategoryService } from '../src/category/category.service';
 import { Pool } from 'pg';
 import { setupTestApp, clearDatabase } from './test-utils';
 

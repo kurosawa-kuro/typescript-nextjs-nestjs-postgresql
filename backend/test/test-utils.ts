@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { AppModule } from './../src/app.module';
-import { UserService } from './../src/user.service';
-import { MicroPostService } from './../src/micropost.service';
-import { CategoryService } from './../src/category.service';
+import { UserService } from '../src/user/user.service';
+import { MicroPostService } from '../src/micropost/micropost.service';
+import { CategoryService } from '../src/category/category.service';
 import { Pool } from 'pg';
 
 export async function setupTestApp() {

@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { UserService } from './../src/user.service';
+import { UserService } from '../src/user/user.service';
 import { Pool } from 'pg';
 import { setupTestApp, clearDatabase, createTestUser } from './test-utils';
 

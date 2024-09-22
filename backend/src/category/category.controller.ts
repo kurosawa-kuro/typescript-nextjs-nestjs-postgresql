@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Param, InternalServerErrorException, Logger } from '@nestjs/common';
 import { CategoryService } from './category.service';
-import { MicropostCategoryService } from './micropost-category.service';
+import { MicropostCategoryService } from '../micropost-category/micropost-category.service';
 
 @Controller('categories')
 export class CategoryController {

@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Body, Param, InternalServerErrorException, Logger, NotFoundException, BadRequestException, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MicroPost, MicroPostService } from './micropost.service';
-import { UserService } from './user.service';
-import { MicropostCategoryService } from './micropost-category.service';
+import { UserService } from '../user/user.service';
+import { MicropostCategoryService } from '../micropost-category/micropost-category.service';
 import * as multer from 'multer';
 import * as path from 'path';
 

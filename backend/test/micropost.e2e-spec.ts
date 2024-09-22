@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { UserService } from './../src/user.service';
-import { MicroPostService } from './../src/micropost.service';
+import { UserService } from '../src/user/user.service';
+import { MicroPostService } from '../src/micropost/micropost.service';
 import { Pool } from 'pg';
 import { setupTestApp, clearDatabase, createTestUser, createTestMicropost } from './test-utils';
 
