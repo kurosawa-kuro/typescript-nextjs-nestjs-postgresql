@@ -4,6 +4,7 @@ import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { Pool } from 'pg';
 import { Logger } from '@nestjs/common';
+import { CreateUserDto } from '../database/database.service';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -55,9 +56,11 @@ describe('AuthService', () => {
       await service.register('John Doe', 'john@example.com', 'password123'),
     ).toBe(true);
     expect(mockUserService.create).toHaveBeenCalledWith(
-      'John Doe',
-      'john@example.com',
-      'password123',
+      expect.objectContaining({
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'password123',
+      })
     );
   });
 
@@ -87,18 +90,14 @@ describe('AuthService', () => {
   });
 
   it('should fail login if the password does not match', async () => {
-    // bcrypt.compare が false を返すようにモック
     jest
       .spyOn(bcrypt, 'compare')
       .mockImplementation(() => Promise.resolve(false));
 
-    // ログインメソッドを実行
     const result = await service.login('test@example.com', 'wrongpassword');
 
-    // ログイン失敗の結果を確認
     expect(result).toEqual({ success: false });
 
-    // ログイン失敗時に "Incorrect credentials" がログに記録されているかを確認
     expect(mockLogger).toHaveBeenCalledWith(
       'Login failed',
       new Error('Incorrect credentials'),
@@ -106,17 +105,13 @@ describe('AuthService', () => {
   });
 
   it('should log an error if a database error occurs during login', async () => {
-    // データベースクエリが失敗するようにモック
     const mockError = new Error('Database error');
     jest.spyOn(mockPool, 'query' as any).mockRejectedValueOnce(mockError);
 
-    // ログインメソッドを実行
     const result = await service.login('test@example.com', 'password123');
 
-    // ログイン失敗の結果を確認
     expect(result).toEqual({ success: false });
 
-    // catch ブロックに入ることを確認し、エラーログが記録されていることを確認
     expect(mockLogger).toHaveBeenCalledWith('Login failed', mockError);
   });
 

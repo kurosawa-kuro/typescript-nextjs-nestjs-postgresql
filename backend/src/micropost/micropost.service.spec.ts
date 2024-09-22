@@ -1,22 +1,23 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MicroPostService, MicroPost } from './micropost.service';
-import { Pool, QueryResult } from 'pg';
+import { DatabaseService } from '../database/database.service';
 
 describe('MicroPostService', () => {
   let microPostService: MicroPostService;
-  let mockPool: jest.Mocked<Pool>;
+  let mockDatabaseService: jest.Mocked<DatabaseService>;
 
   beforeEach(async () => {
-    mockPool = {
-      query: jest.fn(),
-    } as unknown as jest.Mocked<Pool>;
+    mockDatabaseService = {
+      createMicroPost: jest.fn(),
+      listMicroPosts: jest.fn(),
+    } as unknown as jest.Mocked<DatabaseService>;
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         MicroPostService,
         {
-          provide: 'DATABASE_POOL',
-          useValue: mockPool,
+          provide: DatabaseService,
+          useValue: mockDatabaseService,
         },
       ],
     }).compile();
@@ -29,42 +30,36 @@ describe('MicroPostService', () => {
       const userId = 1;
       const title = 'Test MicroPost';
       const imagePath = 'path/to/image.jpg';
-      const userName = 'TestUser';
       const mockMicroPost: MicroPost = {
         id: 1,
         userId,
         title,
-        userName,
+        userName: 'TestUser',
         imagePath,
       };
 
-      (mockPool.query as jest.Mock).mockResolvedValue({ rows: [mockMicroPost] } as QueryResult);
+      mockDatabaseService.createMicroPost.mockResolvedValue(mockMicroPost);
 
       const result = await microPostService.create(userId, title, imagePath);
 
       expect(result).toEqual(mockMicroPost);
-      expect(mockPool.query).toHaveBeenCalledWith(
-        expect.stringContaining(
-          'INSERT INTO micropost(user_id, title, image_path)',
-        ),
-        [userId, title, imagePath],
-      );
+      expect(mockDatabaseService.createMicroPost).toHaveBeenCalledWith(userId, title, imagePath);
     });
 
-    it('should throw error if insertion fails', async () => {
+    it('should throw error if creation fails', async () => {
       const userId = 1;
       const title = 'Failed MicroPost';
       const imagePath = null;
 
-      (mockPool.query as jest.Mock).mockRejectedValue(new Error('Insertion failed'));
+      mockDatabaseService.createMicroPost.mockRejectedValue(new Error('Creation failed'));
 
       await expect(
         microPostService.create(userId, title, imagePath),
-      ).rejects.toThrow('Insertion failed');
+      ).rejects.toThrow('Creation failed');
     });
   });
 
-  describe('index', () => {
+  describe('list', () => {
     it('should return all microposts', async () => {
       const mockMicroPosts: MicroPost[] = [
         {
@@ -83,30 +78,26 @@ describe('MicroPostService', () => {
         },
       ];
 
-      (mockPool.query as jest.Mock).mockResolvedValue({ rows: mockMicroPosts } as QueryResult);
+      mockDatabaseService.listMicroPosts.mockResolvedValue(mockMicroPosts);
 
-      const result = await microPostService.index();
+      const result = await microPostService.list();
 
       expect(result).toEqual(mockMicroPosts);
-      expect(mockPool.query).toHaveBeenCalledWith(
-        expect.stringContaining(
-          'SELECT m.id, m.user_id as "userId", m.title, m.image_path as "imagePath", u.name as "userName"',
-        ),
-      );
+      expect(mockDatabaseService.listMicroPosts).toHaveBeenCalled();
     });
 
     it('should return an empty array if no microposts exist', async () => {
-      (mockPool.query as jest.Mock).mockResolvedValue({ rows: [] } as QueryResult);
+      mockDatabaseService.listMicroPosts.mockResolvedValue([]);
 
-      const result = await microPostService.index();
+      const result = await microPostService.list();
 
       expect(result).toEqual([]);
     });
 
     it('should throw an error if query fails', async () => {
-      (mockPool.query as jest.Mock).mockRejectedValue(new Error('Query failed'));
+      mockDatabaseService.listMicroPosts.mockRejectedValue(new Error('Query failed'));
 
-      await expect(microPostService.index()).rejects.toThrow('Query failed');
+      await expect(microPostService.list()).rejects.toThrow('Query failed');
     });
   });
 });
