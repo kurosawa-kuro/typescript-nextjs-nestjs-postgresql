@@ -1,13 +1,25 @@
 import { Pool, PoolClient } from 'pg';
 
-// データベース接続設定
-const dbConfig = {
-  user: 'postgres',
-  host: 'localhost',
-  database: 'web_app_db_integration',
-  password: 'postgres',
-  port: 5432,
-};
+// 環境設定
+type Environment = 'development' | 'test';
+let env: Environment = 'development';  // デフォルト値
+
+// 環境を切り替える関数
+function setEnvironment(newEnv: Environment): void {
+  env = newEnv;
+  console.log(`Environment set to: ${env}`);
+}
+
+// データベース接続設定を取得する関数
+function getDbConfig() {
+  return {
+    user: 'postgres',
+    host: 'localhost',
+    database: env === 'development' ? 'web_app_db_integration' : 'web_app_db_integration_test',
+    password: 'postgres',
+    port: 5432,
+  };
+}
 
 // SQL文の定義
 const dropTablesSql = `
@@ -79,7 +91,7 @@ INSERT INTO micropost_category (micropost_id, category_id) VALUES
 
 // データベース接続を管理する関数
 async function withConnection<T>(operation: (client: PoolClient) => Promise<T>): Promise<T> {
-  const pool = new Pool(dbConfig);
+  const pool = new Pool(getDbConfig());
   const client = await pool.connect();
   try {
     return await operation(client);
@@ -106,21 +118,27 @@ async function setupDatabase(): Promise<void> {
     await executeSql(client, dropTablesSql, 'Dropping tables');
     await executeSql(client, createTablesSql, 'Creating tables');
     await executeSql(client, insertAdminSql, 'Inserting admin user');
-    await executeSql(client, insertUsersSql, 'Inserting regular users');
-    await executeSql(client, insertOtherDataSql, 'Inserting other data');
+    
+    if (env === 'development') {
+      await executeSql(client, insertUsersSql, 'Inserting regular users');
+      await executeSql(client, insertOtherDataSql, 'Inserting other data');
+    }
   });
 }
 
 // メイン実行関数
 async function main(): Promise<void> {
   try {
+    console.log(`Setting up database for ${env} environment`);
+    console.log(`Using database: ${getDbConfig().database}`);
     await setupDatabase();
-    console.log('Database setup completed successfully');
+    console.log(`Database setup completed successfully for ${env} environment`);
   } catch (err) {
-    console.error('Database setup failed:', err);
+    console.error(`Database setup failed for ${env} environment:`, err);
     process.exit(1);
   }
 }
 
-// スクリプトの実行
+// 使用例
+setEnvironment('test');  // テスト環境に切り替える場合はこの行のコメントを解除
 main();
