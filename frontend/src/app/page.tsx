@@ -8,6 +8,7 @@ interface Micropost {
   title: string;
   content: string;
   userName: string;
+  imagePath?: string;
 }
 
 const API_URL = 'http://localhost:3001/microposts';
@@ -42,17 +43,18 @@ export default function Home() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append('userId', '1'); // この値は適切なユーザーIDに変更する必要があります
+    formData.append('title', title);
+    formData.append('content', content);
+    if (image) {
+      formData.append('image', image);
+    }
+
     try {
       const response = await fetch(API_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: 1, // この値は適切なユーザーIDに変更する必要があります
-          title: title,
-          content: content,
-        }),
+        body: formData,
       });
 
       if (!response.ok) {
@@ -134,6 +136,9 @@ const MicropostList = ({ microposts }: { microposts: Micropost[] }) => (
   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
     {microposts.map((post) => (
       <div key={post.id} className="bg-white shadow-lg rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+        {post.imagePath && (
+          <img src={`http://localhost:3001/${post.imagePath}`} alt={post.title} className="w-full h-48 object-cover" />
+        )}
         <div className="p-6">
           <h2 className="text-xl font-semibold mb-2 text-purple-700">{post.title}</h2>
           <p className="text-gray-600 mb-4">{post.content}</p>
