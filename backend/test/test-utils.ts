@@ -32,13 +32,13 @@ export async function clearDatabase(pool: Pool) {
 }
 
 export async function createTestUser(userService: UserService, name: string, email: string, password: string) {
-  return await userService.createUser(name, email, password);
+  return await userService.create(name, email, password);
 }
 
 export async function createTestMicropost(micropostService: MicroPostService, userId: number, title: string) {
-  return await micropostService.createMicroPost(userId, title, null);
+  return await micropostService.create(userId, title, null);
 }
 
 export async function createTestCategory(categoryService: CategoryService, title: string) {
-  return await categoryService.createCategory(title);
+  return await categoryService.create(title);
 }

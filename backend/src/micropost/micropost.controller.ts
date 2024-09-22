@@ -28,18 +28,18 @@ export class MicroPostController {
 
   @Post()
   @UseInterceptors(FileInterceptor('image', { storage: storage }))
-  async createMicroPost(
+  async create(
     @Body('userId') userId: number,
     @Body('title') title: string,
     @UploadedFile() file?: Express.Multer.File
   ) {
     try {
-      const user = await this.userService.getUserById(userId);
+      const user = await this.userService.find(userId);
       if (!user) {
         throw new NotFoundException(`User with id ${userId} not found`);
       }
       const imagePath = file ? file.path : null;
-      const micropost = await this.microPostService.createMicroPost(userId, title, imagePath);
+      const micropost = await this.microPostService.create(userId, title, imagePath);
       return { message: 'MicroPost created', micropost };
     } catch (error) {
       if (error instanceof NotFoundException) {
@@ -51,9 +51,9 @@ export class MicroPostController {
   }
 
   @Get()
-  async getMicroPosts(): Promise<MicroPost[]> {
+  async index(): Promise<MicroPost[]> {
     try {
-      const microposts = await this.microPostService.getMicroPosts();
+      const microposts = await this.microPostService.index();
       return microposts.map(post => ({
         id: post.id,
         userId: post.userId,
@@ -68,10 +68,10 @@ export class MicroPostController {
   }
 
   @Get(':id/categories')
-  async getMicropostCategories(@Param('id') id: string) {
+  async categories(@Param('id') id: string) {
     try {
       const micropostId = parseInt(id, 10);
-      const categories = await this.micropostCategoryService.getMicropostCategories(micropostId);
+      const categories = await this.micropostCategoryService.categories(micropostId);
       return categories;
     } catch (error) {
       this.logger.error(`Failed to get categories for micropost: ${error.message}`, error.stack);
@@ -80,13 +80,13 @@ export class MicroPostController {
   }
 
   @Post(':id/categories')
-  async addCategoryToMicropost(
+  async add_category(
     @Param('id') id: string,
     @Body('categoryId') categoryId: number
   ) {
     try {
       const micropostId = parseInt(id, 10);
-      await this.micropostCategoryService.addCategoryToMicropost(micropostId, categoryId);
+      await this.micropostCategoryService.add_category(micropostId, categoryId);
       return { message: 'Category added to micropost' };
     } catch (error) {
       this.logger.error(`Failed to add category to micropost: ${error.message}`, error.stack);

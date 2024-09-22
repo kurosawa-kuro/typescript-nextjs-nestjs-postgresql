@@ -31,7 +31,7 @@ describe('MicroPostService', () => {
     microPostService = module.get<MicroPostService>(MicroPostService);
   });
 
-  describe('createMicroPost', () => {
+  describe('create', () => {
     it('should create a new micropost', async () => {
       const userId = 1;
       const title = 'Test MicroPost';
@@ -46,7 +46,7 @@ describe('MicroPostService', () => {
         return Promise.resolve({ rows: [mockMicroPost] });
       });
 
-      const result = await microPostService.createMicroPost(userId, title, imagePath);
+      const result = await microPostService.create(userId, title, imagePath);
 
       expect(result).toEqual(mockMicroPost);
       expect(mockPool.connect).toHaveBeenCalled();
@@ -74,7 +74,7 @@ describe('MicroPostService', () => {
         return Promise.reject(new Error('Insertion failed'));
       });
 
-      await expect(microPostService.createMicroPost(userId, title, imagePath)).rejects.toThrow('Insertion failed');
+      await expect(microPostService.create(userId, title, imagePath)).rejects.toThrow('Insertion failed');
 
       expect(mockPool.connect).toHaveBeenCalled();
       expect(mockClient.query).toHaveBeenCalledWith('BEGIN');
@@ -83,7 +83,7 @@ describe('MicroPostService', () => {
     });
   });
 
-  describe('getMicroPosts', () => {
+  describe('index', () => {
     it('should return all microposts', async () => {
       const mockMicroPosts: MicroPost[] = [
         { id: 1, userId: 1, title: 'MicroPost 1', userName: 'User1', imagePath: 'path/to/image1.jpg' },
@@ -92,7 +92,7 @@ describe('MicroPostService', () => {
 
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: mockMicroPosts });
 
-      const result = await microPostService.getMicroPosts();
+      const result = await microPostService.index();
 
       expect(result).toEqual(mockMicroPosts);
       expect(mockPool.query).toHaveBeenCalledWith(
@@ -103,7 +103,7 @@ describe('MicroPostService', () => {
     it('should return an empty array if no microposts exist', async () => {
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: [] });
 
-      const result = await microPostService.getMicroPosts();
+      const result = await microPostService.index();
 
       expect(result).toEqual([]);
     });
@@ -111,7 +111,7 @@ describe('MicroPostService', () => {
     it('should throw an error if query fails', async () => {
       (mockPool.query as jest.Mock).mockRejectedValue(new Error('Query failed'));
 
-      await expect(microPostService.getMicroPosts()).rejects.toThrow('Query failed');
+      await expect(microPostService.index()).rejects.toThrow('Query failed');
     });
   });
 });

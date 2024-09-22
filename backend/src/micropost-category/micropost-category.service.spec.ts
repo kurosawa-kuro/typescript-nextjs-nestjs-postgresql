@@ -34,7 +34,7 @@ describe('MicropostCategoryService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('getMicropostCategories', () => {
+  describe('categories', () => {
     it('should return categories for a given micropost', async () => {
       const mockCategories = [
         { id: 1, title: 'Category 1' },
@@ -42,14 +42,14 @@ describe('MicropostCategoryService', () => {
       ];
       mockPool.query.mockResolvedValue({ rows: mockCategories });
 
-      const result = await service.getMicropostCategories(1);
+      const result = await service.categories(1);
 
       expect(result).toEqual(mockCategories);
       expect(mockPool.query).toHaveBeenCalledWith(expect.any(String), [1]);
     });
   });
 
-  describe('getCategoryMicroposts', () => {
+  describe('microposts', () => {
     it('should return microposts for a given category', async () => {
       const mockMicroposts = [
         { id: 1, title: 'Micropost 1', user_id: 1, user_name: 'User 1' },
@@ -57,18 +57,18 @@ describe('MicropostCategoryService', () => {
       ];
       mockPool.query.mockResolvedValue({ rows: mockMicroposts });
 
-      const result = await service.getCategoryMicroposts(1);
+      const result = await service.microposts(1);
 
       expect(result).toEqual(mockMicroposts);
       expect(mockPool.query).toHaveBeenCalledWith(expect.any(String), [1]);
     });
   });
 
-  describe('addCategoryToMicropost', () => {
+  describe('add_category', () => {
     it('should add a category to a micropost', async () => {
       mockPool.query.mockResolvedValue({ rowCount: 1 });
 
-      await service.addCategoryToMicropost(1, 1);
+      await service.add_category(1, 1);
 
       expect(mockPool.query).toHaveBeenCalledWith(expect.any(String), [1, 1]);
     });
@@ -76,7 +76,7 @@ describe('MicropostCategoryService', () => {
     it('should throw an error if the insertion fails', async () => {
       mockPool.query.mockRejectedValue(new Error('Insertion failed'));
 
-      await expect(service.addCategoryToMicropost(1, 1)).rejects.toThrow('Insertion failed');
+      await expect(service.add_category(1, 1)).rejects.toThrow('Insertion failed');
     });
   });
 });

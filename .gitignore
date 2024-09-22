@@ -46,3 +46,4 @@ backend/error.log
 backend/combined.log
 backend/src/app/routes/Todo.md
 backend/uploads/
+backend/output.txt

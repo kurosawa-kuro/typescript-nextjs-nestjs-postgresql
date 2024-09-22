@@ -28,7 +28,7 @@ describe('UserService', () => {
     userService = module.get<UserService>(UserService);
   });
 
-  describe('createUser', () => {
+  describe('create', () => {
     it('should create a new user', async () => {
       const name = 'John Doe';
       const email = 'john@example.com';
@@ -39,7 +39,7 @@ describe('UserService', () => {
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: [mockUser] });
 
-      const result = await userService.createUser(name, email, password, isAdmin);
+      const result = await userService.create(name, email, password, isAdmin);
 
       expect(result).toEqual(mockUser);
       expect(mockPool.query).toHaveBeenCalledWith(
@@ -57,18 +57,18 @@ describe('UserService', () => {
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
       (mockPool.query as jest.Mock).mockRejectedValue(new Error('Creation failed'));
 
-      await expect(userService.createUser(name, email, password, isAdmin)).rejects.toThrow('Creation failed');
+      await expect(userService.create(name, email, password, isAdmin)).rejects.toThrow('Creation failed');
     });
   });
 
-  describe('getUserById', () => {
+  describe('find', () => {
     it('should return a user when found', async () => {
       const userId = 1;
       const mockUser: User = { id: userId, name: 'John Doe', email: 'john@example.com', isAdmin: false };
 
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: [mockUser] });
 
-      const result = await userService.getUserById(userId);
+      const result = await userService.find(userId);
 
       expect(result).toEqual(mockUser);
       expect(mockPool.query).toHaveBeenCalledWith(
@@ -82,7 +82,7 @@ describe('UserService', () => {
 
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: [] });
 
-      const result = await userService.getUserById(userId);
+      const result = await userService.find(userId);
 
       expect(result).toBeNull();
     });
@@ -92,11 +92,11 @@ describe('UserService', () => {
 
       (mockPool.query as jest.Mock).mockRejectedValue(new Error('Query failed'));
 
-      await expect(userService.getUserById(userId)).rejects.toThrow('Query failed');
+      await expect(userService.find(userId)).rejects.toThrow('Query failed');
     });
   });
 
-  describe('getUsers', () => {
+  describe('index', () => {
     it('should return all users', async () => {
       const mockUsers: User[] = [
         { id: 1, name: 'John Doe', email: 'john@example.com', isAdmin: false },
@@ -105,7 +105,7 @@ describe('UserService', () => {
 
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: mockUsers });
 
-      const result = await userService.getUsers();
+      const result = await userService.index();
 
       expect(result).toEqual(mockUsers);
       expect(mockPool.query).toHaveBeenCalledWith('SELECT id, name, email, is_admin as "isAdmin" FROM "user"');
@@ -114,7 +114,7 @@ describe('UserService', () => {
     it('should return an empty array if no users exist', async () => {
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: [] });
 
-      const result = await userService.getUsers();
+      const result = await userService.index();
 
       expect(result).toEqual([]);
     });
@@ -122,11 +122,11 @@ describe('UserService', () => {
     it('should throw an error if query fails', async () => {
       (mockPool.query as jest.Mock).mockRejectedValue(new Error('Query failed'));
 
-      await expect(userService.getUsers()).rejects.toThrow('Query failed');
+      await expect(userService.index()).rejects.toThrow('Query failed');
     });
   });
 
-  describe('validateUser', () => {
+  describe('authenticate', () => {
     it('should return a user when credentials are valid', async () => {
       const email = 'john@example.com';
       const password = 'password';
@@ -135,7 +135,7 @@ describe('UserService', () => {
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: [mockUser] });
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
-      const result = await userService.validateUser(email, password);
+      const result = await userService.authenticate(email, password);
 
       expect(result).toEqual({ id: 1, name: 'John Doe', email, isAdmin: false });
     });
@@ -148,7 +148,7 @@ describe('UserService', () => {
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: [mockUser] });
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-      const result = await userService.validateUser(email, password);
+      const result = await userService.authenticate(email, password);
 
       expect(result).toBeNull();
     });
@@ -159,7 +159,7 @@ describe('UserService', () => {
 
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: [] });
 
-      const result = await userService.validateUser(email, password);
+      const result = await userService.authenticate(email, password);
 
       expect(result).toBeNull();
     });

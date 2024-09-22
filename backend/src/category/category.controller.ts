@@ -12,9 +12,9 @@ export class CategoryController {
   ) {}
 
   @Post()
-  async createCategory(@Body('title') title: string) {
+  async create(@Body('title') title: string) {
     try {
-      await this.categoryService.createCategory(title);
+      await this.categoryService.create(title);
       return { message: 'Category created' };
     } catch (error) {
       this.logger.error(`Failed to create category: ${error.message}`, error.stack);
@@ -23,9 +23,9 @@ export class CategoryController {
   }
 
   @Get()
-  async getCategories() {
+  async index() {
     try {
-      const categories = await this.categoryService.getCategories();
+      const categories = await this.categoryService.index();
       return categories;
     } catch (error) {
       this.logger.error(`Failed to get categories: ${error.message}`, error.stack);
@@ -34,10 +34,10 @@ export class CategoryController {
   }
 
   @Get(':id/microposts')
-  async getCategoryMicroposts(@Param('id') id: string) {
+  async microposts(@Param('id') id: string) {
     try {
       const categoryId = parseInt(id, 10);
-      const microposts = await this.micropostCategoryService.getCategoryMicroposts(categoryId);
+      const microposts = await this.micropostCategoryService.microposts(categoryId);
       return microposts;
     } catch (error) {
       this.logger.error(`Failed to get microposts for category: ${error.message}`, error.stack);

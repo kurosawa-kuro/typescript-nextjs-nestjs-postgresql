@@ -15,7 +15,7 @@ export class MicroPostService {
     @Inject('DATABASE_POOL') private readonly pool: Pool,
   ) {}
 
-  async createMicroPost(userId: number, title: string, imagePath: string | null): Promise<MicroPost> {
+  async create(userId: number, title: string, imagePath: string | null): Promise<MicroPost> {
     const client = await this.pool.connect();
     try {
       await client.query('BEGIN');
@@ -36,7 +36,7 @@ export class MicroPostService {
     }
   }
 
-  async getMicroPosts(): Promise<MicroPost[]> {
+  async index(): Promise<MicroPost[]> {
     const query = `
       SELECT m.id, m.user_id as "userId", m.title, m.image_path as "imagePath", u.name as "userName"
       FROM micropost m

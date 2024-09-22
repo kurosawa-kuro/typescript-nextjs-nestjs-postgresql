@@ -36,7 +36,7 @@ describe('CategoryController (e2e)', () => {
 
   it('should retrieve all categories (GET /categories)', async () => {
     // カテゴリーサービスを使用してテストデータを作成
-    await categoryService.createCategory('New Category');
+    await categoryService.create('New Category');
 
     const response = await request(app.getHttpServer())
       .get('/categories')

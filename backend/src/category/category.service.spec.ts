@@ -27,12 +27,12 @@ describe('CategoryService', () => {
     categoryService = module.get<CategoryService>(CategoryService);
   });
 
-  describe('createCategory', () => {
+  describe('create', () => {
     it('should insert a new category', async () => {
       const title = 'Test Category';
       (mockPool.query as jest.Mock).mockResolvedValue({ rowCount: 1 });
 
-      await categoryService.createCategory(title);
+      await categoryService.create(title);
 
       expect(mockPool.query).toHaveBeenCalledWith(
         'INSERT INTO category(title) VALUES($1)',
@@ -44,11 +44,11 @@ describe('CategoryService', () => {
       const title = 'Failed Category';
       (mockPool.query as jest.Mock).mockRejectedValue(new Error('Insertion failed'));
 
-      await expect(categoryService.createCategory(title)).rejects.toThrow('Insertion failed');
+      await expect(categoryService.create(title)).rejects.toThrow('Insertion failed');
     });
   });
 
-  describe('getCategories', () => {
+  describe('index', () => {
     it('should return all categories', async () => {
       const mockCategories = [
         { id: 1, title: 'Category 1' },
@@ -56,7 +56,7 @@ describe('CategoryService', () => {
       ];
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: mockCategories });
 
-      const result = await categoryService.getCategories();
+      const result = await categoryService.index();
 
       expect(result).toEqual(mockCategories);
       expect(mockPool.query).toHaveBeenCalledWith('SELECT * FROM category');
@@ -65,7 +65,7 @@ describe('CategoryService', () => {
     it('should return an empty array if no categories exist', async () => {
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: [] });
 
-      const result = await categoryService.getCategories();
+      const result = await categoryService.index();
 
       expect(result).toEqual([]);
     });
@@ -73,7 +73,7 @@ describe('CategoryService', () => {
     it('should throw an error if query fails', async () => {
       (mockPool.query as jest.Mock).mockRejectedValue(new Error('Query failed'));
 
-      await expect(categoryService.getCategories()).rejects.toThrow('Query failed');
+      await expect(categoryService.index()).rejects.toThrow('Query failed');
     });
   });
 });

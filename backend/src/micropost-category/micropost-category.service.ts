@@ -5,7 +5,7 @@ import { Pool } from 'pg';
 export class MicropostCategoryService {
   constructor(@Inject('DATABASE_POOL') private pool: Pool) {}
 
-  async getMicropostCategories(micropostId: number) {
+  async categories(micropostId: number) {
     const query = `
       SELECT c.id, c.title
       FROM category c
@@ -16,7 +16,7 @@ export class MicropostCategoryService {
     return result.rows;
   }
 
-  async addCategoryToMicropost(micropostId: number, categoryId: number) {
+  async add_category(micropostId: number, categoryId: number) {
     const query = `
       INSERT INTO micropost_category (micropost_id, category_id)
       VALUES ($1, $2)
@@ -25,7 +25,7 @@ export class MicropostCategoryService {
     await this.pool.query(query, [micropostId, categoryId]);
   }
 
-  async getCategoryMicroposts(categoryId: number) {
+  async microposts(categoryId: number) {
     const query = `
       SELECT m.id, m.user_id as "userId", m.title, m.image_path as "imagePath", u.name as "userName"
       FROM micropost m

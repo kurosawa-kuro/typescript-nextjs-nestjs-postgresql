@@ -8,7 +8,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  async createUser(
+  async create(
     @Body('name') name: string,
     @Body('email') email: string,
     @Body('password') password: string,
@@ -17,14 +17,14 @@ export class UserController {
     if (!name || !email || !password) {
       throw new BadRequestException('Name, email, and password are required');
     }
-    const user = await this.userService.createUser(name, email, password, isAdmin);
+    const user = await this.userService.create(name, email, password, isAdmin);
     return { message: 'User created', user: { id: user.id, name: user.name, email: user.email, isAdmin: user.isAdmin } };
   }
 
   @Get()
-  async getUsers() {
-    this.logger.debug('getUsers method called');
-    const users = await this.userService.getUsers();
+  async index() {
+    this.logger.debug('index method called');
+    const users = await this.userService.index();
     this.logger.debug(`Retrieved ${users.length} users`);
     return users.map(user => ({ id: user.id, name: user.name, email: user.email, isAdmin: user.isAdmin }));
   }

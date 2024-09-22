@@ -15,8 +15,8 @@ describe('UserController', () => {
         {
           provide: UserService,
           useValue: {
-            createUser: jest.fn(),
-            getUsers: jest.fn().mockResolvedValue([{ id: 1, name: 'John Doe', email: 'john@example.com', isAdmin: false }]),
+            create: jest.fn(),
+            index: jest.fn().mockResolvedValue([{ id: 1, name: 'John Doe', email: 'john@example.com', isAdmin: false }]),
           },
         },
       ],
@@ -28,19 +28,19 @@ describe('UserController', () => {
 
   it('should create a user and return a success message', async () => {
     const mockUser = { id: 1, name: 'John Doe', email: 'john@example.com', isAdmin: false };
-    (userService.createUser as jest.Mock).mockResolvedValue(mockUser);
+    (userService.create as jest.Mock).mockResolvedValue(mockUser);
 
-    const result = await userController.createUser('John Doe', 'john@example.com', 'password', false);
-    expect(userService.createUser).toHaveBeenCalledWith('John Doe', 'john@example.com', 'password', false);
+    const result = await userController.create('John Doe', 'john@example.com', 'password', false);
+    expect(userService.create).toHaveBeenCalledWith('John Doe', 'john@example.com', 'password', false);
     expect(result).toEqual({ message: 'User created', user: mockUser });
   });
 
   it('should throw BadRequestException if required fields are missing', async () => {
-    await expect(userController.createUser('', '', '', false)).rejects.toThrow(BadRequestException);
+    await expect(userController.create('', '', '', false)).rejects.toThrow(BadRequestException);
   });
 
   it('should return an array of users', async () => {
-    const result = await userController.getUsers();
+    const result = await userController.index();
     expect(result).toEqual([{ id: 1, name: 'John Doe', email: 'john@example.com', isAdmin: false }]);
   });
 });

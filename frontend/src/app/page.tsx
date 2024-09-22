@@ -36,7 +36,7 @@ const fetchMicroposts = async (): Promise<Micropost[]> => {
   return response.json();
 };
 
-const createMicropost = async (formData: FormData): Promise<Micropost> => {
+const create = async (formData: FormData): Promise<Micropost> => {
   const response = await fetch(API_URL, {
     method: 'POST',
     body: formData,
@@ -245,7 +245,7 @@ export default function Home() {
     }
 
     try {
-      const newMicropost = await createMicropost(formData);
+      const newMicropost = await create(formData);
       addMicropost(newMicropost);
       handleCloseModal();
       resetForm();
