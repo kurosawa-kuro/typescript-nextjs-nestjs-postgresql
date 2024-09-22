@@ -1,15 +1,22 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
 
 describe('AuthController', () => {
   let controller: AuthController;
   let mockAuthService: Partial<AuthService>;
+  let mockJwtService: Partial<JwtService>;
 
   const createMockAuthService = () => ({
     register: jest.fn().mockResolvedValue(true),
-    login: jest.fn().mockResolvedValue({ success: true, token: 'abc123' }),
+    login: jest.fn().mockResolvedValue({ success: true, token: 'abc123', user: { id: 1, name: 'John', email: 'john@example.com' } }),
     logout: jest.fn().mockResolvedValue(true),
+  });
+
+  const createMockJwtService = () => ({
+    sign: jest.fn().mockReturnValue('mock.jwt.token'),
   });
 
   const setupTestingModule = async () => {
@@ -20,6 +27,10 @@ describe('AuthController', () => {
           provide: AuthService,
           useValue: mockAuthService,
         },
+        {
+          provide: JwtService,
+          useValue: mockJwtService,
+        },
       ],
     }).compile();
 
@@ -28,6 +39,7 @@ describe('AuthController', () => {
 
   beforeEach(async () => {
     mockAuthService = createMockAuthService();
+    mockJwtService = createMockJwtService();
     await setupTestingModule();
   });
 
@@ -53,40 +65,54 @@ describe('AuthController', () => {
 
   describe('login', () => {
     it('should login successfully', async () => {
-      const result = await controller.login('john@example.com', 'password123');
+      const mockResponse = {
+        cookie: jest.fn(),
+      } as unknown as Response;
+
+      const result = await controller.login('john@example.com', 'password123', mockResponse);
       expect(result).toEqual({
         success: true,
         message: 'Login successful',
-        token: 'abc123',
       });
+      expect(mockResponse.cookie).toHaveBeenCalledWith(
+        'jwt',
+        'abc123',
+        expect.objectContaining({
+          httpOnly: true,
+          secure: expect.any(Boolean),
+          sameSite: 'strict',
+          maxAge: expect.any(Number),
+        })
+      );
     });
 
     it('should handle login failure', async () => {
       jest.spyOn(mockAuthService, 'login').mockResolvedValueOnce({ success: false });
-      const result = await controller.login('john@example.com', 'wrongpassword');
+      const mockResponse = {
+        cookie: jest.fn(),
+      } as unknown as Response;
+
+      const result = await controller.login('john@example.com', 'wrongpassword', mockResponse);
       expect(result).toEqual({
         success: false,
         message: 'Login failed',
       });
+      expect(mockResponse.cookie).not.toHaveBeenCalled();
     });
   });
 
   describe('logout', () => {
     it('should logout successfully', async () => {
-      const result = await controller.logout();
+      const mockResponse = {
+        clearCookie: jest.fn(),
+      } as unknown as Response;
+
+      const result = await controller.logout(mockResponse);
       expect(result).toEqual({
         success: true,
         message: 'Successfully logged out',
       });
-    });
-
-    it('should handle logout failure', async () => {
-      jest.spyOn(mockAuthService, 'logout').mockResolvedValueOnce(false);
-      const result = await controller.logout();
-      expect(result).toEqual({
-        success: false,
-        message: 'Logout failed',
-      });
+      expect(mockResponse.clearCookie).toHaveBeenCalledWith('jwt');
     });
   });
 });

@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Pool } from 'pg';
-import { Logger } from '@nestjs/common';
+import { Logger, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto, UserCreationData } from '../user/user.service';
 
 jest.mock('bcrypt');
@@ -12,6 +13,7 @@ describe('AuthService', () => {
   let service: AuthService;
   let mockUserService: Partial<UserService>;
   let mockPool: jest.Mocked<Partial<Pool>>;
+  let mockJwtService: Partial<JwtService>;
   let mockLogger: jest.SpyInstance;
 
   beforeEach(async () => {
@@ -33,6 +35,10 @@ describe('AuthService', () => {
       }),
     };
 
+    mockJwtService = {
+      sign: jest.fn().mockReturnValue('mock.jwt.token'),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
@@ -43,6 +49,10 @@ describe('AuthService', () => {
         {
           provide: 'DATABASE_POOL',
           useValue: mockPool,
+        },
+        {
+          provide: JwtService,
+          useValue: mockJwtService,
         },
       ],
     }).compile();
@@ -88,20 +98,23 @@ describe('AuthService', () => {
     const loginResult = await service.login('test@example.com', 'password');
     expect(loginResult).toEqual({
       success: true,
-      token: 'placeholder-token',
+      token: 'mock.jwt.token',
       user: { id: 1, name: 'Test User', email: 'test@example.com' },
     });
     expect(mockPool.query).toHaveBeenCalledWith(expect.any(String), [
       'test@example.com',
     ]);
+    expect(mockJwtService.sign).toHaveBeenCalledWith({
+      sub: 1,
+      email: 'test@example.com',
+      isAdmin: false,
+    });
   });
 
   it('should fail login if the password does not match', async () => {
     (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-    const result = await service.login('test@example.com', 'wrongpassword');
-
-    expect(result).toEqual({ success: false });
+    await expect(service.login('test@example.com', 'wrongpassword')).rejects.toThrow(UnauthorizedException);
 
     expect(mockLogger).toHaveBeenCalledWith(
       'Login failed',
@@ -109,13 +122,11 @@ describe('AuthService', () => {
     );
   });
 
-  it('should log an error if a database error occurs during login', async () => {
+  it('should throw an UnauthorizedException if a database error occurs during login', async () => {
     const mockError = new Error('Database error');
     jest.spyOn(mockPool, 'query' as any).mockRejectedValueOnce(mockError);
 
-    const result = await service.login('test@example.com', 'password123');
-
-    expect(result).toEqual({ success: false });
+    await expect(service.login('test@example.com', 'password123')).rejects.toThrow(UnauthorizedException);
 
     expect(mockLogger).toHaveBeenCalledWith('Login failed', mockError);
   });
