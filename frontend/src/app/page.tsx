@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import LoginModal from './LoginModal';
+
 // 1. 型定義
 interface Micropost {
   id: number;
@@ -27,19 +28,19 @@ interface MicropostModalProps {
 interface LoginResponse {
   success: boolean;
   message: string;
-  token: string; // Add the token property
+  token: string;
   user: {
     id: number;
     name: string;
     email: string;
-  }; // Add the user property
+  };
 }
 
 // 2. 定数
 const API_URL = 'http://localhost:3001/microposts';
 
 // 3. API関連の関数
-const fetchMicroposts = async (): Promise<Micropost[]> => {
+const apiFetchMicroposts = async (): Promise<Micropost[]> => {
   const response = await fetch(API_URL);
   if (!response.ok) {
     throw new Error('Failed to fetch microposts');
@@ -47,7 +48,7 @@ const fetchMicroposts = async (): Promise<Micropost[]> => {
   return response.json();
 };
 
-const create = async (formData: FormData): Promise<Micropost> => {
+const apiCreateMicropost = async (formData: FormData): Promise<Micropost> => {
   const response = await fetch(API_URL, {
     method: 'POST',
     body: formData,
@@ -63,51 +64,51 @@ const create = async (formData: FormData): Promise<Micropost> => {
 const useMicroposts = () => {
   const [microposts, setMicroposts] = useState<Micropost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchMicropostsData = async () => {
+  const fetchMicroposts = async () => {
     try {
       setIsLoading(true);
-      const data = await fetchMicroposts();
+      const data = await apiFetchMicroposts();
       setMicroposts(data);
-      setErrorMessage(null);
+      setError(null);
     } catch (err) {
-      setErrorMessage('Error fetching microposts. Please try again later.');
+      setError('Error fetching microposts. Please try again later.');
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchMicropostsData();
+    fetchMicroposts();
   }, []);
 
   const addMicropost = (newMicropost: Micropost) => {
     setMicroposts(prevMicroposts => [newMicropost, ...prevMicroposts]);
   };
 
-  return { microposts, isLoading, errorMessage, addMicropost, fetchMicropostsData };
+  return { microposts, isLoading, error, addMicropost, fetchMicroposts };
 };
 
-const useModal = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
-  return { isModalOpen, handleOpenModal, handleCloseModal };
+const useModal = (initialState = false) => {
+  const [isOpen, setIsOpen] = useState(initialState);
+  const handleOpen = () => setIsOpen(true);
+  const handleClose = () => setIsOpen(false);
+  return { isOpen, handleOpen, handleClose };
 };
 
 const usePostForm = () => {
-  const [postTitle, setPostTitle] = useState("");
-  const [postContent, setPostContent] = useState("");
-  const [postImage, setPostImage] = useState<File | null>(null);
+  const [formTitle, setFormTitle] = useState("");
+  const [formContent, setFormContent] = useState("");
+  const [formImage, setFormImage] = useState<File | null>(null);
 
   const resetForm = () => {
-    setPostTitle("");
-    setPostContent("");
-    setPostImage(null);
+    setFormTitle("");
+    setFormContent("");
+    setFormImage(null);
   };
 
-  return { postTitle, setPostTitle, postContent, setPostContent, postImage, setPostImage, resetForm };
+  return { formTitle, setFormTitle, formContent, setFormContent, formImage, setFormImage, resetForm };
 };
 
 // 5. ユーティリティ関数
@@ -116,6 +117,10 @@ const getImagePreviewUrl = (file: File | null) => {
     return URL.createObjectURL(file);
   }
   return '/dummy-image-url.jpg'; // テスト環境用のダミーURL
+};
+
+const normalizeImagePath = (path: string) => {
+  return path.replace(/\\/g, '/');
 };
 
 // 6. UI コンポーネント
@@ -134,13 +139,9 @@ const ErrorMessage = ({ message }: { message: string }) => (
   </div>
 );
 
-const normalizeImagePath = (path: string) => {
-  return path.replace(/\\/g, '/');
-};
-
 const MicropostCard = ({ post }: { post?: Micropost }) => {
   if (!post) {
-    return null; // または適切なフォールバックUIを返す
+    return null;
   }
 
   const imageUrl = post.imagePath 
@@ -156,8 +157,8 @@ const MicropostCard = ({ post }: { post?: Micropost }) => {
             alt={post.title || 'Micropost image'} 
             className="w-full h-full object-cover"
             onError={(e) => {
-              e.currentTarget.onerror = null; // 再帰的なエラーを防ぐ
-              e.currentTarget.src = 'http://localhost:3001/uploads/test.png'; // プレースホルダー画像のパスに置き換えてください
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = 'http://localhost:3001/uploads/test.png';
             }}
           />
         </div>
@@ -175,7 +176,7 @@ const MicropostCard = ({ post }: { post?: Micropost }) => {
 };
 
 const MicropostList = ({ microposts }: { microposts: Micropost[] }) => {
-  console.log('Microposts:', microposts); // デバッグ用ログ
+  console.log('Microposts:', microposts);
 
   if (!microposts || !Array.isArray(microposts) || microposts.length === 0) {
     console.log('No microposts available or invalid data');
@@ -277,14 +278,12 @@ const MicropostModal = ({ isOpen, onClose, onSubmit, title, setTitle, content, s
 
 // 7. メインコンポーネント
 export default function Home() {
-  const { microposts, isLoading, errorMessage, addMicropost, fetchMicropostsData } = useMicroposts();
-  const { isModalOpen, handleOpenModal, handleCloseModal } = useModal();
-  const { postTitle, setPostTitle, postContent, setPostContent, postImage, setPostImage, resetForm } = usePostForm();
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const { microposts, isLoading, error, addMicropost, fetchMicroposts } = useMicroposts();
+  const { isOpen: isPostModalOpen, handleOpen: handlePostModalOpen, handleClose: handlePostModalClose } = useModal();
+  const { formTitle, setFormTitle, formContent, setFormContent, formImage, setFormImage, resetForm } = usePostForm();
+  const { isOpen: isLoginModalOpen, handleOpen: handleLoginModalOpen, handleClose: handleLoginModalClose } = useModal();
 
-  // 新しい状態
   const [loginStatus, setLoginStatus] = useState<string | null>(null);
-
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState<LoginResponse['user'] | null>(null);
 
@@ -298,35 +297,30 @@ export default function Home() {
       return;
     }
     formData.append('userId', user.id.toString());
-    formData.append('title', postTitle);
-    formData.append('content', postContent);
-    if (postImage) {
-      formData.append('image', postImage);
+    formData.append('title', formTitle);
+    formData.append('content', formContent);
+    if (formImage) {
+      formData.append('image', formImage);
     }
 
     try {
-      const newMicropost = await create(formData);
+      const newMicropost = await apiCreateMicropost(formData);
       addMicropost(newMicropost);
-      handleCloseModal();
+      handlePostModalClose();
       resetForm();
-      // ページリロードを使わずにデータを再取得する
-      await fetchMicropostsData();
-
+      await fetchMicroposts();
     } catch (err) {
       console.error('Error creating micropost:', err);
-      // エラー処理をここに追加することができます
     }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setPostImage(e.target.files[0]);
+      setFormImage(e.target.files[0]);
     }
   };
 
-
   useEffect(() => {
-    // アプリケーション起動時にローカルストレージをチェック
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
     if (storedUser && storedToken) {
@@ -335,65 +329,7 @@ export default function Home() {
     }
   }, []);
 
-  // 更新されたハンドラー
-  const handleLogin = async () => {
-    console.log('Login button clicked');
-    
-    const loginData = {
-      email: "jane.doe@example.com",
-      password: "securepassword123"
-    };
-
-    try {
-      const response = await fetch('http://localhost:3001/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(loginData),
-      });
-
-      const data: LoginResponse = await response.json();
-
-      if (data.success) {
-        setLoginStatus('Login successful');
-        console.log('Login successful');
-        
-        // localStorageにトークンとユーザー情報を保存
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
-        // ステート更新
-        setIsLoggedIn(true);
-        setCurrentUser(data.user);
-      } else {
-        setLoginStatus('Login failed');
-        console.error('Login failed');
-      }
-    } catch (error) {
-      setLoginStatus('Error occurred during login');
-      console.error('Error occurred during login:', error);
-    }
-  };
-
-  const handleLogout = () => {
-    // ログアウト処理
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setIsLoggedIn(false);
-    setCurrentUser(null);
-    setLoginStatus('Logged out successfully');
-  };
-
-  const handleLoginClick = () => {
-    setIsLoginModalOpen(true);
-  };
-
-  const handleLoginModalClose = () => {
-    setIsLoginModalOpen(false);
-  };
-
-  const handleLoginSubmit = async (email: string, password: string) => {
+  const handleLogin = async (email: string, password: string) => {
     console.log('Login submitted', email, password);
     
     const loginData = { email, password };
@@ -418,7 +354,7 @@ export default function Home() {
         
         setIsLoggedIn(true);
         setCurrentUser(data.user);
-        setIsLoginModalOpen(false);  // モーダルを閉じる
+        handleLoginModalClose();
       } else {
         setLoginStatus('Login failed');
         console.error('Login failed');
@@ -429,8 +365,16 @@ export default function Home() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setIsLoggedIn(false);
+    setCurrentUser(null);
+    setLoginStatus('Logged out successfully');
+  };
+
   if (isLoading) return <LoadingSpinner />;
-  if (errorMessage) return <ErrorMessage message={errorMessage} />;
+  if (error) return <ErrorMessage message={error} />;
 
   return (
     <div className="container mx-auto px-4 py-8 bg-gradient-to-r from-pink-50 to-purple-50 min-h-screen">
@@ -442,7 +386,7 @@ export default function Home() {
         <div className="flex-1 text-center">
           {isLoggedIn && (
             <button
-              onClick={handleOpenModal}
+              onClick={handlePostModalOpen}
               className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
             >
               New Micropost
@@ -457,7 +401,7 @@ export default function Home() {
               </button>
               <button 
                 className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
-                onClick={handleLoginClick}
+                onClick={handleLoginModalOpen}
               >
                 Login
               </button>
@@ -485,22 +429,21 @@ export default function Home() {
       )}
       <MicropostList microposts={microposts} />
       <MicropostModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
+        isOpen={isPostModalOpen}
+        onClose={handlePostModalClose}
         onSubmit={handleSubmitPost}
-        title={postTitle}
-        setTitle={setPostTitle}
-        content={postContent}
-        setContent={setPostContent}
-        image={postImage}
+        title={formTitle}
+        setTitle={setFormTitle}
+        content={formContent}
+        setContent={setFormContent}
+        image={formImage}
         onImageChange={handleImageChange}
       />
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={handleLoginModalClose}
-        onLogin={handleLoginSubmit}
+        onLogin={handleLogin}
       />
     </div>
   );
 }
-
