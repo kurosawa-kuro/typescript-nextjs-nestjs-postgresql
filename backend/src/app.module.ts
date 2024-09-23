@@ -11,7 +11,7 @@ import { AuthModule } from './auth/auth.module'; // Import AuthModule
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
+      rootPath: join(__dirname, '..', '..', 'uploads'),
       serveRoot: '/uploads',
     }),
     DatabaseModule,

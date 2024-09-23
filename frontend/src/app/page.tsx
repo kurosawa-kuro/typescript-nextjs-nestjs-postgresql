@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
-
+import LoginModal from './LoginModal';
 // 1. 型定義
 interface Micropost {
   id: number;
@@ -65,25 +65,28 @@ const useMicroposts = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const fetchMicropostsData = async () => {
+    try {
+      setIsLoading(true);
+      const data = await fetchMicroposts();
+      setMicroposts(data);
+      setErrorMessage(null);
+    } catch (err) {
+      setErrorMessage('Error fetching microposts. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await fetchMicroposts();
-        setMicroposts(data);
-      } catch (err) {
-        setErrorMessage('Error fetching microposts. Please try again later.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
+    fetchMicropostsData();
   }, []);
 
   const addMicropost = (newMicropost: Micropost) => {
     setMicroposts(prevMicroposts => [newMicropost, ...prevMicroposts]);
   };
 
-  return { microposts, isLoading, errorMessage, addMicropost };
+  return { microposts, isLoading, errorMessage, addMicropost, fetchMicropostsData };
 };
 
 const useModal = () => {
@@ -131,29 +134,62 @@ const ErrorMessage = ({ message }: { message: string }) => (
   </div>
 );
 
-const MicropostCard = ({ post }: { post: Micropost }) => (
-  <div className="bg-white shadow-lg rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-    {post.imagePath && post.imagePath.trim() !== "" && (
-      <img src={`http://localhost:3001/${post.imagePath}`} alt={post.title} className="w-full h-48 object-cover" />
-    )}
-    <div className="p-6">
-      <h2 className="text-xl font-semibold mb-2 text-purple-700">{post.title}</h2>
-      <p className="text-gray-600 mb-4">{post.content}</p>
-      <p className="text-gray-600 flex items-center mb-2">
-        <span className="inline-block w-2 h-2 rounded-full bg-purple-500 mr-2"></span>
-        User: {post.userName}
-      </p>
-    </div>
-  </div>
-);
+const normalizeImagePath = (path: string) => {
+  return path.replace(/\\/g, '/');
+};
 
-const MicropostList = ({ microposts }: { microposts: Micropost[] }) => (
-  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-    {microposts.map((post) => (
-      <MicropostCard key={post.id} post={post} />
-    ))}
-  </div>
-);
+const MicropostCard = ({ post }: { post?: Micropost }) => {
+  if (!post) {
+    return null; // または適切なフォールバックUIを返す
+  }
+
+  const imageUrl = post.imagePath 
+    ? `http://localhost:3001/${normalizeImagePath(post.imagePath)}`
+    : null;
+
+  return (
+    <div className="bg-white shadow-lg rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+      {imageUrl && (
+        <div className="w-full h-48 relative">
+          <img 
+            src={imageUrl} 
+            alt={post.title || 'Micropost image'} 
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.onerror = null; // 再帰的なエラーを防ぐ
+              e.currentTarget.src = 'http://localhost:3001/uploads/test.png'; // プレースホルダー画像のパスに置き換えてください
+            }}
+          />
+        </div>
+      )}
+      <div className="p-6">
+        <h2 className="text-xl font-semibold mb-2 text-purple-700">{post.title || 'Untitled'}</h2>
+        <p className="text-gray-600 mb-4">{post.content || 'No content'}</p>
+        <p className="text-gray-600 flex items-center mb-2">
+          <span className="inline-block w-2 h-2 rounded-full bg-purple-500 mr-2"></span>
+          User: {post.userName || 'Unknown'}
+        </p>
+      </div>
+    </div>
+  );
+};
+
+const MicropostList = ({ microposts }: { microposts: Micropost[] }) => {
+  console.log('Microposts:', microposts); // デバッグ用ログ
+
+  if (!microposts || !Array.isArray(microposts) || microposts.length === 0) {
+    console.log('No microposts available or invalid data');
+    return <div className="text-center text-gray-500 mt-4">No microposts available</div>;
+  }
+
+  return (
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {microposts.map((post) => (
+        <MicropostCard key={post?.id ?? `temp-${Math.random()}`} post={post} />
+      ))}
+    </div>
+  );
+};
 
 const MicropostModal = ({ isOpen, onClose, onSubmit, title, setTitle, content, setContent, image, onImageChange }: MicropostModalProps) => {
   if (!isOpen) return null;
@@ -244,7 +280,8 @@ export default function Home() {
   const { microposts, isLoading, errorMessage, addMicropost } = useMicroposts();
   const { isModalOpen, handleOpenModal, handleCloseModal } = useModal();
   const { postTitle, setPostTitle, postContent, setPostContent, postImage, setPostImage, resetForm } = usePostForm();
-  
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
   // 新しい状態
   const [loginStatus, setLoginStatus] = useState<string | null>(null);
 
@@ -266,6 +303,8 @@ export default function Home() {
       addMicropost(newMicropost);
       handleCloseModal();
       resetForm();
+      // ページリロード
+      window.location.reload();
     } catch (err) {
       console.error('Error creating micropost:', err);
       // エラー処理をここに追加することができます
@@ -277,6 +316,7 @@ export default function Home() {
       setPostImage(e.target.files[0]);
     }
   };
+
 
   useEffect(() => {
     // アプリケーション起動時にローカルストレージをチェック
@@ -338,6 +378,50 @@ export default function Home() {
     setLoginStatus('Logged out successfully');
   };
 
+  const handleLoginClick = () => {
+    setIsLoginModalOpen(true);
+  };
+
+  const handleLoginModalClose = () => {
+    setIsLoginModalOpen(false);
+  };
+
+  const handleLoginSubmit = async (email: string, password: string) => {
+    console.log('Login submitted', email, password);
+    
+    const loginData = { email, password };
+
+    try {
+      const response = await fetch('http://localhost:3001/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData),
+      });
+
+      const data: LoginResponse = await response.json();
+
+      if (data.success) {
+        setLoginStatus('Login successful');
+        console.log('Login successful');
+        
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        setIsLoggedIn(true);
+        setCurrentUser(data.user);
+        setIsLoginModalOpen(false);  // モーダルを閉じる
+      } else {
+        setLoginStatus('Login failed');
+        console.error('Login failed');
+      }
+    } catch (error) {
+      setLoginStatus('Error occurred during login');
+      console.error('Error occurred during login:', error);
+    }
+  };
+
   if (isLoading) return <LoadingSpinner />;
   if (errorMessage) return <ErrorMessage message={errorMessage} />;
 
@@ -366,7 +450,7 @@ export default function Home() {
               </button>
               <button 
                 className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
-                onClick={handleLogin}
+                onClick={handleLoginClick}
               >
                 Login
               </button>
@@ -403,6 +487,11 @@ export default function Home() {
         setContent={setPostContent}
         image={postImage}
         onImageChange={handleImageChange}
+      />
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={handleLoginModalClose}
+        onLogin={handleLoginSubmit}
       />
     </div>
   );
