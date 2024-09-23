@@ -277,7 +277,7 @@ const MicropostModal = ({ isOpen, onClose, onSubmit, title, setTitle, content, s
 
 // 7. メインコンポーネント
 export default function Home() {
-  const { microposts, isLoading, errorMessage, addMicropost } = useMicroposts();
+  const { microposts, isLoading, errorMessage, addMicropost, fetchMicropostsData } = useMicroposts();
   const { isModalOpen, handleOpenModal, handleCloseModal } = useModal();
   const { postTitle, setPostTitle, postContent, setPostContent, postImage, setPostImage, resetForm } = usePostForm();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -303,8 +303,9 @@ export default function Home() {
       addMicropost(newMicropost);
       handleCloseModal();
       resetForm();
-      // ページリロード
-      window.location.reload();
+      // ページリロードを使わずにデータを再取得する
+      await fetchMicropostsData();
+
     } catch (err) {
       console.error('Error creating micropost:', err);
       // エラー処理をここに追加することができます
