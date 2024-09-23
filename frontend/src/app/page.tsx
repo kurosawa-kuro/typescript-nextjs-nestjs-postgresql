@@ -291,7 +291,13 @@ export default function Home() {
   const handleSubmitPost = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append('userId', '1'); // この値は適切なユーザーIDに変更する必要があります
+    const storedUser = localStorage.getItem('user');
+    const user = storedUser ? JSON.parse(storedUser) : null;
+    if (!user) {
+      console.error('User not found');
+      return;
+    }
+    formData.append('userId', user.id.toString());
     formData.append('title', postTitle);
     formData.append('content', postContent);
     if (postImage) {

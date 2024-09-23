@@ -27,10 +27,11 @@ export class MicroPostService {
 
   async list(): Promise<MicroPost[]> {
     const query = `
-      SELECT m.id, m.user_id as "userId", m.title, m.image_path as "imagePath", u.name as "userName"
-      FROM micropost m
-      JOIN "user" u ON m.user_id = u.id
-    `;
+    SELECT m.id, m.user_id as "userId", m.title, m.image_path as "imagePath", u.name as "userName"
+    FROM micropost m
+    JOIN "user" u ON m.user_id = u.id
+    ORDER BY m.id DESC
+  `;
     const result = await this.databaseService.executeQuery(query);
     return result.rows;
   }
