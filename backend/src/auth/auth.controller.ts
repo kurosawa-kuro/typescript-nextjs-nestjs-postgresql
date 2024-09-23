@@ -39,7 +39,7 @@ export class AuthController {
     @Body('email') email: string,
     @Body('password') password: string,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<{ success: boolean; message: string }> {
+  ): Promise<{ success: boolean; message: string; token?: string; user?: object }> {
     const result = await this.authService.login(email, password);
     if (result.success) {
       res.cookie('jwt', result.token, {
@@ -48,7 +48,12 @@ export class AuthController {
         sameSite: 'strict',
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       });
-      return { success: true, message: 'Login successful' };
+      return {
+        success: true,
+        message: 'Login successful',
+        token: result.token,
+        user: result.user
+      };
     } else {
       return { success: false, message: 'Login failed' };
     }

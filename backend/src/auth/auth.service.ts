@@ -43,7 +43,7 @@ export class AuthService {
         'SELECT id, name, email, password_hash, is_admin as "isAdmin" FROM "user" WHERE email = $1';
       const result = await this.pool.query(query, [email]);
       const user = result.rows[0];
-
+  
       if (user && (await bcrypt.compare(password, user.password_hash))) {
         const payload = { sub: user.id, email: user.email, isAdmin: user.isAdmin };
         const token = this.jwtService.sign(payload);
@@ -51,7 +51,7 @@ export class AuthService {
         return {
           success: true,
           token,
-          user: { id: user.id, name: user.name, email: user.email },
+          user: { id: user.id, name: user.name, email: user.email, isAdmin: user.isAdmin },
         };
       } else {
         this.logger.error('Login failed', new Error('Incorrect credentials'));

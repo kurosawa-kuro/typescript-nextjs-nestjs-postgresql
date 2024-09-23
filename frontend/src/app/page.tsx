@@ -24,6 +24,17 @@ interface MicropostModalProps {
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
+interface LoginResponse {
+  success: boolean;
+  message: string;
+  token: string; // Add the token property
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  }; // Add the user property
+}
+
 // 2. 定数
 const API_URL = 'http://localhost:3001/microposts';
 
@@ -233,6 +244,12 @@ export default function Home() {
   const { microposts, isLoading, errorMessage, addMicropost } = useMicroposts();
   const { isModalOpen, handleOpenModal, handleCloseModal } = useModal();
   const { postTitle, setPostTitle, postContent, setPostContent, postImage, setPostImage, resetForm } = usePostForm();
+  
+  // 新しい状態
+  const [loginStatus, setLoginStatus] = useState<string | null>(null);
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState<LoginResponse['user'] | null>(null);
 
   const handleSubmitPost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -261,8 +278,64 @@ export default function Home() {
     }
   };
 
-  const handleLogin = () => {
+  useEffect(() => {
+    // アプリケーション起動時にローカルストレージをチェック
+    const storedUser = localStorage.getItem('user');
+    const storedToken = localStorage.getItem('token');
+    if (storedUser && storedToken) {
+      setIsLoggedIn(true);
+      setCurrentUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  // 更新されたハンドラー
+  const handleLogin = async () => {
     console.log('Login button clicked');
+    
+    const loginData = {
+      email: "jane.doe@example.com",
+      password: "securepassword123"
+    };
+
+    try {
+      const response = await fetch('http://localhost:3001/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData),
+      });
+
+      const data: LoginResponse = await response.json();
+
+      if (data.success) {
+        setLoginStatus('Login successful');
+        console.log('Login successful');
+        
+        // localStorageにトークンとユーザー情報を保存
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // ステート更新
+        setIsLoggedIn(true);
+        setCurrentUser(data.user);
+      } else {
+        setLoginStatus('Login failed');
+        console.error('Login failed');
+      }
+    } catch (error) {
+      setLoginStatus('Error occurred during login');
+      console.error('Error occurred during login:', error);
+    }
+  };
+
+  const handleLogout = () => {
+    // ログアウト処理
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setIsLoggedIn(false);
+    setCurrentUser(null);
+    setLoginStatus('Logged out successfully');
   };
 
   if (isLoading) return <LoadingSpinner />;
@@ -276,28 +349,49 @@ export default function Home() {
       <div className="flex justify-between items-center mb-6">
         <div className="flex-1"></div>
         <div className="flex-1 text-center">
-          <button
-            onClick={handleOpenModal}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
-          >
-            New Micropost
-          </button>
+          {isLoggedIn && (
+            <button
+              onClick={handleOpenModal}
+              className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+            >
+              New Micropost
+            </button>
+          )}
         </div>
         <div className="flex-1 flex justify-end space-x-2">
-          <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-            Register
-          </button>
-          <button 
-            className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
-            onClick={handleLogin}
-          >
-            Login
-          </button>
-          <button className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
-            Logout
-          </button>
+          {!isLoggedIn && (
+            <>
+              <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                Register
+              </button>
+              <button 
+                className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+                onClick={handleLogin}
+              >
+                Login
+              </button>
+            </>
+          )}
+          {isLoggedIn && (
+            <div className="flex items-center bg-white rounded-lg shadow-md overflow-hidden">
+              <span className="text-gray-800 font-medium px-4 py-2 bg-gray-100">
+                {currentUser?.name}
+              </span>
+              <button 
+                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 transition duration-300 ease-in-out"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
+      {loginStatus && (
+        <div className={`text-center p-2 mb-4 ${loginStatus.includes('successful') || loginStatus.includes('Logged out') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          {loginStatus}
+        </div>
+      )}
       <MicropostList microposts={microposts} />
       <MicropostModal
         isOpen={isModalOpen}
@@ -313,3 +407,4 @@ export default function Home() {
     </div>
   );
 }
+
