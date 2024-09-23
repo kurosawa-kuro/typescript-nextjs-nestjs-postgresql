@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import LoginModal from './LoginModal';
 
-// 1. 型定義
+// Types
 interface Micropost {
   id: number;
   userId: number;
@@ -36,31 +36,44 @@ interface LoginResponse {
   };
 }
 
-// 2. 定数
+// Constants
 const API_URL = 'http://localhost:3001/microposts';
 
-// 3. API関連の関数
-const apiFetchMicroposts = async (): Promise<Micropost[]> => {
-  const response = await fetch(API_URL);
-  if (!response.ok) {
-    throw new Error('Failed to fetch microposts');
+// API Functions
+const ApiService = {
+  fetchMicroposts: async (): Promise<Micropost[]> => {
+    const response = await fetch(API_URL);
+    if (!response.ok) {
+      throw new Error('Failed to fetch microposts');
+    }
+    return response.json();
+  },
+
+  createMicropost: async (formData: FormData): Promise<Micropost> => {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      body: formData,
+    });
+    if (!response.ok) {
+      throw new Error('Failed to create micropost');
+    }
+    const data = await response.json();
+    return data.micropost;
+  },
+
+  login: async (email: string, password: string): Promise<LoginResponse> => {
+    const response = await fetch('http://localhost:3001/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+    return response.json();
   }
-  return response.json();
 };
 
-const apiCreateMicropost = async (formData: FormData): Promise<Micropost> => {
-  const response = await fetch(API_URL, {
-    method: 'POST',
-    body: formData,
-  });
-  if (!response.ok) {
-    throw new Error('Failed to create micropost');
-  }
-  const data = await response.json();
-  return data.micropost;
-};
-
-// 4. カスタムフック
+// Custom Hooks
 const useMicroposts = () => {
   const [microposts, setMicroposts] = useState<Micropost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,7 +82,7 @@ const useMicroposts = () => {
   const fetchMicroposts = async () => {
     try {
       setIsLoading(true);
-      const data = await apiFetchMicroposts();
+      const data = await ApiService.fetchMicroposts();
       setMicroposts(data);
       setError(null);
     } catch (err) {
@@ -111,19 +124,67 @@ const usePostForm = () => {
   return { formTitle, setFormTitle, formContent, setFormContent, formImage, setFormImage, resetForm };
 };
 
-// 5. ユーティリティ関数
-const getImagePreviewUrl = (file: File | null) => {
-  if (file && typeof URL !== 'undefined' && URL.createObjectURL) {
-    return URL.createObjectURL(file);
+const useAuth = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState<LoginResponse['user'] | null>(null);
+  const [loginStatus, setLoginStatus] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    const storedToken = localStorage.getItem('token');
+    if (storedUser && storedToken) {
+      setIsLoggedIn(true);
+      setCurrentUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    try {
+      const data = await ApiService.login(email, password);
+      if (data.success) {
+        setLoginStatus('Login successful');
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        setIsLoggedIn(true);
+        setCurrentUser(data.user);
+        return true;
+      } else {
+        setLoginStatus('Login failed');
+        return false;
+      }
+    } catch (error) {
+      setLoginStatus('Error occurred during login');
+      console.error('Error occurred during login:', error);
+      return false;
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setIsLoggedIn(false);
+    setCurrentUser(null);
+    setLoginStatus('Logged out successfully');
+  };
+
+  return { isLoggedIn, currentUser, loginStatus, login, logout };
+};
+
+// Utility Functions
+const ImageUtils = {
+  getPreviewUrl: (file: File | null) => {
+    if (file && typeof URL !== 'undefined' && URL.createObjectURL) {
+      return URL.createObjectURL(file);
+    }
+    return '/dummy-image-url.jpg';
+  },
+
+  normalizePath: (path: string) => {
+    return path.replace(/\\/g, '/');
   }
-  return '/dummy-image-url.jpg'; // テスト環境用のダミーURL
 };
 
-const normalizeImagePath = (path: string) => {
-  return path.replace(/\\/g, '/');
-};
-
-// 6. UI コンポーネント
+// UI Components
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center h-screen">
     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
@@ -145,7 +206,7 @@ const MicropostCard = ({ post }: { post?: Micropost }) => {
   }
 
   const imageUrl = post.imagePath 
-    ? `http://localhost:3001/${normalizeImagePath(post.imagePath)}`
+    ? `http://localhost:3001/${ImageUtils.normalizePath(post.imagePath)}`
     : null;
 
   return (
@@ -176,10 +237,7 @@ const MicropostCard = ({ post }: { post?: Micropost }) => {
 };
 
 const MicropostList = ({ microposts }: { microposts: Micropost[] }) => {
-  console.log('Microposts:', microposts);
-
   if (!microposts || !Array.isArray(microposts) || microposts.length === 0) {
-    console.log('No microposts available or invalid data');
     return <div className="text-center text-gray-500 mt-4">No microposts available</div>;
   }
 
@@ -227,7 +285,7 @@ const MicropostModal = ({ isOpen, onClose, onSubmit, title, setTitle, content, s
             <div className="mt-1 flex items-center">
               <span className="inline-block h-12 w-12 rounded-md overflow-hidden bg-gray-100">
                 {image ? (
-                  <img src={getImagePreviewUrl(image)} alt="Preview" className="h-full w-full object-cover" />
+                  <img src={ImageUtils.getPreviewUrl(image)} alt="Preview" className="h-full w-full object-cover" />
                 ) : (
                   <svg className="h-full w-full text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -276,16 +334,13 @@ const MicropostModal = ({ isOpen, onClose, onSubmit, title, setTitle, content, s
   );
 };
 
-// 7. メインコンポーネント
+// Main Component
 export default function Home() {
   const { microposts, isLoading, error, addMicropost, fetchMicroposts } = useMicroposts();
   const { isOpen: isPostModalOpen, handleOpen: handlePostModalOpen, handleClose: handlePostModalClose } = useModal();
   const { formTitle, setFormTitle, formContent, setFormContent, formImage, setFormImage, resetForm } = usePostForm();
   const { isOpen: isLoginModalOpen, handleOpen: handleLoginModalOpen, handleClose: handleLoginModalClose } = useModal();
-
-  const [loginStatus, setLoginStatus] = useState<string | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentUser, setCurrentUser] = useState<LoginResponse['user'] | null>(null);
+  const { isLoggedIn, currentUser, loginStatus, login, logout } = useAuth();
 
   const handleSubmitPost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -304,7 +359,7 @@ export default function Home() {
     }
 
     try {
-      const newMicropost = await apiCreateMicropost(formData);
+      const newMicropost = await ApiService.createMicropost(formData);
       addMicropost(newMicropost);
       handlePostModalClose();
       resetForm();
@@ -320,57 +375,11 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    const storedToken = localStorage.getItem('token');
-    if (storedUser && storedToken) {
-      setIsLoggedIn(true);
-      setCurrentUser(JSON.parse(storedUser));
-    }
-  }, []);
-
   const handleLogin = async (email: string, password: string) => {
-    console.log('Login submitted', email, password);
-    
-    const loginData = { email, password };
-
-    try {
-      const response = await fetch('http://localhost:3001/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(loginData),
-      });
-
-      const data: LoginResponse = await response.json();
-
-      if (data.success) {
-        setLoginStatus('Login successful');
-        console.log('Login successful');
-        
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
-        setIsLoggedIn(true);
-        setCurrentUser(data.user);
-        handleLoginModalClose();
-      } else {
-        setLoginStatus('Login failed');
-        console.error('Login failed');
-      }
-    } catch (error) {
-      setLoginStatus('Error occurred during login');
-      console.error('Error occurred during login:', error);
+    const success = await login(email, password);
+    if (success) {
+      handleLoginModalClose();
     }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setIsLoggedIn(false);
-    setCurrentUser(null);
-    setLoginStatus('Logged out successfully');
   };
 
   if (isLoading) return <LoadingSpinner />;
@@ -414,7 +423,7 @@ export default function Home() {
               </span>
               <button 
                 className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 transition duration-300 ease-in-out"
-                onClick={handleLogout}
+                onClick={logout}
               >
                 Logout
               </button>
