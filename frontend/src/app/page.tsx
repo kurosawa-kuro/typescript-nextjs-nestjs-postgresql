@@ -9,7 +9,7 @@ import { useModal } from "./hooks/useModal";
 import { useMicroposts } from "./hooks/useMicroposts";
 import { usePostForm } from "./hooks/usePostForm";
 import { MicropostList } from "./components/MicropostList";
-import LoginModal from './LoginModal';
+import {LoginModal} from './components/LoginModal';
 import { MicropostModal } from "./components/MicropostModal";
 
 // Main Component
