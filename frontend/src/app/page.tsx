@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import LoginModal from './LoginModal';
+import LoadingSpinner from "./components/common/LoadingSpinner";
+import ErrorMessage from "./components/common/ErrorMessage";
 
 // Types
 interface Micropost {
@@ -185,21 +187,6 @@ const ImageUtils = {
 };
 
 // UI Components
-const LoadingSpinner = () => (
-  <div className="flex items-center justify-center h-screen">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
-  </div>
-);
-
-const ErrorMessage = ({ message }: { message: string }) => (
-  <div className="flex items-center justify-center h-screen">
-    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-      <strong className="font-bold">Oh no! </strong>
-      <span className="block sm:inline">{message}</span>
-    </div>
-  </div>
-);
-
 const MicropostCard = ({ post }: { post?: Micropost }) => {
   if (!post) {
     return null;
