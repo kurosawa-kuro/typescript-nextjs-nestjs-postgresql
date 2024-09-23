@@ -261,6 +261,10 @@ export default function Home() {
     }
   };
 
+  const handleLogin = () => {
+    console.log('Login button clicked');
+  };
+
   if (isLoading) return <LoadingSpinner />;
   if (errorMessage) return <ErrorMessage message={errorMessage} />;
 
@@ -269,13 +273,30 @@ export default function Home() {
       <h1 className="text-4xl font-bold mb-8 text-center text-purple-800">
         Microposts
       </h1>
-      <div className="mb-6 text-center">
-        <button
-          onClick={handleOpenModal}
-          className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
-        >
-          New Micropost
-        </button>
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex-1"></div>
+        <div className="flex-1 text-center">
+          <button
+            onClick={handleOpenModal}
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+          >
+            New Micropost
+          </button>
+        </div>
+        <div className="flex-1 flex justify-end space-x-2">
+          <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+            Register
+          </button>
+          <button 
+            className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+            onClick={handleLogin}
+          >
+            Login
+          </button>
+          <button className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+            Logout
+          </button>
+        </div>
       </div>
       <MicropostList microposts={microposts} />
       <MicropostModal
