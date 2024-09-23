@@ -2,8 +2,8 @@
 
 import React  from "react";
 import { ApiService } from './api/apiService';
-import LoadingSpinner from "./components/common/LoadingSpinner";
-import ErrorMessage from "./components/common/ErrorMessage";
+import {LoadingSpinner} from "./components/common/LoadingSpinner";
+import {ErrorMessage} from "./components/common/ErrorMessage";
 import { useAuth } from "./hooks/useAuth";
 import { useModal } from "./hooks/useModal";
 import { useMicroposts } from "./hooks/useMicroposts";
