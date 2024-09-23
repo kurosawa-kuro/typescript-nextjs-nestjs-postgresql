@@ -59,14 +59,14 @@ CREATE TABLE micropost_category (
 
 const insertAdminSql = `
 INSERT INTO public."user" (name, email, password_hash, is_admin) VALUES 
-  ('Admin', 'admin@example.com', 'hashed_password_here', true);
+  ('Admin', 'admin@example.com', '$2b$10$A/JMxdiDKWmpxOc3nBBkVeYiCL9uUrIVWpNohuTP4gKaD/1TGXJt6', true);
 `;
 
 const insertUsersSql = `
 INSERT INTO public."user" (name, email, password_hash, is_admin) VALUES 
-  ('Alice', 'alice@example.com', 'hashed_password_here', false),
-  ('Bob', 'bob@example.com', 'hashed_password_here', false),
-  ('Charlie', 'charlie@example.com', 'hashed_password_here', false);
+  ('Alice', 'alice@example.com', '$2b$10$A/JMxdiDKWmpxOc3nBBkVeYiCL9uUrIVWpNohuTP4gKaD/1TGXJt6', false),
+  ('Bob', 'bob@example.com', '$2b$10$A/JMxdiDKWmpxOc3nBBkVeYiCL9uUrIVWpNohuTP4gKaD/1TGXJt6', false),
+  ('Charlie', 'charlie@example.com', '$2b$10$A/JMxdiDKWmpxOc3nBBkVeYiCL9uUrIVWpNohuTP4gKaD/1TGXJt6', false);
 `;
 
 const insertOtherDataSql = `
@@ -137,5 +137,5 @@ async function main(): Promise<void> {
 }
 
 // 使用例
-setEnvironment('test');  // テスト環境に切り替える場合はこの行のコメントを解除
+// setEnvironment('test');  // テスト環境に切り替える場合はこの行のコメントを解除
 main();
