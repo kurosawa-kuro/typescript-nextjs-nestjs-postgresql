@@ -1,190 +1,20 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
+import { Micropost, MicropostModalProps, LoginResponse } from './types';
+import { ApiService } from './api/apiService';
 import LoginModal from './LoginModal';
 import LoadingSpinner from "./components/common/LoadingSpinner";
 import ErrorMessage from "./components/common/ErrorMessage";
-
-// Types
-interface Micropost {
-  id: number;
-  userId: number;
-  title: string;
-  content: string;
-  userName: string;
-  imagePath?: string;
-}
-
-interface MicropostModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (e: React.FormEvent) => void;
-  title: string;
-  setTitle: (title: string) => void;
-  content: string;
-  setContent: (content: string) => void;
-  image: File | null;
-  onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
-
-interface LoginResponse {
-  success: boolean;
-  message: string;
-  token: string;
-  user: {
-    id: number;
-    name: string;
-    email: string;
-  };
-}
+import {ImageUtils} from "./utils/imageUtils";
+import { useAuth } from "./hooks/useAuth";
+import { useModal } from "./hooks/useModal";
+import { useMicroposts } from "./hooks/useMicroposts";
+import { usePostForm } from "./hooks/usePostForm";
 
 // Constants
 const API_URL = 'http://localhost:3001/microposts';
 
-// API Functions
-const ApiService = {
-  fetchMicroposts: async (): Promise<Micropost[]> => {
-    const response = await fetch(API_URL);
-    if (!response.ok) {
-      throw new Error('Failed to fetch microposts');
-    }
-    return response.json();
-  },
-
-  createMicropost: async (formData: FormData): Promise<Micropost> => {
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      body: formData,
-    });
-    if (!response.ok) {
-      throw new Error('Failed to create micropost');
-    }
-    const data = await response.json();
-    return data.micropost;
-  },
-
-  login: async (email: string, password: string): Promise<LoginResponse> => {
-    const response = await fetch('http://localhost:3001/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
-    return response.json();
-  }
-};
-
-// Custom Hooks
-const useMicroposts = () => {
-  const [microposts, setMicroposts] = useState<Micropost[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchMicroposts = async () => {
-    try {
-      setIsLoading(true);
-      const data = await ApiService.fetchMicroposts();
-      setMicroposts(data);
-      setError(null);
-    } catch (err) {
-      setError('Error fetching microposts. Please try again later.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchMicroposts();
-  }, []);
-
-  const addMicropost = (newMicropost: Micropost) => {
-    setMicroposts(prevMicroposts => [newMicropost, ...prevMicroposts]);
-  };
-
-  return { microposts, isLoading, error, addMicropost, fetchMicroposts };
-};
-
-const useModal = (initialState = false) => {
-  const [isOpen, setIsOpen] = useState(initialState);
-  const handleOpen = () => setIsOpen(true);
-  const handleClose = () => setIsOpen(false);
-  return { isOpen, handleOpen, handleClose };
-};
-
-const usePostForm = () => {
-  const [formTitle, setFormTitle] = useState("");
-  const [formContent, setFormContent] = useState("");
-  const [formImage, setFormImage] = useState<File | null>(null);
-
-  const resetForm = () => {
-    setFormTitle("");
-    setFormContent("");
-    setFormImage(null);
-  };
-
-  return { formTitle, setFormTitle, formContent, setFormContent, formImage, setFormImage, resetForm };
-};
-
-const useAuth = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentUser, setCurrentUser] = useState<LoginResponse['user'] | null>(null);
-  const [loginStatus, setLoginStatus] = useState<string | null>(null);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    const storedToken = localStorage.getItem('token');
-    if (storedUser && storedToken) {
-      setIsLoggedIn(true);
-      setCurrentUser(JSON.parse(storedUser));
-    }
-  }, []);
-
-  const login = async (email: string, password: string) => {
-    try {
-      const data = await ApiService.login(email, password);
-      if (data.success) {
-        setLoginStatus('Login successful');
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        setIsLoggedIn(true);
-        setCurrentUser(data.user);
-        return true;
-      } else {
-        setLoginStatus('Login failed');
-        return false;
-      }
-    } catch (error) {
-      setLoginStatus('Error occurred during login');
-      console.error('Error occurred during login:', error);
-      return false;
-    }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setIsLoggedIn(false);
-    setCurrentUser(null);
-    setLoginStatus('Logged out successfully');
-  };
-
-  return { isLoggedIn, currentUser, loginStatus, login, logout };
-};
-
-// Utility Functions
-const ImageUtils = {
-  getPreviewUrl: (file: File | null) => {
-    if (file && typeof URL !== 'undefined' && URL.createObjectURL) {
-      return URL.createObjectURL(file);
-    }
-    return '/dummy-image-url.jpg';
-  },
-
-  normalizePath: (path: string) => {
-    return path.replace(/\\/g, '/');
-  }
-};
 
 // UI Components
 const MicropostCard = ({ post }: { post?: Micropost }) => {
