@@ -40,12 +40,11 @@ export const MicropostCard: React.FC<MicropostCardProps> = ({ post }) => {
         </div>
       ) : (
         <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-          <span className="text-gray-500">No image available</span>
+          <span className="text-gray-700 font-medium text-lg">No image available</span>
         </div>
       )}
       <div className="p-4">
-        <h2 className="text-xl font-semibold mb-2">{post.title}</h2>
-        <p className="text-gray-600">{post.content}</p>
+        <h2 className="text-2xl mb-2 text-gray-900">{post.title}</h2>
       </div>
     </div>
   );
