@@ -85,7 +85,6 @@ export function ClientSideWrapper({ children }: { children: React.ReactNode }) {
         image={formImage}
         onImageChange={handleImageChange}
       />
-
     </>
   );
 }
