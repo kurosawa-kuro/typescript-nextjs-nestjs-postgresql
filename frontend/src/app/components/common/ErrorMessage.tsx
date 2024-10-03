@@ -1,3 +1,5 @@
+// frontend\src\app\components\common\ErrorMessage.tsx
+
 import React from 'react';
 
 interface ErrorMessageProps {

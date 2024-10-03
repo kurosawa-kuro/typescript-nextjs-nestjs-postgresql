@@ -1,3 +1,5 @@
+// frontend\src\app\components\MicropostCard.tsx
+
 import React from 'react';
 import { Micropost } from '../types';
 import { ImageUtils } from '../utils/imageUtils';

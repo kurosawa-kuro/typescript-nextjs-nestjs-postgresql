@@ -1,3 +1,5 @@
+// frontend\src\app\components\MicropostModal.tsx
+
 import React from 'react';
 import { MicropostModalProps } from '../types';
 import { ImageUtils } from '../utils/imageUtils';

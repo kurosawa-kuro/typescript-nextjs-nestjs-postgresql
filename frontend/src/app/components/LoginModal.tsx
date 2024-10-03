@@ -1,3 +1,5 @@
+// frontend\src\app\components\LoginModal.tsx
+
 import React, { useState } from 'react';
 
 interface LoginModalProps {
