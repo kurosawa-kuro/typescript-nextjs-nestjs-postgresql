@@ -1,8 +1,6 @@
-// frontend\src\app\page.tsx
-
 'use client';
 
-import React  from "react";
+import React from "react";
 import { ApiService } from './api/apiService';
 import {LoadingSpinner} from "./components/common/LoadingSpinner";
 import {ErrorMessage} from "./components/common/ErrorMessage";
@@ -14,7 +12,6 @@ import { MicropostList } from "./components/MicropostList";
 import {LoginModal} from './components/LoginModal';
 import { MicropostModal } from "./components/MicropostModal";
 
-// Main Component
 export default function Home() {
   const { microposts, isLoading, error, addMicropost, fetchMicroposts } = useMicroposts();
   const { isOpen: isPostModalOpen, handleOpen: handlePostModalOpen, handleClose: handlePostModalClose } = useModal();
@@ -66,57 +63,54 @@ export default function Home() {
   if (error) return <ErrorMessage message={error} />;
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-gradient-to-r from-pink-50 to-purple-50 min-h-screen">
-      <h1 className="text-4xl font-bold mb-8 text-center text-purple-800">
-        Microposts
-      </h1>
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex-1"></div>
-        <div className="flex-1 text-center">
-          {isLoggedIn && (
-            <button
-              onClick={handlePostModalOpen}
-              className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
-            >
-              New Micropost
-            </button>
-          )}
+    <div className="bg-gray-50 min-h-screen">
+      <header className="bg-white border-b border-gray-300 fixed top-0 left-0 right-0 z-10">
+        <div className="max-w-5xl mx-auto px-4 py-2 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-pink-500">TypeGram</h1>
+          <div className="flex items-center space-x-4">
+            {isLoggedIn ? (
+              <>
+                <button
+                  onClick={handlePostModalOpen}
+                  className="bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full p-2"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
+                <button 
+                  onClick={logout}
+                  className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <button className="text-sm font-medium text-gray-700 hover:text-gray-900">
+                  Register
+                </button>
+                <button 
+                  onClick={handleLoginModalOpen}
+                  className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                >
+                  Login
+                </button>
+              </>
+            )}
+          </div>
         </div>
-        <div className="flex-1 flex justify-end space-x-2">
-          {!isLoggedIn && (
-            <>
-              <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-                Register
-              </button>
-              <button 
-                className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
-                onClick={handleLoginModalOpen}
-              >
-                Login
-              </button>
-            </>
-          )}
-          {isLoggedIn && (
-            <div className="flex items-center bg-white rounded-lg shadow-md overflow-hidden">
-              <span className="text-gray-800 font-medium px-4 py-2 bg-gray-100">
-                {currentUser?.name}
-              </span>
-              <button 
-                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 transition duration-300 ease-in-out"
-                onClick={logout}
-              >
-                Logout
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-      {loginStatus && (
-        <div className={`text-center p-2 mb-4 ${loginStatus.includes('successful') || loginStatus.includes('Logged out') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-          {loginStatus}
-        </div>
-      )}
-      <MicropostList microposts={microposts} />
+      </header>
+
+      <main className="max-w-5xl mx-auto px-4 pt-16 pb-8">
+        {loginStatus && (
+          <div className={`text-center p-2 mb-4 ${loginStatus.includes('successful') || loginStatus.includes('Logged out') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+            {loginStatus}
+          </div>
+        )}
+        <MicropostList microposts={microposts} />
+      </main>
+
       <MicropostModal
         isOpen={isPostModalOpen}
         onClose={handlePostModalClose}

@@ -1,5 +1,3 @@
-// frontend\src\app\components\MicropostCard.tsx
-
 import React from 'react';
 import { Micropost } from '../types';
 import { ImageUtils } from '../utils/imageUtils';
@@ -14,9 +12,13 @@ export const MicropostCard = ({ post }: { post?: Micropost }) => {
     : null;
 
   return (
-    <div className="bg-white shadow-lg rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+    <div className="bg-white border border-gray-200 rounded-md overflow-hidden h-full flex flex-col">
+      <div className="p-3 flex items-center">
+        <div className="w-8 h-8 rounded-full bg-gray-300 mr-2"></div>
+        <span className="font-semibold text-sm">{post.userName || 'Unknown'}</span>
+      </div>
       {imageUrl && (
-        <div className="w-full h-48 relative">
+        <div className="w-full aspect-square relative flex-grow">
           <img 
             src={imageUrl} 
             alt={post.title || 'Micropost image'} 
@@ -28,13 +30,14 @@ export const MicropostCard = ({ post }: { post?: Micropost }) => {
           />
         </div>
       )}
-      <div className="p-6">
-        <h2 className="text-xl font-semibold mb-2 text-purple-700">{post.title || 'Untitled'}</h2>
-        <p className="text-gray-600 mb-4">{post.content || 'No content'}</p>
-        <p className="text-gray-600 flex items-center mb-2">
-          <span className="inline-block w-2 h-2 rounded-full bg-purple-500 mr-2"></span>
-          User: {post.userName || 'Unknown'}
-        </p>
+      <div className="p-3">
+        <div className="flex items-center space-x-3 mb-2">
+          <button className="text-xl">❤️</button>
+          <button className="text-xl">💬</button>
+          <button className="text-xl">🚀</button>
+        </div>
+        <h2 className="font-semibold text-sm mb-1">{post.title || 'Untitled'}</h2>
+        <p className="text-xs text-gray-600 line-clamp-2">{post.content || 'No content'}</p>
       </div>
     </div>
   );
