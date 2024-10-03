@@ -1,8 +1,7 @@
-// frontend/src/app/components/MicropostCard.tsx
-
-'use client';
+"use client"
 
 import React, { useState, useMemo } from 'react';
+import Image from 'next/image';
 import { Micropost } from '../types';
 import { ImageUtils } from '../utils/imageUtils';
 
@@ -30,12 +29,15 @@ export const MicropostCard: React.FC<MicropostCardProps> = ({ post }) => {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       {imageUrl && !imageError ? (
-        <img
-          src={imageUrl}
-          alt={post.title}
-          className="w-full h-48 object-cover"
-          onError={handleImageError}
-        />
+        <div className="relative w-full h-48">
+          <Image
+            src={imageUrl}
+            alt={post.title}
+            fill
+            style={{ objectFit: 'cover' }}
+            onError={handleImageError}
+          />
+        </div>
       ) : (
         <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
           <span className="text-gray-500">No image available</span>

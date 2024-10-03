@@ -14,7 +14,7 @@ export function ClientSideWrapper({ children }: { children: React.ReactNode }) {
   const { isOpen: isPostModalOpen, handleOpen: handlePostModalOpen, handleClose: handlePostModalClose } = useModal();
   const { isOpen: isLoginModalOpen, handleOpen: handleLoginModalOpen, handleClose: handleLoginModalClose } = useModal();
   const { formTitle, setFormTitle, formContent, setFormContent, formImage, setFormImage, resetForm } = usePostForm();
-  const { isLoggedIn, currentUser, loginStatus, login, logout } = useAuth();
+  const { isLoggedIn, currentUser, login, logout } = useAuth();
 
   const handleSubmitPost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,8 +37,7 @@ export function ClientSideWrapper({ children }: { children: React.ReactNode }) {
       handlePostModalClose();
       resetForm();
       // ここでページをリフレッシュするか、状態を更新する処理を追加
-    //   ・ページをリフレッシュする場合は、location.reload() を呼び出す
-    location.reload() 
+        location.reload() 
     } catch (err) {
       console.error('Error creating micropost:', err);
     }
