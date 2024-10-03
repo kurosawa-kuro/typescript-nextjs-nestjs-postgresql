@@ -65,8 +65,8 @@ export default function Home() {
   return (
     <div className="bg-gray-50 min-h-screen">
       <header className="bg-white border-b border-gray-300 fixed top-0 left-0 right-0 z-10">
-        <div className="max-w-5xl mx-auto px-4 py-2 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-pink-500">TypeGram</h1>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-pink-500">TypeGram</h1>
           <div className="flex items-center space-x-4">
             {isLoggedIn ? (
               <>
@@ -78,6 +78,7 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
                 </button>
+                <span className="text-sm font-medium text-gray-700">{currentUser?.name}</span>
                 <button 
                   onClick={logout}
                   className="text-sm font-medium text-gray-700 hover:text-gray-900"
@@ -102,7 +103,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 pt-16 pb-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-8">
         {loginStatus && (
           <div className={`text-center p-2 mb-4 ${loginStatus.includes('successful') || loginStatus.includes('Logged out') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
             {loginStatus}
