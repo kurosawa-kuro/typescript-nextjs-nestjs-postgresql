@@ -1,4 +1,4 @@
-// frontend\src\app\components\MicropostList.tsx
+// frontend/src/app/components/MicropostList.tsx
 
 import React from 'react';
 import { Micropost } from '../types';

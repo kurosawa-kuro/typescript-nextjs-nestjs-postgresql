@@ -1,42 +1,49 @@
-import React from 'react';
+// frontend/src/app/components/MicropostCard.tsx
+
+'use client';
+
+import React, { useState, useMemo } from 'react';
 import { Micropost } from '../types';
 import { ImageUtils } from '../utils/imageUtils';
 
-export const MicropostCard = ({ post }: { post?: Micropost }) => {
-  if (!post) {
-    return null;
-  }
+interface MicropostCardProps {
+  post: Micropost;
+}
 
-  const imageUrl = post.imagePath 
-    ? `http://localhost:3001/${ImageUtils.normalizePath(post.imagePath)}`
-    : null;
+const API_BASE_URL = 'http://localhost:3001';
+
+export const MicropostCard: React.FC<MicropostCardProps> = ({ post }) => {
+  const [imageError, setImageError] = useState(false);
+
+  const imageUrl = useMemo(() => {
+    if (post.imagePath) {
+      const normalizedPath = ImageUtils.normalizePath(post.imagePath);
+      return `${API_BASE_URL}/${normalizedPath}`;
+    }
+    return null;
+  }, [post.imagePath]);
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
-      <div className="p-3 flex items-center border-b border-gray-200 bg-gray-50">
-        <div className="w-8 h-8 rounded-full bg-gray-300 mr-2"></div>
-        <span className="font-semibold text-sm text-gray-800">{post.userName || 'Unknown'}</span>
-      </div>
-      {imageUrl && (
-        <div className="aspect-square relative">
-          <img 
-            src={imageUrl} 
-            alt={post.title || 'Micropost image'} 
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              e.currentTarget.onerror = null;
-              e.currentTarget.src = 'http://localhost:3001/uploads/test.png';
-            }}
-          />
+    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      {imageUrl && !imageError ? (
+        <img
+          src={imageUrl}
+          alt={post.title}
+          className="w-full h-48 object-cover"
+          onError={handleImageError}
+        />
+      ) : (
+        <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
+          <span className="text-gray-500">No image available</span>
         </div>
       )}
-      <div className="p-3 bg-white">
-        <div className="flex items-center space-x-3 mb-2">
-          <button className="text-2xl">❤️</button>
-          <button className="text-2xl">💬</button>
-          <button className="text-2xl">🚀</button>
-        </div>
-        <h2 className="font-semibold text-base mb-1 text-gray-900">{post.title || 'Untitled'}</h2>
+      <div className="p-4">
+        <h2 className="text-xl font-semibold mb-2">{post.title}</h2>
+        <p className="text-gray-600">{post.content}</p>
       </div>
     </div>
   );

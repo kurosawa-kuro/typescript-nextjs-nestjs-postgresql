@@ -1,4 +1,4 @@
-// frontend\src\app\api\apiService.ts
+// frontend/src/app/api/apiService.ts
 
 import { Micropost, LoginResponse } from '../types';
 
@@ -6,7 +6,7 @@ const API_URL = 'http://localhost:3001/microposts';
 
 export const ApiService = {
   fetchMicroposts: async (): Promise<Micropost[]> => {
-    const response = await fetch(API_URL);
+    const response = await fetch(API_URL, { cache: 'no-store' });
     if (!response.ok) {
       throw new Error('Failed to fetch microposts');
     }
