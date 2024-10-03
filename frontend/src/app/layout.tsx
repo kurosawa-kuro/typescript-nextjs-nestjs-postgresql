@@ -1,8 +1,7 @@
-// frontend\src\app\layout.tsx
-
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { ClientSideWrapper } from "./components/ClientSideWrapper";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -30,7 +29,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <ClientSideWrapper>
+          {children}
+        </ClientSideWrapper>
       </body>
     </html>
   );
