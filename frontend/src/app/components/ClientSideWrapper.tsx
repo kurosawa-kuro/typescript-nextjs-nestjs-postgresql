@@ -68,6 +68,12 @@ export function ClientSideWrapper({ children }: { children: React.ReactNode }) {
 
       {children}
 
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={handleLoginModalClose}
+        onLogin={handleLogin}
+      />
+
       <MicropostModal
         isOpen={isPostModalOpen}
         onClose={handlePostModalClose}
@@ -79,11 +85,7 @@ export function ClientSideWrapper({ children }: { children: React.ReactNode }) {
         image={formImage}
         onImageChange={handleImageChange}
       />
-      <LoginModal
-        isOpen={isLoginModalOpen}
-        onClose={handleLoginModalClose}
-        onLogin={handleLogin}
-      />
+
     </>
   );
 }
