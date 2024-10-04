@@ -1,7 +1,7 @@
 // frontend\src\app\store\useMicropostStore.ts
 
 import { create } from 'zustand';
-import { MicropostState } from '../types/models';
+import { MicropostState, Micropost } from '../types/models';
 import { ApiService } from '../lib/api/apiService';
 
 export const useMicropostStore = create<MicropostState>((set, get) => ({
@@ -9,23 +9,30 @@ export const useMicropostStore = create<MicropostState>((set, get) => ({
   isLoading: false,
   error: null,
 
-  setMicroposts: (microposts) => set({ microposts: microposts.filter(post => post !== undefined) }),
+  setMicroposts: (microposts: Micropost[]) => set({ 
+    microposts: microposts.filter(post => post !== undefined) 
+  }),
 
-  addMicropost: (newMicropost) => {
-    if (newMicropost !== undefined) {
-      set((state) => ({
-        microposts: [newMicropost, ...state.microposts]
-      }));
-    }
+  addMicropost: (newMicropost: Micropost) => {
+    set((state) => ({
+      microposts: [newMicropost, ...state.microposts]
+    }));
   },
 
   fetchMicroposts: async () => {
     set({ isLoading: true, error: null });
     try {
       const microposts = await ApiService.fetchMicroposts();
-      set({ microposts: microposts.filter(post => post !== undefined), isLoading: false });
+      set({ 
+        microposts: microposts.filter(post => post !== undefined), 
+        isLoading: false 
+      });
     } catch (error) {
-      set({ error: 'Failed to fetch microposts', isLoading: false });
+      set({ 
+        error: 'Error fetching microposts. Please try again later.', 
+        isLoading: false 
+      });
+      console.error('Failed to fetch microposts:', error);
     }
   },
 
@@ -40,7 +47,18 @@ export const useMicropostStore = create<MicropostState>((set, get) => ({
       return newMicropost;
     } catch (error) {
       set({ error: 'Failed to create micropost', isLoading: false });
+      console.error('Failed to create micropost:', error);
       return null;
     }
   },
+
+  // 初期化関数を追加
+  initializeMicroposts: () => {
+    get().fetchMicroposts();
+  }
 }));
+
+// コンポーネントのマウント時に初期化を行う
+if (typeof window !== 'undefined') {
+  useMicropostStore.getState().initializeMicroposts();
+}
