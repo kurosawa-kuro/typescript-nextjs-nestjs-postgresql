@@ -9,7 +9,7 @@ export const ApiService = {
       return await ApiClient.get<Micropost[]>('/microposts', { cache: 'no-store' });
     } catch (error) {
       console.error('Failed to fetch microposts:', error);
-      return [];  // エラー時は空の配列を返す
+      return [];
     }
   },
 
@@ -22,12 +22,11 @@ export const ApiService = {
     }
   },
 
-  login: async (email: string, password: string): Promise<LoginResponse | null> => {
-    try {
-      return await ApiClient.post<LoginResponse>('/auth/login', { email, password });
-    } catch (error) {
-      console.error('Login failed:', error);
-      return null;
+  login: async (email: string, password: string): Promise<LoginResponse> => {
+    const response = await ApiClient.post<LoginResponse>('/auth/login', { email, password });
+    if (!response || !response.success) {
+      throw new Error(response?.message || 'Login failed');
     }
+    return response;
   }
 };

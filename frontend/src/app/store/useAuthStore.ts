@@ -1,10 +1,9 @@
-// frontend\src\app\store\useAuthStore.ts
+// src/app/store/useAuthStore.ts
 
 import { create } from 'zustand';
-import { AuthState, User  } from '../types/models';
+import { AuthState, User, LoginResponse } from '../types/models';
 import { ApiService } from '../lib/api/apiService';
 
-// カスタムエラータイプの定義
 interface ApiError extends Error {
   statusCode?: number;
 }
