@@ -21,6 +21,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   login: async (email: string, password: string) => {
     try {
       const data = await ApiService.login(email, password);
+      
       if (data.success) {
         set({
           isLoggedIn: true,

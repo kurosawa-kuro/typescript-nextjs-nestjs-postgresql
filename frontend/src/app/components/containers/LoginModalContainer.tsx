@@ -1,6 +1,6 @@
 import React from "react";
 import { LoginModal } from '../auth/LoginModal';
-import { useAuthStore } from '../../store/useAuthStore.';
+import { useAuthStore } from '../../store/useAuthStore';
 
 type LoginModalContainerProps = {
   isOpen: boolean;

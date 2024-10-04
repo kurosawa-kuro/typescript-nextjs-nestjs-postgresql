@@ -21,6 +21,13 @@ export const ApiService = {
 
   login: async (email: string, password: string): Promise<LoginResponse> => {
     const response = await ApiClient.post('/auth/login', { email, password });
-    return response.json();
+    console.log("★★★ login response ★★★", response);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data;
   }
 };
