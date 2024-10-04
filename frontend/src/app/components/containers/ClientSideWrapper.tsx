@@ -1,7 +1,7 @@
 'use client';
 
 import React from "react";
-import { useAuthStore } from "../../store/authStore";
+import { useAuthStore } from "../../store/useAuthStore.";
 import { useModal } from "../../lib/hooks/useModal";
 import { HeaderContainer } from './HeaderContainer';
 import { LoginModalContainer } from './LoginModalContainer';
