@@ -37,7 +37,6 @@ export const useMicropostStore = create<MicropostState>((set, get) => ({
     }
   },
 
-
   // 初期化関数を追加
   initializeMicroposts: () => {
     get().fetchMicroposts();
