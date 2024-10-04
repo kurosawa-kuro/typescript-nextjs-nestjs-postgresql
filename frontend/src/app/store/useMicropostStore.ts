@@ -1,7 +1,7 @@
 // frontend\src\app\store\useMicropostStore.ts
 
 import { create } from 'zustand';
-import { MicropostState, Micropost } from '../types/models';
+import { MicropostState, Micropost, ApiError } from '../types/models';
 import { ApiService } from '../lib/api/apiService';
 
 export const useMicropostStore = create<MicropostState>((set, get) => ({
@@ -28,11 +28,12 @@ export const useMicropostStore = create<MicropostState>((set, get) => ({
         isLoading: false 
       });
     } catch (error) {
+      const apiError = error as ApiError;
       set({ 
-        error: 'Error fetching microposts. Please try again later.', 
+        error: `Error fetching microposts: ${apiError.message || 'Please try again later.'}`, 
         isLoading: false 
       });
-      console.error('Failed to fetch microposts:', error);
+      console.error('Failed to fetch microposts:', apiError);
     }
   },
 
@@ -46,8 +47,12 @@ export const useMicropostStore = create<MicropostState>((set, get) => ({
       set({ isLoading: false });
       return newMicropost;
     } catch (error) {
-      set({ error: 'Failed to create micropost', isLoading: false });
-      console.error('Failed to create micropost:', error);
+      const apiError = error as ApiError;
+      set({ 
+        error: `Failed to create micropost: ${apiError.message || 'Unknown error occurred'}`, 
+        isLoading: false 
+      });
+      console.error('Failed to create micropost:', apiError);
       return null;
     }
   },

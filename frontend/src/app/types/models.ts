@@ -53,3 +53,8 @@ export interface MicropostState extends AsyncOperationState {
   createMicropost: (formData: FormData) => Promise<Micropost | null>;
   initializeMicroposts: () => void;
 }
+
+// 追加された ApiError インターフェース
+export interface ApiError extends Error {
+  statusCode?: number;
+}
