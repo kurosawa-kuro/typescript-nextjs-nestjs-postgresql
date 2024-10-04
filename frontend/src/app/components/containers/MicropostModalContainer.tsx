@@ -1,5 +1,4 @@
-// src/app/components/containers/MicropostModalContainer.tsx
-import React from "react";
+import React, { useState } from "react";
 import { usePostForm } from "../../hooks/usePostForm";
 import { useMicropostStore } from '../../store/useMicropostStore';
 import { MicropostModal } from "../microposts/MicropostModal";
@@ -11,15 +10,21 @@ type MicropostModalContainerProps = {
 
 export function MicropostModalContainer({ isOpen, onClose }: MicropostModalContainerProps) {
   const { formTitle, setFormTitle, formImage, setFormImage, resetForm } = usePostForm();
-  const createMicropost = useMicropostStore(state => state.createMicropost);
+  const { createMicropost } = useMicropostStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmitPost = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+
     const formData = new FormData();
     const storedUser = localStorage.getItem('user');
     const user = storedUser ? JSON.parse(storedUser) : null;
     if (!user) {
-      console.error('User not found');
+      setError('User not found');
+      setIsSubmitting(false);
       return;
     }
     formData.append('userId', user.id.toString());
@@ -29,11 +34,18 @@ export function MicropostModalContainer({ isOpen, onClose }: MicropostModalConta
     }
 
     try {
-      await createMicropost(formData);
-      onClose();
-      resetForm();
+      const newMicropost = await createMicropost(formData);
+      console.log("★★★ newMicropost ★★★:",newMicropost);
+      if (newMicropost) {
+        resetForm();
+        onClose();
+      } else {
+        setError('Failed to create micropost');
+      }
     } catch (err) {
-      console.error('Error creating micropost:', err);
+      setError('An error occurred while creating the micropost');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -52,6 +64,8 @@ export function MicropostModalContainer({ isOpen, onClose }: MicropostModalConta
       setTitle={setFormTitle}
       image={formImage}
       onImageChange={handleImageChange}
+      isLoading={isSubmitting}
+      error={error}
     />
   );
 }

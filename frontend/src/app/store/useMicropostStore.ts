@@ -1,33 +1,50 @@
-// src/app/store/useMicropostStore.ts
 import { create } from 'zustand';
 import { Micropost } from '../types/models';
 import { ApiService } from '../lib/api/apiService';
 
 interface MicropostState {
   microposts: Micropost[];
+  isLoading: boolean;
+  error: string | null;
   setMicroposts: (microposts: Micropost[]) => void;
   addMicropost: (newMicropost: Micropost) => void;
-  createMicropost: (formData: FormData) => Promise<void>;
+  fetchMicroposts: () => Promise<void>;
+  createMicropost: (formData: FormData) => Promise<Micropost | null>;
 }
 
-export const useMicropostStore = create<MicropostState>((set) => ({
+export const useMicropostStore = create<MicropostState>((set, get) => ({
   microposts: [],
-  setMicroposts: (microposts) => {
-    console.log('Setting microposts in store:', microposts);
-    set({ microposts });
+  isLoading: false,
+  error: null,
+  setMicroposts: (microposts) => set({ microposts: microposts.filter(post => post !== undefined) }),
+  addMicropost: (newMicropost) => {
+    if (newMicropost !== undefined) {
+      set((state) => ({
+        microposts: [newMicropost, ...state.microposts]
+      }));
+    }
   },
-  addMicropost: (newMicropost) => set((state) => {
-    console.log('Adding new micropost:', newMicropost);
-    return { microposts: [newMicropost, ...state.microposts] };
-  }),
-  createMicropost: async (formData: FormData) => {
+  fetchMicroposts: async () => {
+    set({ isLoading: true, error: null });
     try {
-      await ApiService.createMicropost(formData);
-      const updatedMicroposts = await ApiService.fetchMicroposts();
-      set({ microposts: updatedMicroposts });
-      console.log('Microposts updated after creation');
-    } catch (err) {
-      console.error('Error creating micropost:', err);
+      const microposts = await ApiService.fetchMicroposts();
+      set({ microposts: microposts.filter(post => post !== undefined), isLoading: false });
+    } catch (error) {
+      set({ error: 'Failed to fetch microposts', isLoading: false });
+    }
+  },
+  createMicropost: async (formData: FormData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const newMicropost = await ApiService.createMicropost(formData);
+      if (newMicropost !== undefined) {
+        get().addMicropost(newMicropost);
+      }
+      set({ isLoading: false });
+      return newMicropost;
+    } catch (error) {
+      set({ error: 'Failed to create micropost', isLoading: false });
+      throw error;
     }
   },
 }));

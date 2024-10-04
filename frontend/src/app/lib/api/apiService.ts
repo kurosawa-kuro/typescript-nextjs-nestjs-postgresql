@@ -1,4 +1,3 @@
-// src/app/lib/api/apiService.ts
 import { Micropost, LoginResponse } from '../../types/models';
 import { ApiClient } from './apiClient';
 
@@ -17,7 +16,7 @@ export const ApiService = {
       throw new Error('Failed to create micropost');
     }
     const data = await response.json();
-    return data.micropost;
+    return data as Micropost;
   },
 
   login: async (email: string, password: string): Promise<LoginResponse> => {

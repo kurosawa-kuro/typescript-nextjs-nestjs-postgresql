@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { MicropostModalProps } from '../../types/models';
 import { ImageUtils } from '../../lib/utils/imageUtils';
 
-export const MicropostModal = ({ isOpen, onClose, onSubmit, title, setTitle ,image, onImageChange }: MicropostModalProps) => {
+export const MicropostModal = ({ isOpen, onClose, onSubmit, title, setTitle, image, onImageChange, isLoading, error }: MicropostModalProps) => {
   if (!isOpen) return null;
 
   return (
@@ -12,9 +12,12 @@ export const MicropostModal = ({ isOpen, onClose, onSubmit, title, setTitle ,ima
         <div className="border-b border-gray-200 p-4 flex justify-between items-center">
           <button onClick={onClose} className="text-gray-700 font-medium text-lg">Cancel</button>
           <h2 className="text-xl font-bold text-gray-900">Create new post</h2>
-          <button onClick={onSubmit} className="text-blue-600 font-bold text-lg">Share</button>
+          <button onClick={onSubmit} className="text-blue-600 font-bold text-lg" disabled={isLoading}>
+            {isLoading ? 'Sharing...' : 'Share'}
+          </button>
         </div>
         <form onSubmit={onSubmit} className="p-4">
+          {error && <div className="text-red-500 mb-4">{error}</div>}
           <div className="mb-4">
             <label htmlFor="image" className="block text-base font-semibold text-gray-800 mb-2">Image</label>
             <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">

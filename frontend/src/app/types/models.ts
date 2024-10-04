@@ -25,19 +25,13 @@ export interface User {
 // Ensure that MicropostModalProps is defined and exported here
 
 export interface MicropostModalProps {
-
   isOpen: boolean;
-
   onClose: () => void;
-
   onSubmit: (event: React.FormEvent) => void;
-
   title: string;
-
   setTitle: (title: string) => void;
-
   image: File | null;
-
   onImageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-
+  isLoading: boolean;
+  error: string | null;
 }
