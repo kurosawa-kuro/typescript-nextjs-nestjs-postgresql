@@ -12,10 +12,6 @@ export function ClientSideWrapper({ children }: { children: React.ReactNode }) {
   const { isOpen: isLoginModalOpen, handleOpen: handleLoginModalOpen, handleClose: handleLoginModalClose } = useModal();
   const { isOpen: isPostModalOpen, handleOpen: handlePostModalOpen, handleClose: handlePostModalClose } = useModal();
 
-  // if (isLoading) {
-  //   return <div>Loading...</div>; // または適切なローディングコンポーネント
-  // }
-
   return (
     <>
       <HeaderContainer
