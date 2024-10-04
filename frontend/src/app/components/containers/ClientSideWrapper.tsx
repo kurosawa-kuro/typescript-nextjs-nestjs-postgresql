@@ -8,7 +8,7 @@ import { LoginModalContainer } from './LoginModalContainer';
 import { MicropostModalContainer } from './MicropostModalContainer';
 
 export function ClientSideWrapper({ children }: { children: React.ReactNode }) {
-  const { isLoggedIn, currentUser, logout, isLoading } = useAuthStore();
+  const { isLoggedIn, currentUser, logout  } = useAuthStore();
   const { isOpen: isLoginModalOpen, handleOpen: handleLoginModalOpen, handleClose: handleLoginModalClose } = useModal();
   const { isOpen: isPostModalOpen, handleOpen: handlePostModalOpen, handleClose: handlePostModalClose } = useModal();
 

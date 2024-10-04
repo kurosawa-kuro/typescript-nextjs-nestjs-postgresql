@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { MicropostModalProps } from '../../types/models';
 import { ImageUtils } from '../../lib/utils/imageUtils';
 
-export const MicropostModal = ({ isOpen, onClose, onSubmit, title, setTitle, content, setContent, image, onImageChange }: MicropostModalProps) => {
+export const MicropostModal = ({ isOpen, onClose, onSubmit, title, setTitle ,image, onImageChange }: MicropostModalProps) => {
   if (!isOpen) return null;
 
   return (
