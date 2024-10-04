@@ -13,7 +13,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const data = await ApiService.login(email, password);
 
-      if (data.success) {
+      if (data && data.success) {
         set({
           isLoggedIn: true,
           currentUser: data.user,
