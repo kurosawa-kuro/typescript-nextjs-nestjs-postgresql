@@ -1,37 +1,49 @@
 // src/app/lib/api/apiClient.ts
-const API_BASE_URL = 'http://localhost:3001';
 
-// 汎用的なオブジェクト型を定義
-type JsonObject = { [key: string]: unknown };
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001';
 
 export class ApiClient {
-  static async get(endpoint: string, options: RequestInit = {}): Promise<Response> {
+  private static async request<T>(
+    method: string,
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
-    return fetch(url, {
+    const headers = new Headers(options.headers);
+
+    if (!(options.body instanceof FormData)) {
+      headers.set('Content-Type', 'application/json');
+    }
+
+    const config: RequestInit = {
       ...options,
-      method: 'GET',
-    });
+      method,
+      headers,
+    };
+
+    try {
+      const response = await fetch(url, config);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error(`Error in ${method} request to ${endpoint}:`, error);
+      throw error;
+    }
   }
 
-  static async post<T extends JsonObject>(endpoint: string, body: T, options: RequestInit = {}): Promise<Response> {
-    const url = `${API_BASE_URL}${endpoint}`;
-    return fetch(url, {
-      ...options,
-      method: 'POST',
-      body: JSON.stringify(body),
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-    });
+  static async get<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    return this.request<T>('GET', endpoint, options);
   }
 
-  static async postFormData(endpoint: string, formData: FormData, options: RequestInit = {}): Promise<Response> {
-    const url = `${API_BASE_URL}${endpoint}`;
-    return fetch(url, {
-      ...options,
-      method: 'POST',
-      body: formData,
-    });
+  static async post<T>(endpoint: string, body: unknown, options: RequestInit = {}): Promise<T> {
+    return this.request<T>('POST', endpoint, { ...options, body: JSON.stringify(body) });
+  }
+
+  static async postFormData<T>(endpoint: string, formData: FormData, options: RequestInit = {}): Promise<T> {
+    return this.request<T>('POST', endpoint, { ...options, body: formData });
   }
 }
