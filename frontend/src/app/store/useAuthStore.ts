@@ -6,7 +6,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   isLoggedIn: false,
   currentUser: null,
   loginStatus: null,
-  isLoading: true,
+  isLoading: false,
   error: null,
 
   login: async (email: string, password: string) => {
@@ -18,7 +18,8 @@ export const useAuthStore = create<AuthState>((set) => ({
           isLoggedIn: true,
           currentUser: data.user,
           loginStatus: 'Login successful',
-          isLoading: false
+          isLoading: false,
+          error: null
         });
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
@@ -41,7 +42,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       isLoggedIn: false,
       currentUser: null,
       loginStatus: 'Logged out successfully',
-      isLoading: false
+      isLoading: false,
+      error: null
     });
   },
 
@@ -52,10 +54,11 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({
         isLoggedIn: true,
         currentUser: JSON.parse(storedUser),
-        isLoading: false
+        isLoading: false,
+        error: null
       });
     } else {
-      set({ isLoading: false });
+      set({ isLoading: false, error: null });
     }
   }
 }));

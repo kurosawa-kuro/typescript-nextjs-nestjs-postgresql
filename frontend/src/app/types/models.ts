@@ -1,4 +1,5 @@
 // src/app/types/models.ts
+
 export interface Micropost {
   id: number;
   userId: number;
@@ -21,9 +22,6 @@ export interface User {
   email: string;
 }
 
-
-// Ensure that MicropostModalProps is defined and exported here
-
 export interface MicropostModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -36,14 +34,11 @@ export interface MicropostModalProps {
   error: string | null;
 }
 
-
-// 非同期操作の共通状態を表す型
 export interface AsyncOperationState {
   isLoading: boolean;
   error: string | null;
 }
 
-// AuthStateを更新
 export interface AuthState extends AsyncOperationState {
   isLoggedIn: boolean;
   currentUser: User | null;
@@ -53,7 +48,6 @@ export interface AuthState extends AsyncOperationState {
   initializeAuth: () => void;
 }
 
-// MicropostStateを更新
 export interface MicropostState extends AsyncOperationState {
   microposts: Micropost[];
   setMicroposts: (microposts: Micropost[]) => void;

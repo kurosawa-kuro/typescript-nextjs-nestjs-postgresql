@@ -6,7 +6,9 @@ export const useMicropostStore = create<MicropostState>((set, get) => ({
   microposts: [],
   isLoading: false,
   error: null,
+
   setMicroposts: (microposts) => set({ microposts: microposts.filter(post => post !== undefined) }),
+
   addMicropost: (newMicropost) => {
     if (newMicropost !== undefined) {
       set((state) => ({
@@ -14,6 +16,7 @@ export const useMicropostStore = create<MicropostState>((set, get) => ({
       }));
     }
   },
+
   fetchMicroposts: async () => {
     set({ isLoading: true, error: null });
     try {
@@ -23,6 +26,7 @@ export const useMicropostStore = create<MicropostState>((set, get) => ({
       set({ error: 'Failed to fetch microposts', isLoading: false });
     }
   },
+
   createMicropost: async (formData: FormData) => {
     set({ isLoading: true, error: null });
     try {
