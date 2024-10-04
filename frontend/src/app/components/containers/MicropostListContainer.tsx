@@ -12,21 +12,14 @@ interface MicropostListContainerProps {
 }
 
 export const MicropostListContainer: React.FC<MicropostListContainerProps> = ({ initialMicroposts }) => {
-  const { microposts, isLoading, error, setMicroposts, fetchMicroposts } = useMicropostStore();
+  const { microposts, isLoading, error, setMicroposts } = useMicropostStore();
 
   useEffect(() => {
-    if (initialMicroposts && initialMicroposts.length > 0) {
-      setMicroposts(initialMicroposts);
-    } else {
-      fetchMicroposts();
-    }
-  }, [initialMicroposts, setMicroposts, fetchMicroposts]);
+    setMicroposts(initialMicroposts);
+  }, [initialMicroposts, setMicroposts]);
 
-  if (isLoading && (!microposts || microposts.length === 0)) return <LoadingSpinner />;
+  if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message={error} />;
 
-  // フィルタリングを追加して未定義の投稿を除外
-  const validMicroposts = microposts ? microposts.filter(post => post !== undefined) : [];
-
-  return <MicropostList microposts={validMicroposts} />;
+  return <MicropostList microposts={microposts} />;
 };

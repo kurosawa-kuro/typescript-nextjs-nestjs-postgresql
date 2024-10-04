@@ -49,8 +49,6 @@ export interface MicropostState extends AsyncOperationState {
   microposts: Micropost[];
   setMicroposts: (microposts: Micropost[]) => void;
   addMicropost: (newMicropost: Micropost) => void;
-  fetchMicroposts: () => Promise<void>;
-  initializeMicroposts: () => void;
 }
 
 // 追加された ApiError インターフェース

@@ -2,7 +2,7 @@
 
 "use client"
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo  } from 'react';
 import Image from 'next/image';
 import { Micropost } from '../../types/models';
 import { ImageUtils } from '../../lib/utils/imageUtils';
