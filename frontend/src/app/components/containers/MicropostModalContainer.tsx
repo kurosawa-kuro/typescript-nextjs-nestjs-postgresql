@@ -1,7 +1,7 @@
-// MicropostModalContainer.tsx
+// src/app/components/containers/MicropostModalContainer.tsx
 import React from "react";
 import { usePostForm } from "../../lib/hooks/usePostForm";
-import { ApiService } from '../../lib/api/apiService';
+import { useMicropostStore } from '../../store/useMicropostStore';
 import { MicropostModal } from "../microposts/MicropostModal";
 
 type MicropostModalContainerProps = {
@@ -11,6 +11,7 @@ type MicropostModalContainerProps = {
 
 export function MicropostModalContainer({ isOpen, onClose }: MicropostModalContainerProps) {
   const { formTitle, setFormTitle, formContent, setFormContent, formImage, setFormImage, resetForm } = usePostForm();
+  const createMicropost = useMicropostStore(state => state.createMicropost);
 
   const handleSubmitPost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,10 +30,9 @@ export function MicropostModalContainer({ isOpen, onClose }: MicropostModalConta
     }
 
     try {
-      await ApiService.createMicropost(formData);
+      await createMicropost(formData);
       onClose();
       resetForm();
-      location.reload();
     } catch (err) {
       console.error('Error creating micropost:', err);
     }
