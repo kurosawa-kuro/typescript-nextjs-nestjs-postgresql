@@ -1,6 +1,6 @@
 // LoginModalContainer.tsx
 import React from "react";
-import { LoginModal } from './auth/LoginModal';
+import { LoginModal } from '../auth/LoginModal';
 
 type LoginModalContainerProps = {
   isOpen: boolean;

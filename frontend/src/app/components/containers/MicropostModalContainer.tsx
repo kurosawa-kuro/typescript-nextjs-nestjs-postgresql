@@ -1,8 +1,8 @@
 // MicropostModalContainer.tsx
 import React from "react";
-import { usePostForm } from "../lib/hooks/usePostForm";
-import { ApiService } from '../lib/api/apiService';
-import { MicropostModal } from "./microposts/MicropostModal";
+import { usePostForm } from "../../lib/hooks/usePostForm";
+import { ApiService } from '../../lib/api/apiService';
+import { MicropostModal } from "../microposts/MicropostModal";
 
 type MicropostModalContainerProps = {
   isOpen: boolean;

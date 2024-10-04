@@ -2,8 +2,8 @@
 'use client';
 
 import React from "react";
-import { useAuth } from "../lib/hooks/useAuth";
-import { useModal } from "../lib/hooks/useModal";
+import { useAuth } from "../../lib/hooks/useAuth";
+import { useModal } from "../../lib/hooks/useModal";
 import { HeaderContainer } from './HeaderContainer';
 import { LoginModalContainer } from './LoginModalContainer';
 import { MicropostModalContainer } from './MicropostModalContainer';
