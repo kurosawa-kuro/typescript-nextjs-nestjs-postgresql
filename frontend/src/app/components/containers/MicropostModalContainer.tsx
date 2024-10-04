@@ -1,6 +1,6 @@
 // src/app/components/containers/MicropostModalContainer.tsx
 import React from "react";
-import { usePostForm } from "../../lib/hooks/usePostForm";
+import { usePostForm } from "../../hooks/usePostForm";
 import { useMicropostStore } from '../../store/useMicropostStore';
 import { MicropostModal } from "../microposts/MicropostModal";
 

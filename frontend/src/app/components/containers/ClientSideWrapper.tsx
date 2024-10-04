@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useAuthStore } from "../../store/useAuthStore.";
-import { useModal } from "../../lib/hooks/useModal";
+import { useModal } from "../../hooks/useModal";
 import { HeaderContainer } from './HeaderContainer';
 import { LoginModalContainer } from './LoginModalContainer';
 import { MicropostModalContainer } from './MicropostModalContainer';

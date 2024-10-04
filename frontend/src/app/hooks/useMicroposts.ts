@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Micropost } from '../../types/models';
-import { ApiService } from '../../lib/api/apiService';
+import { Micropost } from '../types/models';
+import { ApiService } from '../lib/api/apiService';
 
 export const useMicroposts = () => {
   const [microposts, setMicroposts] = useState<Micropost[]>([]);
