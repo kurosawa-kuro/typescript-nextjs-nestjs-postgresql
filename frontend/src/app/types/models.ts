@@ -1,12 +1,9 @@
 // src/app/types/models.ts
 
-export interface Micropost {
+export interface User {
   id: number;
-  userId: number;
-  title: string;
-  content: string;
-  userName: string;
-  imagePath?: string;
+  name: string;
+  email: string;
 }
 
 export interface LoginResponse {
@@ -16,10 +13,13 @@ export interface LoginResponse {
   user: User;
 }
 
-export interface User {
+export interface Micropost {
   id: number;
-  name: string;
-  email: string;
+  userId: number;
+  title: string;
+  content: string;
+  userName: string;
+  imagePath?: string;
 }
 
 export interface AsyncOperationState {
