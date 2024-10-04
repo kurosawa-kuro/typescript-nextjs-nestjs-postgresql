@@ -37,14 +37,14 @@ export const useMicropostStore = create<MicropostState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const newMicropost = await ApiService.createMicropost(formData);
-      if (newMicropost !== undefined) {
+      if (newMicropost) {
         get().addMicropost(newMicropost);
       }
       set({ isLoading: false });
       return newMicropost;
     } catch (error) {
       set({ error: 'Failed to create micropost', isLoading: false });
-      throw error;
+      return null;
     }
   },
 }));

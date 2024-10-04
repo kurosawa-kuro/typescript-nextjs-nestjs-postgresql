@@ -35,7 +35,6 @@ export function MicropostModalContainer({ isOpen, onClose }: MicropostModalConta
 
     try {
       const newMicropost = await createMicropost(formData);
-      console.log("★★★ newMicropost ★★★:",newMicropost);
       if (newMicropost) {
         resetForm();
         onClose();
