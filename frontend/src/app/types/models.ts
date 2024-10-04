@@ -35,3 +35,29 @@ export interface MicropostModalProps {
   isLoading: boolean;
   error: string | null;
 }
+
+
+// 非同期操作の共通状態を表す型
+export interface AsyncOperationState {
+  isLoading: boolean;
+  error: string | null;
+}
+
+// AuthStateを更新
+export interface AuthState extends AsyncOperationState {
+  isLoggedIn: boolean;
+  currentUser: User | null;
+  loginStatus: string | null;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => void;
+  initializeAuth: () => void;
+}
+
+// MicropostStateを更新
+export interface MicropostState extends AsyncOperationState {
+  microposts: Micropost[];
+  setMicroposts: (microposts: Micropost[]) => void;
+  addMicropost: (newMicropost: Micropost) => void;
+  fetchMicroposts: () => Promise<void>;
+  createMicropost: (formData: FormData) => Promise<Micropost | null>;
+}

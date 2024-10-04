@@ -1,17 +1,6 @@
 import { create } from 'zustand';
-import { User } from '../types/models';
+import { AuthState, User } from '../types/models';
 import { ApiService } from '../lib/api/apiService';
-
-interface AuthState {
-  isLoggedIn: boolean;
-  currentUser: User | null;
-  loginStatus: string | null;
-  isLoading: boolean;
-  error: string | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  initializeAuth: () => void;
-}
 
 export const useAuthStore = create<AuthState>((set) => ({
   isLoggedIn: false,

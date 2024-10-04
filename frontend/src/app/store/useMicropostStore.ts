@@ -1,16 +1,6 @@
 import { create } from 'zustand';
-import { Micropost } from '../types/models';
+import { MicropostState, Micropost } from '../types/models';
 import { ApiService } from '../lib/api/apiService';
-
-interface MicropostState {
-  microposts: Micropost[];
-  isLoading: boolean;
-  error: string | null;
-  setMicroposts: (microposts: Micropost[]) => void;
-  addMicropost: (newMicropost: Micropost) => void;
-  fetchMicroposts: () => Promise<void>;
-  createMicropost: (formData: FormData) => Promise<Micropost | null>;
-}
 
 export const useMicropostStore = create<MicropostState>((set, get) => ({
   microposts: [],
