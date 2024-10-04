@@ -1,4 +1,3 @@
-// ClientSideWrapper.tsx
 'use client';
 
 import React from "react";
@@ -9,9 +8,13 @@ import { LoginModalContainer } from './LoginModalContainer';
 import { MicropostModalContainer } from './MicropostModalContainer';
 
 export function ClientSideWrapper({ children }: { children: React.ReactNode }) {
-  const { isLoggedIn, currentUser, logout } = useAuthStore();
+  const { isLoggedIn, currentUser, logout, isLoading } = useAuthStore();
   const { isOpen: isLoginModalOpen, handleOpen: handleLoginModalOpen, handleClose: handleLoginModalClose } = useModal();
   const { isOpen: isPostModalOpen, handleOpen: handlePostModalOpen, handleClose: handlePostModalClose } = useModal();
+
+  // if (isLoading) {
+  //   return <div>Loading...</div>; // または適切なローディングコンポーネント
+  // }
 
   return (
     <>
