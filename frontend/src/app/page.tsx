@@ -13,9 +13,9 @@ export default async function Home() {
 
   return (
     <div className="bg-gray-50 min-h-screen">
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-8">
-          <MicropostList microposts={microposts} />
-        </main>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-8">
+        <MicropostList microposts={microposts} />
+      </main>
     </div>
   );
 }
