@@ -37,25 +37,6 @@ export const useMicropostStore = create<MicropostState>((set, get) => ({
     }
   },
 
-  createMicropost: async (formData: FormData) => {
-    set({ isLoading: true, error: null });
-    try {
-      const newMicropost = await ApiService.createMicropost(formData);
-      if (newMicropost) {
-        get().addMicropost(newMicropost);
-      }
-      set({ isLoading: false });
-      return newMicropost;
-    } catch (error) {
-      const apiError = error as ApiError;
-      set({ 
-        error: `Failed to create micropost: ${apiError.message || 'Unknown error occurred'}`, 
-        isLoading: false 
-      });
-      console.error('Failed to create micropost:', apiError);
-      return null;
-    }
-  },
 
   // 初期化関数を追加
   initializeMicroposts: () => {

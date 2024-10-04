@@ -50,7 +50,6 @@ export interface MicropostState extends AsyncOperationState {
   setMicroposts: (microposts: Micropost[]) => void;
   addMicropost: (newMicropost: Micropost) => void;
   fetchMicroposts: () => Promise<void>;
-  createMicropost: (formData: FormData) => Promise<Micropost | null>;
   initializeMicroposts: () => void;
 }
 
