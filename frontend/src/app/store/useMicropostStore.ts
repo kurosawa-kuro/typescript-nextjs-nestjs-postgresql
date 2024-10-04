@@ -1,3 +1,5 @@
+// frontend\src\app\store\useMicropostStore.ts
+
 import { create } from 'zustand';
 import { MicropostState } from '../types/models';
 import { ApiService } from '../lib/api/apiService';
