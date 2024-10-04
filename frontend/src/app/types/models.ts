@@ -22,7 +22,12 @@ export interface User {
   email: string;
 }
 
-export interface MicropostModalProps {
+export interface AsyncOperationState {
+  isLoading: boolean;
+  error: string | null;
+}
+
+export interface MicropostModalProps extends AsyncOperationState {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (event: React.FormEvent) => void;
@@ -30,13 +35,6 @@ export interface MicropostModalProps {
   setTitle: (title: string) => void;
   image: File | null;
   onImageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  isLoading: boolean;
-  error: string | null;
-}
-
-export interface AsyncOperationState {
-  isLoading: boolean;
-  error: string | null;
 }
 
 export interface AuthState extends AsyncOperationState {
