@@ -1,7 +1,7 @@
 // frontend/src/app/components/MicropostList.tsx
 
 import React from 'react';
-import { Micropost } from '../types';
+import { Micropost } from '../../types/models';
 import { MicropostCard } from './MicropostCard';
 
 export const MicropostList = ({ microposts }: { microposts: Micropost[] }) => {
