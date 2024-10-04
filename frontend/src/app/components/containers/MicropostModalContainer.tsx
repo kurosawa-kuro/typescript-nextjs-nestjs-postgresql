@@ -10,7 +10,7 @@ type MicropostModalContainerProps = {
 };
 
 export function MicropostModalContainer({ isOpen, onClose }: MicropostModalContainerProps) {
-  const { formTitle, setFormTitle, formContent, setFormContent, formImage, setFormImage, resetForm } = usePostForm();
+  const { formTitle, setFormTitle, formImage, setFormImage, resetForm } = usePostForm();
   const createMicropost = useMicropostStore(state => state.createMicropost);
 
   const handleSubmitPost = async (e: React.FormEvent) => {
@@ -24,7 +24,6 @@ export function MicropostModalContainer({ isOpen, onClose }: MicropostModalConta
     }
     formData.append('userId', user.id.toString());
     formData.append('title', formTitle);
-    formData.append('content', formContent);
     if (formImage) {
       formData.append('image', formImage);
     }
@@ -51,8 +50,6 @@ export function MicropostModalContainer({ isOpen, onClose }: MicropostModalConta
       onSubmit={handleSubmitPost}
       title={formTitle}
       setTitle={setFormTitle}
-      content={formContent}
-      setContent={setFormContent}
       image={formImage}
       onImageChange={handleImageChange}
     />

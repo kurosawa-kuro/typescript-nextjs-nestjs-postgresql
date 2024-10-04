@@ -36,10 +36,6 @@ export interface MicropostModalProps {
 
   setTitle: (title: string) => void;
 
-  content: string;
-
-  setContent: (content: string) => void;
-
   image: File | null;
 
   onImageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
