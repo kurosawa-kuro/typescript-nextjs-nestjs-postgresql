@@ -7,6 +7,7 @@ interface AuthState {
   currentUser: User | null;
   loginStatus: string | null;
   isLoading: boolean;
+  error: string | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   initializeAuth: () => void;
@@ -17,11 +18,12 @@ export const useAuthStore = create<AuthState>((set) => ({
   currentUser: null,
   loginStatus: null,
   isLoading: true,
+  error: null,
 
   login: async (email: string, password: string) => {
     try {
       const data = await ApiService.login(email, password);
-      
+
       if (data.success) {
         set({
           isLoggedIn: true,
@@ -33,11 +35,11 @@ export const useAuthStore = create<AuthState>((set) => ({
         localStorage.setItem('user', JSON.stringify(data.user));
         return true;
       } else {
-        set({ loginStatus: 'Login failed', isLoading: false });
+        set({ loginStatus: 'Login failed', isLoading: false, error: 'Invalid credentials' });
         return false;
       }
-    } catch (error) {
-      set({ loginStatus: 'Error occurred during login', isLoading: false });
+    } catch (error: any) {
+      set({ loginStatus: 'Error occurred during login', isLoading: false, error: error.message });
       console.error('Error occurred during login:', error);
       return false;
     }
