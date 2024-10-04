@@ -1,3 +1,5 @@
+// frontend\src\app\hooks\useAuth.ts
+
 import { useState, useEffect } from 'react';
 import { LoginResponse } from '../types/models';
 import { ApiService } from '../lib/api/apiService';
