@@ -1,7 +1,7 @@
 // frontend/src/app/components/Header.tsx
 
 import React from 'react';
-import { User } from '../types';
+import { User } from '../../types/models';
 
 interface HeaderProps {
   isLoggedIn: boolean;

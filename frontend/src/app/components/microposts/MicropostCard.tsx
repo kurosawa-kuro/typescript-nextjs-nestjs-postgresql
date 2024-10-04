@@ -2,8 +2,8 @@
 
 import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
-import { Micropost } from '../types';
-import { ImageUtils } from '../utils/imageUtils';
+import { Micropost } from '../../types/models';
+import { ImageUtils } from '../../lib/utils/imageUtils';
 
 interface MicropostCardProps {
   post: Micropost;

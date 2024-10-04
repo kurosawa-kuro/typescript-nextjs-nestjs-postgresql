@@ -3,13 +3,13 @@
 'use client';
 
 import React from "react";
-import { useAuth } from "../hooks/useAuth";
-import { useModal } from "../hooks/useModal";
-import { usePostForm } from "../hooks/usePostForm";
-import { LoginModal } from './LoginModal';
-import { MicropostModal } from "./MicropostModal";
-import { ApiService } from '../api/apiService';
-import { Header } from './Header';
+import { useAuth } from "../lib/hooks/useAuth";
+import { useModal } from "../lib/hooks/useModal";
+import { usePostForm } from "../lib/hooks/usePostForm";
+import { LoginModal } from './auth/LoginModal';
+import { MicropostModal } from "./microposts/MicropostModal";
+import { ApiService } from '../lib/api/apiService';
+import { Header } from './layout/Header';
 
 export function ClientSideWrapper({ children }: { children: React.ReactNode }) {
   const { isOpen: isPostModalOpen, handleOpen: handlePostModalOpen, handleClose: handlePostModalClose } = useModal();

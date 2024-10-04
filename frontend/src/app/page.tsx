@@ -1,8 +1,7 @@
 // frontend/src/app/page.tsx
 
-import { MicropostList } from "./components/MicropostList";
-import { ClientSideWrapper } from "./components/ClientSideWrapper";
-import { ApiService } from './api/apiService';
+import { MicropostList } from "./components/microposts/MicropostList";
+import { ApiService } from './lib/api/apiService';
 
 async function getMicroposts() {
   const microposts = await ApiService.fetchMicroposts();

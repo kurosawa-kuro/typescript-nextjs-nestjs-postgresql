@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
-import { MicropostModalProps } from '../types';
-import { ImageUtils } from '../utils/imageUtils';
+import { MicropostModalProps } from '../../types/models';
+import { ImageUtils } from '../../lib/utils/imageUtils';
 
 export const MicropostModal = ({ isOpen, onClose, onSubmit, title, setTitle, content, setContent, image, onImageChange }: MicropostModalProps) => {
   if (!isOpen) return null;

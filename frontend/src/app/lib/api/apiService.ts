@@ -1,6 +1,6 @@
 // frontend/src/app/api/apiService.ts
 
-import { Micropost, LoginResponse } from '../types';
+import { Micropost, LoginResponse } from '../../types/models';
 
 const API_URL = 'http://localhost:3001/microposts';
 
