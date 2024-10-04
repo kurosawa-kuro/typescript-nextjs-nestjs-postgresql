@@ -1,7 +1,10 @@
+'use client'
+
 import React, { useState } from "react";
 import { usePostForm } from "../../hooks/usePostForm";
-import { useMicropostStore } from '../../store/useMicropostStore';
 import { MicropostModal } from "../microposts/MicropostModal";
+import { createMicropost } from "../../actions/createMicropost";
+import { useRouter } from 'next/navigation';
 
 type MicropostModalContainerProps = {
   isOpen: boolean;
@@ -10,9 +13,9 @@ type MicropostModalContainerProps = {
 
 export function MicropostModalContainer({ isOpen, onClose }: MicropostModalContainerProps) {
   const { formTitle, setFormTitle, formImage, setFormImage, resetForm } = usePostForm();
-  const { createMicropost } = useMicropostStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleSubmitPost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,12 +37,13 @@ export function MicropostModalContainer({ isOpen, onClose }: MicropostModalConta
     }
 
     try {
-      const newMicropost = await createMicropost(formData);
-      if (newMicropost) {
+      const result = await createMicropost(formData);
+      if (result.success) {
         resetForm();
         onClose();
+        router.refresh(); // Refresh the current page to show the new micropost
       } else {
-        setError('Failed to create micropost');
+        setError(result.error || 'Failed to create micropost');
       }
     } catch (err) {
       setError('An error occurred while creating the micropost');
