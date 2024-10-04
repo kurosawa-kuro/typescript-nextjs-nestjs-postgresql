@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { MicropostState, Micropost } from '../types/models';
+import { MicropostState } from '../types/models';
 import { ApiService } from '../lib/api/apiService';
 
 export const useMicropostStore = create<MicropostState>((set, get) => ({
