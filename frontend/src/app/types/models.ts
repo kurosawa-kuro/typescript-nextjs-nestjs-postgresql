@@ -17,7 +17,6 @@ export interface Micropost {
   id: number;
   userId: number;
   title: string;
-  content: string;
   userName: string;
   imagePath?: string;
 }
