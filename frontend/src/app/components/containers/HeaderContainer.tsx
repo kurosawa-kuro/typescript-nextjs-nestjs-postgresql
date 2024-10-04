@@ -1,10 +1,11 @@
 // HeaderContainer.tsx
 import React from "react";
 import { Header } from '../layout/Header';
+import { User } from '../../types/models';
 
 type HeaderContainerProps = {
   isLoggedIn: boolean;
-  currentUser: any; // Replace 'any' with a proper user type
+  currentUser: User | null;
   logout: () => void;
   handlePostModalOpen: () => void;
   handleLoginModalOpen: () => void;
