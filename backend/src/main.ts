@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import * as cookieParser from 'cookie-parser';
+import * as morgan from 'morgan';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -13,6 +14,9 @@ async function bootstrap() {
   });
 
   app.use(cookieParser());
+
+  // Morganロガーを追加
+  app.use(morgan('dev'));
 
   await app.listen(3001);
 }
