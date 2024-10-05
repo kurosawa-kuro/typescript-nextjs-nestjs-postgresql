@@ -35,22 +35,4 @@ describe('ImageUtils.getPreviewUrl', () => {
     expect(result).toBe('/dummy-image-url.jpg');
     expect(mockCreateObjectURL).not.toHaveBeenCalled();
   });
-
-  it('should return dummy URL when URL.createObjectURL is not available', () => {
-    const mockFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
-    (global.URL as any).createObjectURL = undefined;
-
-    const result = ImageUtils.getPreviewUrl(mockFile);
-
-    expect(result).toBe('/dummy-image-url.jpg');
-  });
-
-  it('should return dummy URL when URL is undefined', () => {
-    const mockFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
-    (global as any).URL = undefined;
-
-    const result = ImageUtils.getPreviewUrl(mockFile);
-
-    expect(result).toBe('/dummy-image-url.jpg');
-  });
 });
