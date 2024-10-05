@@ -10,11 +10,6 @@ const CONFIG = {
   IMAGE_FILE_NAME: 'test.png',
 };
 
-// Helper functions
-async function waitForElement(page: Page, selector: string, timeout = 5000) {
-  await page.waitForSelector(selector, { state: 'visible', timeout });
-}
-
 // User actions
 async function loginUser(page: Page): Promise<void> {
   await page.goto(CONFIG.BASE_URL);
