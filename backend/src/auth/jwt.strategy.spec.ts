@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtStrategy } from './jwt.strategy';
-import { UnauthorizedException } from '@nestjs/common';
 import { ExtractJwt } from 'passport-jwt';
 
 jest.mock('passport-jwt', () => ({

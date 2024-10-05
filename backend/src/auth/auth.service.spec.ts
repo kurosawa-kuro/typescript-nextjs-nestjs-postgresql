@@ -5,7 +5,6 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Pool } from 'pg';
 import { Logger, UnauthorizedException } from '@nestjs/common';
-import { CreateUserDto, UserCreationData } from '../user/user.service';
 
 jest.mock('bcrypt');
 

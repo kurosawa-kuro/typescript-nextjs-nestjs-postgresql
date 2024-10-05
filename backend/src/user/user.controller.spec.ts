@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { BadRequestException } from '@nestjs/common';
-import { CreateUserDto, UserCreationData } from './user.service';
+import { CreateUserDto } from './user.service';
 
 describe('UserController', () => {
   let userController: UserController;

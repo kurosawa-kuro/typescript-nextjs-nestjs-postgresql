@@ -2,10 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MicroPostController } from './micropost.controller';
 import { MicroPostService } from './micropost.service';
 import { UserService } from '../user/user.service';
-import {
-  BadRequestException,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 
 describe('MicroPostController', () => {
   let microPostController: MicroPostController;

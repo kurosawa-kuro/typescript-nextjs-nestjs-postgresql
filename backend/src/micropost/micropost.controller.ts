@@ -4,7 +4,6 @@ import {
   Get,
   Post,
   Body,
-  Param,
   ParseIntPipe,
   UseInterceptors,
   UploadedFile,

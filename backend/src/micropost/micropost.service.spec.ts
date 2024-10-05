@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MicroPostService, MicroPost } from './micropost.service';
 import { DatabaseService } from '../database/database.service';
-import { BadRequestException } from '@nestjs/common';
 
 describe('MicroPostService', () => {
   let microPostService: MicroPostService;

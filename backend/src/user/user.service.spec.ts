@@ -1,11 +1,6 @@
 // src/user/user.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
-import {
-  UserService,
-  User,
-  CreateUserDto,
-  UserCreationData,
-} from './user.service';
+import { UserService, User, UserCreationData } from './user.service';
 import { DatabaseService } from '../database/database.service';
 import * as bcrypt from 'bcrypt';
 
@@ -46,12 +41,6 @@ describe('UserService', () => {
   });
 
   describe('create', () => {
-    const createUserDto: CreateUserDto = {
-      name: 'John Doe',
-      email: 'john@example.com',
-      password: 'password',
-    };
-
     it('should create a new user', async () => {
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
       mockDatabaseService.executeQuery.mockResolvedValue({

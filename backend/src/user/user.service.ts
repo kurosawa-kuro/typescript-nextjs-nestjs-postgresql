@@ -1,6 +1,5 @@
 // src/user/user.service.ts
-import { Injectable, Inject, Logger } from '@nestjs/common';
-import { Pool } from 'pg';
+import { Injectable, Logger } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import * as bcrypt from 'bcrypt';
 

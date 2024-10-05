@@ -1,11 +1,10 @@
 // test/test-utils.ts
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
 import { UserService } from '../src/user/user.service';
 import { MicroPostService } from '../src/micropost/micropost.service';
 import { CategoryService } from '../src/category/category.service';
 import { DatabaseService } from '../src/database/database.service';
-import { MicropostCategoryService } from '../src/micropost-category/micropost-category.service';
 import { AuthService } from '../src/auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';

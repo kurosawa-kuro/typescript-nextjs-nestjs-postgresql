@@ -2,7 +2,7 @@
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { DatabaseService } from './database.service';
-import { Pool, QueryResult } from 'pg';
+import { QueryResult } from 'pg';
 
 describe('DatabaseService', () => {
   let service: DatabaseService;
