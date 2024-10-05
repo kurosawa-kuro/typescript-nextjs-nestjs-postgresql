@@ -1,58 +1,79 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import path from 'path';
 
-test.beforeEach(async ({ request }) => {
-  // Clean up the database before each test
-  await request.post(`http://localhost:3001/test/reset-db`);
-});
+// Constants
+const CONFIG = {
+  BASE_URL: 'http://localhost:3000',
+  API_URL: 'http://localhost:3001',
+  EMAIL: 'alice@example.com',
+  PASSWORD: 'hashed_password_here',
+  IMAGE_FILE_NAME: 'test.png',
+};
 
-test('Login and create a micropost with image', async ({ page }) => {
-  // Constants
-  const BASE_URL = 'http://localhost:3000';
-  const EMAIL = 'alice@example.com';
-  const PASSWORD = 'hashed_password_here';
-  const IMAGE_FILE_NAME = 'test.png';
-  const POST_TITLE = `Test Post ${Date.now()}`; // Unique title for each test run
+// Helper functions
+async function waitForElement(page: Page, selector: string, timeout = 5000) {
+  await page.waitForSelector(selector, { state: 'visible', timeout });
+}
 
-  // Navigate to the home page
-  await page.goto(BASE_URL);
-
-  // Login process
+// User actions
+async function loginUser(page: Page): Promise<void> {
+  await page.goto(CONFIG.BASE_URL);
   await page.getByRole('button', { name: 'Login' }).click();
-  await page.getByLabel('Email').fill(EMAIL);
-  await page.getByLabel('Password').fill(PASSWORD);
+  await page.getByLabel('Email').fill(CONFIG.EMAIL);
+  await page.getByLabel('Password').fill(CONFIG.PASSWORD);
   await page.locator('form').getByRole('button', { name: 'Login' }).click();
-
-  // Verify login was successful
   await expect(page.getByText('Alice', { exact: true })).toBeVisible();
+}
 
-  // Create new post
+async function createPost(page: Page, postTitle: string): Promise<void> {
   await page.getByRole('button').first().click();
-
-  // Set up the file path
-  const testImagePath = path.join(__dirname, 'test-data', IMAGE_FILE_NAME);
-
-  // Upload the image
-  const fileInput = page.locator('input[type="file"]');
-  await fileInput.setInputFiles(testImagePath);
-
-  // Enter the post title
-  await page.getByLabel('Title').fill(POST_TITLE);
-
-  // Share the post
+  const testImagePath = path.join(__dirname, 'test-data', CONFIG.IMAGE_FILE_NAME);
+  await page.locator('input[type="file"]').setInputFiles(testImagePath);
+  await page.getByLabel('Title').fill(postTitle);
   await page.getByRole('button', { name: 'Share' }).click();
-
-  // Wait for the modal to close
   await page.waitForSelector('div[role="dialog"]', { state: 'hidden' });
+}
 
-  // Verify the new post appears (look for the most recent post with the unique title)
-  const newPost = page.locator(`h2:has-text("${POST_TITLE}")`).first();
+async function verifyPost(page: Page, postTitle: string): Promise<void> {
+  const newPost = page.locator(`h2:has-text("${postTitle}")`).first();
   await expect(newPost).toBeVisible();
-
-  // Optionally, verify the image is visible
-  const postImage = page.locator(`img[alt="${POST_TITLE}"]`).first();
+  const postImage = page.locator(`img[alt="${postTitle}"]`).first();
   await expect(postImage).toBeVisible();
+}
 
+async function logoutUser(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Logout' }).click();
   await expect(page.getByRole('button', { name: 'Login' })).toBeVisible();
+}
+
+// Test setup
+test.beforeEach(async ({ request }) => {
+  try {
+    await request.post(`${CONFIG.API_URL}/test/reset-db`);
+  } catch (error) {
+    console.error('Failed to reset database:', error);
+    throw error;
+  }
+});
+
+// Main test
+test('User journey: Login, create a micropost, and logout', async ({ page }) => {
+  const POST_TITLE = `Test Post ${Date.now()}`; // Unique title for each test run
+
+  try {
+    // Step 1: Login
+    await loginUser(page);
+
+    // Step 2: Create a new post
+    await createPost(page, POST_TITLE);
+
+    // Step 3: Verify the new post
+    await verifyPost(page, POST_TITLE);
+
+    // Step 4: Logout
+    await logoutUser(page);
+  } catch (error) {
+    console.error('Test failed:', error);
+    throw error;
+  }
 });
