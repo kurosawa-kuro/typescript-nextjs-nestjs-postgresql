@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import { useAuthStore } from '../../src/app/store/useAuthStore';
 import { ApiService } from '../../src/app/lib/api/apiService';
 
-// APIサービスのモック
+// Mock ApiService
 jest.mock('../../src/app/lib/api/apiService');
 
 describe('useAuthStore', () => {
@@ -43,6 +43,42 @@ describe('useAuthStore', () => {
     expect(localStorage.getItem('user')).toBe(JSON.stringify(mockUser));
   });
 
+  it('should handle login failure', async () => {
+    const mockLoginResponse = { success: false };
+    (ApiService.login as jest.Mock).mockResolvedValue(mockLoginResponse);
+
+    const { result } = renderHook(() => useAuthStore());
+
+    await act(async () => {
+      const success = await result.current.login('test@example.com', 'wrong-password');
+      expect(success).toBe(false);
+    });
+
+    expect(result.current.isLoggedIn).toBe(false);
+    expect(result.current.currentUser).toBeNull();
+    expect(result.current.loginStatus).toBe('Login failed');
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.error).toBe('Invalid credentials');
+  });
+
+  it('should handle API error during login', async () => {
+    const apiError = new Error('Network error');
+    (ApiService.login as jest.Mock).mockRejectedValue(apiError);
+
+    const { result } = renderHook(() => useAuthStore());
+
+    await act(async () => {
+      const success = await result.current.login('test@example.com', 'password');
+      expect(success).toBe(false);
+    });
+
+    expect(result.current.isLoggedIn).toBe(false);
+    expect(result.current.currentUser).toBeNull();
+    expect(result.current.loginStatus).toBe('Error occurred during login');
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.error).toBe('Network error');
+  });
+
   it('should log out successfully', () => {
     const { result } = renderHook(() => useAuthStore());
 
@@ -75,5 +111,21 @@ describe('useAuthStore', () => {
     expect(result.current.currentUser).toEqual(mockUser);
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBeNull();
+  });
+
+  it('should handle error when initializing auth with invalid data', () => {
+    localStorage.setItem('token', 'fake-token');
+    localStorage.setItem('user', 'invalid-json');
+
+    const { result } = renderHook(() => useAuthStore());
+
+    act(() => {
+      result.current.initializeAuth();
+    });
+
+    expect(result.current.isLoggedIn).toBe(false);
+    expect(result.current.currentUser).toBeNull();
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.error).toBe('Error initializing auth');
   });
 });

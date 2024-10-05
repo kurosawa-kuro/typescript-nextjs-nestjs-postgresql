@@ -1,5 +1,3 @@
-// src/app/store/useAuthStore.ts
-
 import { create } from 'zustand';
 import { AuthState, User, ApiError } from '../types/models';
 import { ApiService } from '../lib/api/apiService';
@@ -28,12 +26,20 @@ export const useAuthStore = create<AuthState>((set) => ({
         localStorage.setItem('user', JSON.stringify(data.user));
         return true;
       } else {
-        set({ loginStatus: 'Login failed', isLoading: false, error: 'Invalid credentials' });
+        set({
+          isLoggedIn: false,
+          currentUser: null,
+          loginStatus: 'Login failed',
+          isLoading: false,
+          error: 'Invalid credentials'
+        });
         return false;
       }
     } catch (error) {
       const apiError = error as ApiError;
       set({ 
+        isLoggedIn: false,
+        currentUser: null,
         loginStatus: 'Error occurred during login', 
         isLoading: false, 
         error: apiError.message || 'An unknown error occurred'
@@ -69,10 +75,20 @@ export const useAuthStore = create<AuthState>((set) => ({
         });
       } catch (error) {
         console.error('Error parsing stored user:', error);
-        set({ isLoading: false, error: 'Error initializing auth' });
+        set({
+          isLoggedIn: false,
+          currentUser: null,
+          isLoading: false,
+          error: 'Error initializing auth'
+        });
       }
     } else {
-      set({ isLoading: false, error: null });
+      set({
+        isLoggedIn: false,
+        currentUser: null,
+        isLoading: false,
+        error: null
+      });
     }
   }
 }));
