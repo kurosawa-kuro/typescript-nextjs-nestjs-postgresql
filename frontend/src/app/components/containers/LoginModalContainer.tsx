@@ -8,7 +8,7 @@ type LoginModalContainerProps = {
 };
 
 export function LoginModalContainer({ isOpen, onClose }: LoginModalContainerProps) {
-  const login = useAuthStore(state => state.login);
+  const { login } = useAuthStore();
 
   const handleLogin = async (email: string, password: string) => {
     const success = await login(email, password);
