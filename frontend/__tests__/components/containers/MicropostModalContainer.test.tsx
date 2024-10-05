@@ -1,5 +1,3 @@
-// __tests__/components/containers/MicropostModalContainer.test.tsx
-
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -17,11 +15,12 @@ jest.mock('../../../src/app/actions/createMicropost', () => ({
 
 // MicropostModalのモックを簡略化
 jest.mock('../../../src/app/components/microposts/MicropostModal', () => ({
-  MicropostModal: ({ onSubmit, onImageChange, setTitle }: any) => (
+  MicropostModal: ({ onSubmit, onImageChange, setTitle, error }: any) => (
     <form onSubmit={onSubmit} data-testid="micropost-form">
       <input type="text" onChange={(e) => setTitle(e.target.value)} data-testid="title-input" />
       <input type="file" onChange={onImageChange} data-testid="image-input" />
       <button type="submit" data-testid="submit-button">Submit</button>
+      {error && <p data-testid="error-message">{error}</p>}
     </form>
   ),
 }));
@@ -64,16 +63,55 @@ describe('MicropostModalContainer', () => {
     });
   });
 
-//   it('handles form submission error', async () => {
-//     (createMicropostModule.createMicropost as jest.Mock).mockResolvedValue({ success: false, error: 'Submission failed' });
+  it('handles form submission error', async () => {
+    (createMicropostModule.createMicropost as jest.Mock).mockResolvedValue({ success: false, error: 'Submission failed' });
 
-//     render(<MicropostModalContainer isOpen={true} onClose={() => {}} />);
+    render(<MicropostModalContainer isOpen={true} onClose={() => {}} />);
 
-//     fireEvent.change(screen.getByTestId('title-input'), { target: { value: 'Test Post' } });
-//     fireEvent.submit(screen.getByTestId('micropost-form'));
+    fireEvent.change(screen.getByTestId('title-input'), { target: { value: 'Test Post' } });
+    fireEvent.submit(screen.getByTestId('micropost-form'));
 
-//     await waitFor(() => {
-//       expect(screen.getByText('Submission failed')).toBeInTheDocument();
-//     });
-//   });
+    await waitFor(() => {
+      expect(screen.getByTestId('error-message')).toHaveTextContent('Submission failed');
+    });
+  });
+
+  it('handles "User not found" error', async () => {
+    localStorage.removeItem('user');
+
+    render(<MicropostModalContainer isOpen={true} onClose={() => {}} />);
+
+    fireEvent.change(screen.getByTestId('title-input'), { target: { value: 'Test Post' } });
+    fireEvent.submit(screen.getByTestId('micropost-form'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('error-message')).toHaveTextContent('User not found');
+    });
+  });
+
+  it('handles specific error from createMicropost', async () => {
+    (createMicropostModule.createMicropost as jest.Mock).mockResolvedValue({ success: false, error: 'Failed to create micropost' });
+
+    render(<MicropostModalContainer isOpen={true} onClose={() => {}} />);
+
+    fireEvent.change(screen.getByTestId('title-input'), { target: { value: 'Test Post' } });
+    fireEvent.submit(screen.getByTestId('micropost-form'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('error-message')).toHaveTextContent('Failed to create micropost');
+    });
+  });
+
+  it('handles generic error during micropost creation', async () => {
+    (createMicropostModule.createMicropost as jest.Mock).mockRejectedValue(new Error('Network error'));
+
+    render(<MicropostModalContainer isOpen={true} onClose={() => {}} />);
+
+    fireEvent.change(screen.getByTestId('title-input'), { target: { value: 'Test Post' } });
+    fireEvent.submit(screen.getByTestId('micropost-form'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('error-message')).toHaveTextContent('An error occurred while creating the micropost');
+    });
+  });
 });
