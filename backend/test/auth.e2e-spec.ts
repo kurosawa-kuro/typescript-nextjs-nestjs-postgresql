@@ -1,19 +1,15 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { AuthService } from '../src/auth/auth.service';
 import { UserService } from '../src/user/user.service';
 import { DatabaseService } from '../src/database/database.service';
 import { setupTestApp, clearDatabase, createTestUser } from './test-utils';
-import { JwtService } from '@nestjs/jwt';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
-  let authService: AuthService;
   let databaseService: DatabaseService;
-  let jwtService: JwtService;
 
   beforeAll(async () => {
-    ({ app, authService, databaseService, jwtService } = await setupTestApp());
+    ({ app,   databaseService  } = await setupTestApp());
     app.useGlobalPipes(new ValidationPipe());
   });
 
