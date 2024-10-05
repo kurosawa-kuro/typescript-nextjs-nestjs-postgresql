@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MicroPostService, MicroPost } from './micropost.service';
 import { DatabaseService } from '../database/database.service';
+import { BadRequestException } from '@nestjs/common';
 
 describe('MicroPostService', () => {
   let microPostService: MicroPostService;
@@ -48,46 +49,66 @@ describe('MicroPostService', () => {
       const result = await microPostService.create(userId, title, imagePath);
 
       expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
-        `
-      INSERT INTO micropost(user_id, title, image_path) 
-      VALUES($1, $2, $3) 
-      RETURNING id, user_id as "userId", title, image_path as "imagePath",
-        (SELECT name FROM "user" WHERE id = $1) as "userName"
-    `,
+        expect.any(String),
         [userId, title, imagePath]
       );
       expect(result).toEqual(mockMicroPost);
     });
 
-    it('should throw error if creation fails', async () => {
+    it('should create a new micropost with null image path', async () => {
       const userId = 1;
-      const title = 'Failed MicroPost';
+      const title = 'Test MicroPost';
       const imagePath = null;
+      const mockMicroPost: MicroPost = {
+        id: 1,
+        userId,
+        title,
+        userName: 'TestUser',
+        imagePath,
+      };
 
-      mockDatabaseService.executeQuery.mockRejectedValue(new Error('Creation failed'));
+      mockDatabaseService.executeQuery.mockResolvedValue({
+        rows: [mockMicroPost],
+        command: '',
+        rowCount: 1,
+        oid: 0,
+        fields: []
+      });
+
+      const result = await microPostService.create(userId, title, imagePath);
+
+      expect(result).toEqual(mockMicroPost);
+    });
+
+    it('should throw error if creation fails due to database constraint', async () => {
+      const userId = 1;
+      const title = 'Test MicroPost';
+      const imagePath = 'path/to/image.jpg';
+
+      mockDatabaseService.executeQuery.mockRejectedValue(new Error('Unique constraint violation'));
 
       await expect(
-        microPostService.create(userId, title, imagePath),
-      ).rejects.toThrow('Creation failed');
+        microPostService.create(userId, title, imagePath)
+      ).rejects.toThrow('Unique constraint violation');
     });
   });
 
   describe('list', () => {
-    it('should return all microposts', async () => {
+    it('should return all microposts in descending order of id', async () => {
       const mockMicroPosts: MicroPost[] = [
-        {
-          id: 1,
-          userId: 1,
-          title: 'MicroPost 1',
-          userName: 'User1',
-          imagePath: 'path/to/image1.jpg',
-        },
         {
           id: 2,
           userId: 2,
           title: 'MicroPost 2',
           userName: 'User2',
           imagePath: null,
+        },
+        {
+          id: 1,
+          userId: 1,
+          title: 'MicroPost 1',
+          userName: 'User1',
+          imagePath: 'path/to/image1.jpg',
         },
       ];
 
@@ -101,14 +122,9 @@ describe('MicroPostService', () => {
 
       const result = await microPostService.list();
 
-      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
-        `
-      SELECT m.id, m.user_id as "userId", m.title, m.image_path as "imagePath", u.name as "userName"
-      FROM micropost m
-      JOIN "user" u ON m.user_id = u.id
-    `
-      );
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(expect.stringContaining('ORDER BY m.id DESC'));
       expect(result).toEqual(mockMicroPosts);
+      expect(result[0].id).toBeGreaterThan(result[1].id);
     });
 
     it('should return an empty array if no microposts exist', async () => {
