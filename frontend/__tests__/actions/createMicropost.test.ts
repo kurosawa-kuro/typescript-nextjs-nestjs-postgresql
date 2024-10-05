@@ -14,7 +14,7 @@ describe('createMicropost', () => {
     jest.resetAllMocks();
   });
 
-  it('should create a micropost successfully', async () => {
+  it('should create a micropost successfully and revalidate the path', async () => {
     // Mock data
     const mockTitle = 'Test Micropost';
     const mockUserId = '1';
@@ -49,5 +49,70 @@ describe('createMicropost', () => {
     });
     expect(result).toEqual({ success: true, micropost: mockNewMicropost });
     expect(require('next/cache').revalidatePath).toHaveBeenCalledWith('/');
+  });
+
+  it('should handle missing required fields', async () => {
+    const formData = new FormData();
+    formData.append('title', 'Test Micropost');
+    // Missing userId and image
+
+    const result = await createMicropost(formData);
+
+    expect(result).toEqual({
+      success: false,
+      error: 'Missing required fields'
+    });
+  });
+
+  it('should handle network error', async () => {
+    const formData = new FormData();
+    formData.append('title', 'Test Micropost');
+    formData.append('userId', '1');
+    formData.append('image', new File(['test'], 'test.png', { type: 'image/png' }));
+
+    (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
+
+    const result = await createMicropost(formData);
+
+    expect(result).toEqual({
+      success: false,
+      error: 'Network error'
+    });
+  });
+
+  it('should handle server error response', async () => {
+    const formData = new FormData();
+    formData.append('title', 'Test Micropost');
+    formData.append('userId', '1');
+    formData.append('image', new File(['test'], 'test.png', { type: 'image/png' }));
+
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 500,
+      statusText: 'Internal Server Error'
+    });
+
+    const result = await createMicropost(formData);
+
+    expect(result).toEqual({
+      success: false,
+      error: 'Failed to create micropost: 500 Internal Server Error'
+    });
+  });
+
+  it('should handle unknown error', async () => {
+    const formData = new FormData();
+    formData.append('title', 'Test Micropost');
+    formData.append('userId', '1');
+    formData.append('image', new File(['test'], 'test.png', { type: 'image/png' }));
+
+    (global.fetch as jest.Mock).mockRejectedValue('Unknown error');
+
+    const result = await createMicropost(formData);
+
+    expect(result).toEqual({
+      success: false,
+      error: 'An unknown error occurred'
+    });
   });
 });

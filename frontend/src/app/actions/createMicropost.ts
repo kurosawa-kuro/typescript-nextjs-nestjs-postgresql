@@ -35,7 +35,6 @@ export async function createMicropost(formData: FormData) {
     revalidatePath('/') // Revalidate the home page to show the new micropost
     return { success: true, micropost: newMicropost }
   } catch (error) {
-    console.error('Error in createMicropost:', error)
     return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' }
   }
 }
