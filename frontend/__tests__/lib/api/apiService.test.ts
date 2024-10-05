@@ -1,4 +1,3 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ApiService } from '../../../src/app/lib/api/apiService';
 import { ApiClient } from '../../../src/app/lib/api/apiClient';
 import { LoginResponse } from '../../../src/app/types/models';
@@ -34,5 +33,16 @@ describe('ApiService - login', () => {
     expect(result.success).toBe(true);
     expect(result.user).toEqual(mockUser);
     expect(result.token).toBe('mock-token');
+  });
+
+  it('should throw an error when login fails due to invalid credentials', async () => {
+    const failedLoginResponse = {
+      success: false,
+      message: 'Invalid email or password',
+    };
+    (ApiClient.post as jest.Mock).mockResolvedValue(failedLoginResponse);
+
+    await expect(ApiService.login(mockEmail, mockPassword)).rejects.toThrow('Invalid email or password');
+    expect(ApiClient.post).toHaveBeenCalledWith('/auth/login', { email: mockEmail, password: mockPassword });
   });
 });
