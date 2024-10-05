@@ -53,9 +53,16 @@ describe('AuthController (e2e)', () => {
       })
       .expect(200);
 
-    expect(response.body).toEqual({
+    expect(response.body).toMatchObject({
       success: true,
       message: 'Login successful',
+      token: expect.any(String),
+      user: expect.objectContaining({
+        email: 'jane.doe@example.com',
+        name: 'Jane Doe',
+        id: expect.any(Number),
+        isAdmin: expect.any(Boolean),
+      }),
     });
 
     expect(response.headers['set-cookie']).toBeDefined();
@@ -77,37 +84,39 @@ describe('AuthController (e2e)', () => {
     });
   });
 
-  // it('should retrieve the user profile with a valid JWT (GET /auth/profile)', async () => {
-  //   const userService = app.get<UserService>(UserService);
-  //   await createTestUser(userService, 'Jane Doe', 'jane.doe@example.com', 'securepassword123');
-  //   const user = await userService.findUserByEmail('jane.doe@example.com');
-  //   const token = jwtService.sign({ sub: user.id, email: user.email });
-  //   console.log('★★★★ Token:', token);
+  // Commented out profile tests
+  /*
+  it('should retrieve the user profile with a valid JWT (GET /auth/profile)', async () => {
+    const userService = app.get<UserService>(UserService);
+    await createTestUser(userService, 'Jane Doe', 'jane.doe@example.com', 'securepassword123');
+    const user = await userService.findUserByEmail('jane.doe@example.com');
+    const token = jwtService.sign({ sub: user.id, email: user.email });
+    console.log('★★★★ Token:', token);
   
-  //   const response = await request(app.getHttpServer())
-  //     .get('/auth/profile')
-  //     .set('Cookie', [`jwt=${token}`]) // Send the JWT token as a cookie
-  //     .expect(200); // Expect success if the JWT is valid
+    const response = await request(app.getHttpServer())
+      .get('/auth/profile')
+      .set('Cookie', [`jwt=${token}`]) // Send the JWT token as a cookie
+      .expect(200); // Expect success if the JWT is valid
   
-  //     console.log('★★★★ response:', response);
+      console.log('★★★★ response:', response);
 
-  //   expect(response.body).toEqual({
-  //     id: user.id,
-  //     email: 'jane.doe@example.com',
-  //     name: 'Jane Doe',
-  //   });
-  // });
+    expect(response.body).toEqual({
+      id: user.id,
+      email: 'jane.doe@example.com',
+      name: 'Jane Doe',
+    });
+  });
 
+  it('should return 401 for profile request without JWT (GET /auth/profile)', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/auth/profile')
+      .expect(401); // Expect 401 Unauthorized
   
-  // it('should return 401 for profile request without JWT (GET /auth/profile)', async () => {
-  //   const response = await request(app.getHttpServer())
-  //     .get('/auth/profile')
-  //     .expect(401); // Expect 401 Unauthorized
-  
-  //   expect(response.body).toEqual({
-  //     statusCode: 401,
-  //     message: 'JWT token missing',
-  //     error: 'Unauthorized',
-  //   });
-  // });
+    expect(response.body).toEqual({
+      statusCode: 401,
+      message: 'JWT token missing',
+      error: 'Unauthorized',
+    });
+  });
+  */
 });
