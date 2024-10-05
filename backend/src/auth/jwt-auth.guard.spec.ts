@@ -40,7 +40,10 @@ describe('JwtAuthGuard', () => {
       }),
     } as ExecutionContext;
 
-    (jwtService.verify as jest.Mock).mockReturnValue({ userId: 1, email: 'test@example.com' });
+    (jwtService.verify as jest.Mock).mockReturnValue({
+      userId: 1,
+      email: 'test@example.com',
+    });
 
     expect(guard.canActivate(mockContext)).toBe(true);
     expect(mockRequest.user).toEqual({ userId: 1, email: 'test@example.com' });

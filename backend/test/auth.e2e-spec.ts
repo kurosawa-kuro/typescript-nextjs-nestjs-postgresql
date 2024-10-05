@@ -34,7 +34,7 @@ describe('AuthController (e2e)', () => {
         password: 'securepassword123',
       })
       .expect(201);
-    
+
     expect(response.body).toEqual({
       success: true,
       message: 'Registration successful',
@@ -43,8 +43,13 @@ describe('AuthController (e2e)', () => {
 
   it('should login an existing user (POST /auth/login)', async () => {
     const userService = app.get<UserService>(UserService);
-    await createTestUser(userService, 'Jane Doe', 'jane.doe@example.com', 'securepassword123');
-    
+    await createTestUser(
+      userService,
+      'Jane Doe',
+      'jane.doe@example.com',
+      'securepassword123',
+    );
+
     const response = await request(app.getHttpServer())
       .post('/auth/login')
       .send({

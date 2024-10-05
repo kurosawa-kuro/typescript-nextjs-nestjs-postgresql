@@ -38,7 +38,12 @@ export class AuthController {
     @Body('email') email: string,
     @Body('password') password: string,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<{ success: boolean; message: string; token?: string; user?: object }> {
+  ): Promise<{
+    success: boolean;
+    message: string;
+    token?: string;
+    user?: object;
+  }> {
     const result = await this.authService.login(email, password);
     if (result.success) {
       res.cookie('jwt', result.token, {
@@ -51,7 +56,7 @@ export class AuthController {
         success: true,
         message: 'Login successful',
         token: result.token,
-        user: result.user
+        user: result.user,
       };
     } else {
       return { success: false, message: 'Login failed' };
@@ -61,7 +66,9 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(@Res({ passthrough: true }) res: Response): Promise<{ success: boolean; message: string }> {
+  async logout(
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{ success: boolean; message: string }> {
     res.clearCookie('jwt');
     return { success: true, message: 'Successfully logged out' };
   }

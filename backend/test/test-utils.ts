@@ -10,7 +10,6 @@ import { AuthService } from '../src/auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
-
 export async function setupTestApp() {
   process.env.JWT_SECRET = 'your-secret-key'; // Ensure JWT secret is set in test environment
 
@@ -24,7 +23,8 @@ export async function setupTestApp() {
   const authService = moduleFixture.get<AuthService>(AuthService);
   const userService = moduleFixture.get<UserService>(UserService); // Get UserService
   const categoryService = moduleFixture.get<CategoryService>(CategoryService); // Get CategoryService
-  const micropostService = moduleFixture.get<MicroPostService>(MicroPostService); // Get MicroPostService
+  const micropostService =
+    moduleFixture.get<MicroPostService>(MicroPostService); // Get MicroPostService
   const databaseService = moduleFixture.get<DatabaseService>(DatabaseService);
   const jwtService = moduleFixture.get<JwtService>(JwtService);
 
@@ -54,7 +54,10 @@ export async function createTestUser(
 ) {
   const passwordHash = await bcrypt.hash(password, 10);
   const userCreationData = {
-    name, email, passwordHash, isAdmin: false,
+    name,
+    email,
+    passwordHash,
+    isAdmin: false,
   };
   return await userService.create(userCreationData);
 }

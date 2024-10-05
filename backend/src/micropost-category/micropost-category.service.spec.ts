@@ -79,7 +79,9 @@ describe('MicropostCategoryService', () => {
     it('should throw an error if the insertion fails', async () => {
       mockPool.query.mockRejectedValue(new Error('Insertion failed'));
 
-      await expect(service.add_category(1, 1)).rejects.toThrow('Insertion failed');
+      await expect(service.add_category(1, 1)).rejects.toThrow(
+        'Insertion failed',
+      );
     });
   });
 });

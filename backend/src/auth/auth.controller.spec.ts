@@ -11,7 +11,11 @@ describe('AuthController', () => {
 
   const createMockAuthService = () => ({
     register: jest.fn().mockResolvedValue(true),
-    login: jest.fn().mockResolvedValue({ success: true, token: 'abc123', user: { id: 1, name: 'John', email: 'john@example.com' } }),
+    login: jest.fn().mockResolvedValue({
+      success: true,
+      token: 'abc123',
+      user: { id: 1, name: 'John', email: 'john@example.com' },
+    }),
     logout: jest.fn().mockResolvedValue(true),
   });
 
@@ -45,17 +49,29 @@ describe('AuthController', () => {
 
   describe('register', () => {
     it('should register a user successfully', async () => {
-      const result = await controller.register('John', 'john@example.com', 'password123');
+      const result = await controller.register(
+        'John',
+        'john@example.com',
+        'password123',
+      );
       expect(result).toEqual({
         success: true,
         message: 'Registration successful',
       });
-      expect(mockAuthService.register).toHaveBeenCalledWith('John', 'john@example.com', 'password123');
+      expect(mockAuthService.register).toHaveBeenCalledWith(
+        'John',
+        'john@example.com',
+        'password123',
+      );
     });
 
     it('should handle registration failure', async () => {
       jest.spyOn(mockAuthService, 'register').mockResolvedValueOnce(false);
-      const result = await controller.register('Jane', 'jane@example.com', 'password123');
+      const result = await controller.register(
+        'Jane',
+        'jane@example.com',
+        'password123',
+      );
       expect(result).toEqual({
         success: false,
         message: 'Registration failed',
@@ -69,12 +85,16 @@ describe('AuthController', () => {
         cookie: jest.fn(),
       } as unknown as Response;
 
-      const result = await controller.login('john@example.com', 'password123', mockResponse);
+      const result = await controller.login(
+        'john@example.com',
+        'password123',
+        mockResponse,
+      );
       expect(result).toEqual({
         success: true,
         message: 'Login successful',
         token: 'abc123',
-        user: { id: 1, name: 'John', email: 'john@example.com' }
+        user: { id: 1, name: 'John', email: 'john@example.com' },
       });
       expect(mockResponse.cookie).toHaveBeenCalledWith(
         'jwt',
@@ -84,17 +104,23 @@ describe('AuthController', () => {
           secure: expect.any(Boolean),
           sameSite: 'strict',
           maxAge: expect.any(Number),
-        })
+        }),
       );
     });
 
     it('should handle login failure', async () => {
-      jest.spyOn(mockAuthService, 'login').mockResolvedValueOnce({ success: false });
+      jest
+        .spyOn(mockAuthService, 'login')
+        .mockResolvedValueOnce({ success: false });
       const mockResponse = {
         cookie: jest.fn(),
       } as unknown as Response;
 
-      const result = await controller.login('john@example.com', 'wrongpassword', mockResponse);
+      const result = await controller.login(
+        'john@example.com',
+        'wrongpassword',
+        mockResponse,
+      );
       expect(result).toEqual({
         success: false,
         message: 'Login failed',
@@ -124,24 +150,24 @@ describe('AuthController', () => {
       const mockRequest = {
         user: { id: 1, name: 'John Doe', email: 'john.doe@example.com' },
       };
-  
+
       const result = controller.getProfile(mockRequest as any);
-      
+
       expect(result).toEqual({
         id: 1,
         name: 'John Doe',
         email: 'john.doe@example.com',
       });
     });
-  
+
     it('should return undefined if user is not attached to the request', () => {
       // Mock request object without user
       const mockRequest = {
         user: undefined,
       };
-  
+
       const result = controller.getProfile(mockRequest as any);
-      
+
       expect(result).toBeUndefined();
     });
   });

@@ -1,6 +1,11 @@
 // src/user/user.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserService, User, CreateUserDto, UserCreationData } from './user.service';
+import {
+  UserService,
+  User,
+  CreateUserDto,
+  UserCreationData,
+} from './user.service';
 import { DatabaseService } from '../database/database.service';
 import * as bcrypt from 'bcrypt';
 
@@ -49,12 +54,12 @@ describe('UserService', () => {
 
     it('should create a new user', async () => {
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
-      mockDatabaseService.executeQuery.mockResolvedValue({ 
+      mockDatabaseService.executeQuery.mockResolvedValue({
         command: 'SELECT',
         rowCount: 1,
         oid: null,
         rows: [mockUser],
-        fields: []
+        fields: [],
       });
 
       const userCreationData: UserCreationData = {
@@ -69,13 +74,20 @@ describe('UserService', () => {
       expect(result).toEqual(mockUser);
       expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
         expect.any(String),
-        expect.arrayContaining(['John Doe', 'john@example.com', 'hashedPassword', false])
+        expect.arrayContaining([
+          'John Doe',
+          'john@example.com',
+          'hashedPassword',
+          false,
+        ]),
       );
     });
 
     it('should throw an error if creation fails', async () => {
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
-      mockDatabaseService.executeQuery.mockRejectedValue(new Error('Creation failed'));
+      mockDatabaseService.executeQuery.mockRejectedValue(
+        new Error('Creation failed'),
+      );
 
       const userCreationData: UserCreationData = {
         name: 'John Doe',
@@ -84,7 +96,9 @@ describe('UserService', () => {
         isAdmin: false,
       };
 
-      await expect(userService.create(userCreationData)).rejects.toThrow('Creation failed');
+      await expect(userService.create(userCreationData)).rejects.toThrow(
+        'Creation failed',
+      );
     });
   });
 
@@ -97,7 +111,7 @@ describe('UserService', () => {
         rowCount: 1,
         oid: null,
         rows: [mockUser],
-        fields: []
+        fields: [],
       });
 
       const result = await userService.find(userId);
@@ -105,7 +119,7 @@ describe('UserService', () => {
       expect(result).toEqual(mockUser);
       expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
         expect.any(String),
-        [userId]
+        [userId],
       );
     });
 
@@ -115,7 +129,7 @@ describe('UserService', () => {
         rowCount: 0,
         oid: null,
         rows: [],
-        fields: []
+        fields: [],
       });
 
       const result = await userService.find(userId);
@@ -124,7 +138,9 @@ describe('UserService', () => {
     });
 
     it('should throw an error if query fails', async () => {
-      mockDatabaseService.executeQuery.mockRejectedValue(new Error('Query failed'));
+      mockDatabaseService.executeQuery.mockRejectedValue(
+        new Error('Query failed'),
+      );
 
       await expect(userService.find(userId)).rejects.toThrow('Query failed');
     });
@@ -142,7 +158,7 @@ describe('UserService', () => {
         rowCount: mockUsers.length,
         oid: null,
         rows: mockUsers,
-        fields: []
+        fields: [],
       });
 
       const result = await userService.index();
@@ -157,7 +173,7 @@ describe('UserService', () => {
         rowCount: 0,
         oid: null,
         rows: [],
-        fields: []
+        fields: [],
       });
 
       const result = await userService.index();
@@ -166,7 +182,9 @@ describe('UserService', () => {
     });
 
     it('should throw an error if query fails', async () => {
-      mockDatabaseService.executeQuery.mockRejectedValue(new Error('Query failed'));
+      mockDatabaseService.executeQuery.mockRejectedValue(
+        new Error('Query failed'),
+      );
 
       await expect(userService.index()).rejects.toThrow('Query failed');
     });
@@ -198,7 +216,7 @@ describe('UserService', () => {
         rowCount: 1,
         oid: null,
         rows: [mockUserWithPasswordHash],
-        fields: []
+        fields: [],
       });
 
       const result = await userService.findUserByEmail(userEmail);
@@ -206,7 +224,7 @@ describe('UserService', () => {
       expect(result).toEqual(mockUserWithPasswordHash);
       expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
         expect.any(String),
-        [userEmail]
+        [userEmail],
       );
     });
 
@@ -216,7 +234,7 @@ describe('UserService', () => {
         rowCount: 0,
         oid: null,
         rows: [],
-        fields: []
+        fields: [],
       });
 
       const result = await userService.findUserByEmail(userEmail);
@@ -225,9 +243,13 @@ describe('UserService', () => {
     });
 
     it('should throw an error if query fails', async () => {
-      mockDatabaseService.executeQuery.mockRejectedValue(new Error('Query failed'));
+      mockDatabaseService.executeQuery.mockRejectedValue(
+        new Error('Query failed'),
+      );
 
-      await expect(userService.findUserByEmail(userEmail)).rejects.toThrow('Query failed');
+      await expect(userService.findUserByEmail(userEmail)).rejects.toThrow(
+        'Query failed',
+      );
     });
   });
 });

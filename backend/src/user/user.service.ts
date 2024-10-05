@@ -28,7 +28,7 @@ export class CreateUserDto {
 export class UserService {
   private readonly logger = new Logger(UserService.name);
 
-  constructor(private databaseService: DatabaseService) {} 
+  constructor(private databaseService: DatabaseService) {}
 
   async create(userCreationData: UserCreationData): Promise<User> {
     const query = `
@@ -40,15 +40,16 @@ export class UserService {
       userCreationData.name,
       userCreationData.email,
       userCreationData.passwordHash,
-      userCreationData.isAdmin
+      userCreationData.isAdmin,
     ];
-    
+
     const result = await this.databaseService.executeQuery(query, values);
     return result.rows[0];
   }
 
   async find(id: number): Promise<User | null> {
-    const query = 'SELECT id, name, email, is_admin AS "isAdmin" FROM "user" WHERE id = $1';
+    const query =
+      'SELECT id, name, email, is_admin AS "isAdmin" FROM "user" WHERE id = $1';
     const result = await this.databaseService.executeQuery(query, [id]);
     return result.rows[0] || null;
   }
@@ -60,7 +61,8 @@ export class UserService {
   }
 
   async findUserByEmail(email: string): Promise<User | null> {
-    const query = 'SELECT id, name, email, password_hash, is_admin AS "isAdmin" FROM "user" WHERE email = $1';
+    const query =
+      'SELECT id, name, email, password_hash, is_admin AS "isAdmin" FROM "user" WHERE email = $1';
     const result = await this.databaseService.executeQuery(query, [email]);
     return result.rows[0] || null;
   }

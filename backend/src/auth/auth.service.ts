@@ -1,4 +1,9 @@
-import { Injectable, Logger, Inject, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  Inject,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
@@ -23,7 +28,10 @@ export class AuthService {
     try {
       const passwordHash = await bcrypt.hash(password, 10);
       const createUserDto: UserCreationData = {
-        name, email, passwordHash, isAdmin: false,
+        name,
+        email,
+        passwordHash,
+        isAdmin: false,
       };
       await this.userService.create(createUserDto);
       return true;
@@ -42,15 +50,24 @@ export class AuthService {
         'SELECT id, name, email, password_hash, is_admin as "isAdmin" FROM "user" WHERE email = $1';
       const result = await this.pool.query(query, [email]);
       const user = result.rows[0];
-  
+
       if (user && (await bcrypt.compare(password, user.password_hash))) {
-        const payload = { sub: user.id, email: user.email, isAdmin: user.isAdmin };
+        const payload = {
+          sub: user.id,
+          email: user.email,
+          isAdmin: user.isAdmin,
+        };
         const token = this.jwtService.sign(payload);
         this.logger.log(`User ${user.id} logged in`);
         return {
           success: true,
           token,
-          user: { id: user.id, name: user.name, email: user.email, isAdmin: user.isAdmin },
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            isAdmin: user.isAdmin,
+          },
         };
       } else {
         this.logger.error('Login failed', new Error('Incorrect credentials'));

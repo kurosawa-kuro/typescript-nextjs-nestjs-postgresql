@@ -40,16 +40,20 @@ describe('CategoryService', () => {
 
       expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
         'INSERT INTO category(title) VALUES($1) RETURNING id, title',
-        [title]
+        [title],
       );
       expect(result).toEqual(mockCategory);
     });
 
     it('should throw an error if insertion fails', async () => {
       const title = 'Failed Category';
-      mockDatabaseService.executeQuery.mockRejectedValue(new Error('Insertion failed'));
+      mockDatabaseService.executeQuery.mockRejectedValue(
+        new Error('Insertion failed'),
+      );
 
-      await expect(categoryService.create(title)).rejects.toThrow('Insertion failed');
+      await expect(categoryService.create(title)).rejects.toThrow(
+        'Insertion failed',
+      );
     });
   });
 
@@ -69,7 +73,9 @@ describe('CategoryService', () => {
 
       const result = await categoryService.list();
 
-      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith('SELECT * FROM category');
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
+        'SELECT * FROM category',
+      );
       expect(result).toEqual(mockCategories);
     });
 
@@ -88,7 +94,9 @@ describe('CategoryService', () => {
     });
 
     it('should throw an error if query fails', async () => {
-      mockDatabaseService.executeQuery.mockRejectedValue(new Error('Query failed'));
+      mockDatabaseService.executeQuery.mockRejectedValue(
+        new Error('Query failed'),
+      );
 
       await expect(categoryService.list()).rejects.toThrow('Query failed');
     });

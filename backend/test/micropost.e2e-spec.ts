@@ -24,7 +24,12 @@ describe('MicroPostController (e2e)', () => {
   });
 
   it('should create a micropost (POST /microposts)', async () => {
-    const user = await createTestUser(userService, 'Test User', 'test@example.com', 'password123');
+    const user = await createTestUser(
+      userService,
+      'Test User',
+      'test@example.com',
+      'password123',
+    );
 
     const testImagePath = path.join(__dirname, 'test.png');
 
@@ -45,14 +50,19 @@ describe('MicroPostController (e2e)', () => {
   });
 
   it('should retrieve all microposts (GET /microposts)', async () => {
-    const user = await createTestUser(userService, 'Test User', 'test@example.com', 'password123');
-    await databaseService.executeQuery(
-      'INSERT INTO micropost (user_id, title, image_path) VALUES ($1, $2, $3)',
-      [user.id, 'Test Micropost 1', 'uploads/image1.jpg']
+    const user = await createTestUser(
+      userService,
+      'Test User',
+      'test@example.com',
+      'password123',
     );
     await databaseService.executeQuery(
       'INSERT INTO micropost (user_id, title, image_path) VALUES ($1, $2, $3)',
-      [user.id, 'Test Micropost 2', 'uploads/image2.jpg']
+      [user.id, 'Test Micropost 1', 'uploads/image1.jpg'],
+    );
+    await databaseService.executeQuery(
+      'INSERT INTO micropost (user_id, title, image_path) VALUES ($1, $2, $3)',
+      [user.id, 'Test Micropost 2', 'uploads/image2.jpg'],
     );
 
     const response = await request(app.getHttpServer())

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseService  } from '../database/database.service';
+import { DatabaseService } from '../database/database.service';
 
 export interface Category {
   id: number;
@@ -12,11 +12,15 @@ export class CategoryService {
 
   async create(title: string): Promise<Category> {
     const query = 'INSERT INTO category(title) VALUES($1) RETURNING id, title';
-    return this.databaseService.executeQuery(query, [title]).then(result => result.rows[0]);
+    return this.databaseService
+      .executeQuery(query, [title])
+      .then((result) => result.rows[0]);
   }
 
   async list(): Promise<Category[]> {
     const query = 'SELECT * FROM category';
-  return this.databaseService.executeQuery(query).then(result => result.rows);
+    return this.databaseService
+      .executeQuery(query)
+      .then((result) => result.rows);
   }
 }

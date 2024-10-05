@@ -2,7 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MicroPostController } from './micropost.controller';
 import { MicroPostService } from './micropost.service';
 import { UserService } from '../user/user.service';
-import { BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 
 describe('MicroPostController', () => {
   let microPostController: MicroPostController;
@@ -55,7 +58,11 @@ describe('MicroPostController', () => {
 
       expect(result).toEqual(mockMicroPost);
       expect(userService.find).toHaveBeenCalledWith(userId);
-      expect(microPostService.create).toHaveBeenCalledWith(userId, title, file.path);
+      expect(microPostService.create).toHaveBeenCalledWith(
+        userId,
+        title,
+        file.path,
+      );
     });
 
     it('should throw BadRequestException when title is missing', async () => {
@@ -63,9 +70,9 @@ describe('MicroPostController', () => {
       const title = '';
       const file = {} as Express.Multer.File;
 
-      await expect(microPostController.create(userId, title, file)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        microPostController.create(userId, title, file),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw BadRequestException when user is not found', async () => {
@@ -75,9 +82,9 @@ describe('MicroPostController', () => {
 
       userService.find.mockResolvedValue(null);
 
-      await expect(microPostController.create(userId, title, file)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        microPostController.create(userId, title, file),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should handle null file', async () => {

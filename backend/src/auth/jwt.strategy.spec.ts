@@ -58,7 +58,8 @@ describe('JwtStrategy', () => {
   describe('constructor', () => {
     it('should use the correct options', () => {
       expect(ExtractJwt.fromExtractors).toHaveBeenCalled();
-      const extractorFn = (ExtractJwt.fromExtractors as jest.Mock).mock.calls[0][0][0];
+      const extractorFn = (ExtractJwt.fromExtractors as jest.Mock).mock
+        .calls[0][0][0];
 
       const mockRequestWithJwt = { cookies: { jwt: 'test.jwt.token' } };
       expect(extractorFn(mockRequestWithJwt)).toBe('test.jwt.token');

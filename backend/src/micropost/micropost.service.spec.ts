@@ -43,14 +43,14 @@ describe('MicroPostService', () => {
         command: '',
         rowCount: 1,
         oid: 0,
-        fields: []
+        fields: [],
       });
 
       const result = await microPostService.create(userId, title, imagePath);
 
       expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
         expect.any(String),
-        [userId, title, imagePath]
+        [userId, title, imagePath],
       );
       expect(result).toEqual(mockMicroPost);
     });
@@ -72,7 +72,7 @@ describe('MicroPostService', () => {
         command: '',
         rowCount: 1,
         oid: 0,
-        fields: []
+        fields: [],
       });
 
       const result = await microPostService.create(userId, title, imagePath);
@@ -85,10 +85,12 @@ describe('MicroPostService', () => {
       const title = 'Test MicroPost';
       const imagePath = 'path/to/image.jpg';
 
-      mockDatabaseService.executeQuery.mockRejectedValue(new Error('Unique constraint violation'));
+      mockDatabaseService.executeQuery.mockRejectedValue(
+        new Error('Unique constraint violation'),
+      );
 
       await expect(
-        microPostService.create(userId, title, imagePath)
+        microPostService.create(userId, title, imagePath),
       ).rejects.toThrow('Unique constraint violation');
     });
   });
@@ -117,12 +119,14 @@ describe('MicroPostService', () => {
         command: '',
         rowCount: mockMicroPosts.length,
         oid: 0,
-        fields: []
+        fields: [],
       });
 
       const result = await microPostService.list();
 
-      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(expect.stringContaining('ORDER BY m.id DESC'));
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
+        expect.stringContaining('ORDER BY m.id DESC'),
+      );
       expect(result).toEqual(mockMicroPosts);
       expect(result[0].id).toBeGreaterThan(result[1].id);
     });
@@ -133,7 +137,7 @@ describe('MicroPostService', () => {
         command: '',
         rowCount: 0,
         oid: 0,
-        fields: []
+        fields: [],
       });
 
       const result = await microPostService.list();
@@ -142,7 +146,9 @@ describe('MicroPostService', () => {
     });
 
     it('should throw an error if query fails', async () => {
-      mockDatabaseService.executeQuery.mockRejectedValue(new Error('Query failed'));
+      mockDatabaseService.executeQuery.mockRejectedValue(
+        new Error('Query failed'),
+      );
 
       await expect(microPostService.list()).rejects.toThrow('Query failed');
     });

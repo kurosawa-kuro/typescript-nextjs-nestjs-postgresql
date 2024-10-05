@@ -37,7 +37,7 @@ describe('DatabaseService', () => {
         command: '',
         rowCount: 1,
         oid: 0,
-        fields: []
+        fields: [],
       };
       mockPool.query.mockResolvedValueOnce(mockResult);
 
@@ -53,13 +53,19 @@ describe('DatabaseService', () => {
         command: '',
         rowCount: 1,
         oid: 0,
-        fields: []
+        fields: [],
       };
       mockPool.query.mockResolvedValueOnce(mockResult);
 
-      const result = await service.executeQuery('SELECT * FROM test WHERE id = $1', [1]);
+      const result = await service.executeQuery(
+        'SELECT * FROM test WHERE id = $1',
+        [1],
+      );
 
-      expect(mockPool.query).toHaveBeenCalledWith('SELECT * FROM test WHERE id = $1', [1]);
+      expect(mockPool.query).toHaveBeenCalledWith(
+        'SELECT * FROM test WHERE id = $1',
+        [1],
+      );
       expect(result).toEqual(mockResult);
     });
 
@@ -67,7 +73,9 @@ describe('DatabaseService', () => {
       const error = new Error('Database failure');
       mockPool.query.mockRejectedValueOnce(error);
 
-      await expect(service.executeQuery('SELECT * FROM test')).rejects.toThrow(error);
+      await expect(service.executeQuery('SELECT * FROM test')).rejects.toThrow(
+        error,
+      );
       expect(mockPool.query).toHaveBeenCalledWith('SELECT * FROM test', []);
     });
   });

@@ -54,11 +54,11 @@ describe('CategoryController (e2e)', () => {
 
   it('should retrieve microposts for a category (GET /categories/:id/microposts)', async () => {
     const category = await categoryService.create('Test Category');
-    
+
     const response = await request(app.getHttpServer())
       .get(`/categories/${category.id}/microposts`)
       .expect(200);
 
-    expect(response.body).toEqual([]);  // Expecting an empty array if no microposts are associated
+    expect(response.body).toEqual([]); // Expecting an empty array if no microposts are associated
   });
 });
