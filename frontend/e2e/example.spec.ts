@@ -1,38 +1,42 @@
 import { test, expect } from '@playwright/test';
 import path from 'path';
 
-test('Image upload functionality', async ({ page }) => {
-  // 定数定義
-  const BASE_URL = 'http://localhost:3000/';
-  const IMAGE_FILE_NAME = '2024-09-14_05h42_47.png';
-  const UPLOAD_BUTTON_TEXT = 'アップロード';
-  const UPLOADED_IMAGE_ALT_TEXT = 'Uploaded';
-  const UPLOADED_IMAGE_HEADING = 'アップロードされた画像:';
+test('Login and create a micropost with image', async ({ page }) => {
+  // Constants
+  const BASE_URL = 'http://localhost:3000';
+  const EMAIL = 'alice@example.com';
+  const PASSWORD = 'hashed_password_here';
+  const IMAGE_FILE_NAME = 'test.png';
+  const POST_TITLE = 'test';
 
-  // テスト用画像のパス
-  const testImagePath = path.join(__dirname, 'test-data', IMAGE_FILE_NAME);
-
-  // ページへの遷移
+  // Navigate to the home page
   await page.goto(BASE_URL);
 
-  // ファイル選択操作
-  const fileInput = page.getByLabel('ファイルを選択');
-  await fileInput.click();
+  // Login process
+  await page.getByRole('button', { name: 'Login' }).click();
+  await page.getByLabel('Email').fill(EMAIL);
+  await page.getByLabel('Password').fill(PASSWORD);
+  await page.locator('form').getByRole('button', { name: 'Login' }).click();
+
+  // Verify login was successful
+  await expect(page.getByText('Alice', { exact: true })).toBeVisible();
+
+  // Create new post
+  await page.getByRole('button').first().click();
+
+  // Set up the file path
+  const testImagePath = path.join(__dirname, 'test-data', IMAGE_FILE_NAME);
+
+  // Upload the image
+  const fileInput = page.locator('input[type="file"]');
   await fileInput.setInputFiles(testImagePath);
 
-  // アップロードボタンのクリック
-  const uploadButton = page.getByRole('button', { name: UPLOAD_BUTTON_TEXT });
-  await uploadButton.click();
+  // Enter the post title
+  await page.getByLabel('Title').fill(POST_TITLE);
 
-  // アップロードされた画像の確認
-  const uploadedImage = page.getByRole('img', { name: UPLOADED_IMAGE_ALT_TEXT });
-  await uploadedImage.click();
+  // Share the post
+  await page.getByRole('button', { name: 'Share' }).click();
 
-  // アップロード完了の見出し確認
-  const uploadedHeading = page.getByRole('heading', { name: UPLOADED_IMAGE_HEADING });
-  await uploadedHeading.click();
-
-  // アサーション
-  await expect(uploadedImage).toBeVisible();
-  await expect(uploadedHeading).toBeVisible();
+  // Verify the new post appears
+  await expect(page.getByRole('heading', { name: POST_TITLE })).toBeVisible();
 });
