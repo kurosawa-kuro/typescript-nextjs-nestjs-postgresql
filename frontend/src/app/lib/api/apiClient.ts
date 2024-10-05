@@ -30,7 +30,6 @@ export class ApiClient {
 
       return await response.json();
     } catch (error) {
-      console.error(`Error in ${method} request to ${endpoint}:`, error);
       throw error;
     }
   }
