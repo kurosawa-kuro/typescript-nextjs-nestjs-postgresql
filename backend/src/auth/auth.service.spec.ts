@@ -99,7 +99,7 @@ describe('AuthService', () => {
     expect(loginResult).toEqual({
       success: true,
       token: 'mock.jwt.token',
-      user: { id: 1, name: 'Test User', email: 'test@example.com' },
+      user: { id: 1, name: 'Test User', email: 'test@example.com', isAdmin: false },
     });
     expect(mockPool.query).toHaveBeenCalledWith(expect.any(String), [
       'test@example.com',

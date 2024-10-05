@@ -1,4 +1,3 @@
-// auth.service.ts
 import { Injectable, Logger, Inject, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
