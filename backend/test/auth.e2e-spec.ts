@@ -9,7 +9,7 @@ describe('AuthController (e2e)', () => {
   let databaseService: DatabaseService;
 
   beforeAll(async () => {
-    ({ app,   databaseService  } = await setupTestApp());
+    ({ app, databaseService } = await setupTestApp());
     app.useGlobalPipes(new ValidationPipe());
   });
 
