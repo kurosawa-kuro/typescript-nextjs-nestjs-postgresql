@@ -1,8 +1,6 @@
 // src/app/components/microposts/MicropostCard.tsx
 
-"use client"
-
-import React, { useState, useMemo  } from 'react';
+import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { Micropost } from '../../types/models';
 import { ImageUtils } from '../../lib/utils/imageUtils';
@@ -45,8 +43,8 @@ export const MicropostCard: React.FC<MicropostCardProps> = ({ post }) => {
           <Image
             src={imageUrl}
             alt={post.title}
-            fill
-            style={{ objectFit: 'cover' }}
+            layout="fill"
+            objectFit="cover"
             onError={handleImageError}
           />
         </div>
