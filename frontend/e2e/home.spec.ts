@@ -52,4 +52,7 @@ test('Login and create a micropost with image', async ({ page }) => {
   // Optionally, verify the image is visible
   const postImage = page.locator(`img[alt="${POST_TITLE}"]`).first();
   await expect(postImage).toBeVisible();
+
+  await page.getByRole('button', { name: 'Logout' }).click();
+  await expect(page.getByRole('button', { name: 'Login' })).toBeVisible();
 });
