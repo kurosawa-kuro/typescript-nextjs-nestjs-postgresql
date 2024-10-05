@@ -73,6 +73,8 @@ describe('AuthController', () => {
       expect(result).toEqual({
         success: true,
         message: 'Login successful',
+        token: 'abc123',
+        user: { id: 1, name: 'John', email: 'john@example.com' }
       });
       expect(mockResponse.cookie).toHaveBeenCalledWith(
         'jwt',
