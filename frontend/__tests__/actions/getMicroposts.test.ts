@@ -26,7 +26,7 @@ describe('getMicroposts', () => {
     const result = await getMicroposts();
 
     // Assertions
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:3001/microposts');
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:3001/microposts', { cache: 'no-cache' });
     expect(result).toEqual(mockMicroposts);
   });
 
@@ -38,7 +38,7 @@ describe('getMicroposts', () => {
     const result = await getMicroposts();
 
     // Assertions
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:3001/microposts');
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:3001/microposts', { cache: 'no-cache' });
     expect(result).toEqual([]);
   });
 
@@ -54,7 +54,7 @@ describe('getMicroposts', () => {
     const result = await getMicroposts();
 
     // Assertions
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:3001/microposts');
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:3001/microposts', { cache: 'no-cache' });
     expect(result).toEqual([]);
   });
 
@@ -76,7 +76,7 @@ describe('getMicroposts', () => {
     const result = await getMicroposts();
 
     // Assertions
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:3001/microposts');
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:3001/microposts', { cache: 'no-cache' });
     expect(result).toEqual([
       { id: 1, userId: 1, title: 'Test Post 1', userName: 'User1' },
       { id: 2, userId: 2, title: 'Test Post 2', userName: 'User2' },
