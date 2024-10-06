@@ -1,11 +1,11 @@
 import { Pool, PoolClient } from 'pg';
 
 // 環境設定
-type Environment = 'development' | 'test';
-let env: Environment = 'development';  // デフォルト値
+export type Environment = 'development' | 'test';
+export let env: Environment = 'development';  // デフォルト値
 
 // 環境を切り替える関数
-function setEnvironment(newEnv: Environment): void {
+export function setEnvironment(newEnv: Environment): void {
   env = newEnv;
   console.log(`Environment set to: ${env}`);
 }
@@ -23,34 +23,43 @@ function getDbConfig() {
 
 // SQL文の定義
 const dropTablesSql = `
-DROP TABLE IF EXISTS micropost_category;
-DROP TABLE IF EXISTS micropost;
-DROP TABLE IF EXISTS category;
-DROP TABLE IF EXISTS "user";
+DROP TABLE IF EXISTS micropost_category CASCADE;
+DROP TABLE IF EXISTS micropost CASCADE;
+DROP TABLE IF EXISTS category CASCADE;
+DROP TABLE IF EXISTS "user" CASCADE;
+DROP SEQUENCE IF EXISTS user_id_seq CASCADE;
+DROP SEQUENCE IF EXISTS micropost_id_seq CASCADE;
+DROP SEQUENCE IF EXISTS category_id_seq CASCADE;
 `;
 
 const createTablesSql = `
+CREATE SEQUENCE IF NOT EXISTS user_id_seq;
 CREATE TABLE IF NOT EXISTS "user" (
-  id SERIAL PRIMARY KEY,
+  id INTEGER PRIMARY KEY DEFAULT nextval('user_id_seq'),
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   is_admin BOOLEAN DEFAULT false
 );
+ALTER SEQUENCE user_id_seq OWNED BY "user".id;
 
-CREATE TABLE micropost (
-  id SERIAL PRIMARY KEY,
+CREATE SEQUENCE IF NOT EXISTS micropost_id_seq;
+CREATE TABLE IF NOT EXISTS micropost (
+  id INTEGER PRIMARY KEY DEFAULT nextval('micropost_id_seq'),
   user_id INTEGER REFERENCES "user"(id) ON DELETE CASCADE,
   title VARCHAR(255) NOT NULL,
   image_path VARCHAR(255)
 );
+ALTER SEQUENCE micropost_id_seq OWNED BY micropost.id;
 
-CREATE TABLE category (
-  id SERIAL PRIMARY KEY,
+CREATE SEQUENCE IF NOT EXISTS category_id_seq;
+CREATE TABLE IF NOT EXISTS category (
+  id INTEGER PRIMARY KEY DEFAULT nextval('category_id_seq'),
   title VARCHAR(255) NOT NULL
 );
+ALTER SEQUENCE category_id_seq OWNED BY category.id;
 
-CREATE TABLE micropost_category (
+CREATE TABLE IF NOT EXISTS micropost_category (
   micropost_id INTEGER REFERENCES micropost(id) ON DELETE CASCADE,
   category_id INTEGER REFERENCES category(id) ON DELETE CASCADE,
   PRIMARY KEY (micropost_id, category_id)
@@ -132,10 +141,6 @@ export async function main(): Promise<void> {
     console.log(`Database setup completed successfully for ${env} environment`);
   } catch (err) {
     console.error(`Database setup failed for ${env} environment:`, err);
-    process.exit(1);
+    throw err;
   }
 }
-
-// 使用例
-// setEnvironment('test');  // テスト環境に切り替える場合はこの行のコメントを解除
-main();
