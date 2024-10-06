@@ -4,12 +4,6 @@ import { Pool, PoolClient } from 'pg';
 export type Environment = 'development' | 'test';
 export let env: Environment = 'development';  // デフォルト値
 
-// 環境を切り替える関数
-export function setEnvironment(newEnv: Environment): void {
-  env = newEnv;
-  console.log(`Environment set to: ${env}`);
-}
-
 // データベース接続設定を取得する関数
 function getDbConfig() {
   return {
@@ -143,4 +137,9 @@ export async function main(): Promise<void> {
     console.error(`Database setup failed for ${env} environment:`, err);
     throw err;
   }
+}
+
+// main()を実行する
+if (require.main === module) {
+  main();
 }

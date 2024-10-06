@@ -6,7 +6,9 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3
 
 export async function getMicroposts(): Promise<Micropost[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/microposts`);
+    const response = await fetch(`${API_BASE_URL}/microposts`, {
+      cache: 'no-cache'
+    });
     if (!response.ok) {
       throw new Error('Failed to fetch microposts');
     }

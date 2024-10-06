@@ -1,4 +1,4 @@
-import { main, setEnvironment } from '../../../backend/database/resetDatabase';
+import { main } from '../../../backend/database/resetDatabase';
 
 let isResetComplete = false;
 
