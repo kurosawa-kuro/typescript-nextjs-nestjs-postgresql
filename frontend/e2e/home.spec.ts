@@ -1,6 +1,8 @@
 import { test, expect, Page } from '@playwright/test';
 import path from 'path';
 
+import { main } from '../../backend/database/resetDatabase';
+
 // Constants
 const CONFIG = {
   BASE_URL: 'http://localhost:3000',
@@ -44,7 +46,7 @@ async function logoutUser(page: Page): Promise<void> {
 // Test setup
 test.beforeEach(async ({ request }) => {
   try {
-    await request.post(`${CONFIG.API_URL}/test/reset-db`);
+    await main();
   } catch (error) {
     console.error('Failed to reset database:', error);
     throw error;

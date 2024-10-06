@@ -124,7 +124,7 @@ async function setupDatabase(): Promise<void> {
 }
 
 // メイン実行関数
-async function main(): Promise<void> {
+export async function main(): Promise<void> {
   try {
     console.log(`Setting up database for ${env} environment`);
     console.log(`Using database: ${getDbConfig().database}`);
