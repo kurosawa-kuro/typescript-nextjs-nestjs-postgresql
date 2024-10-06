@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import { resetDatabase } from './utils/database';
 import { loginUser, createPost, verifyPost, logoutUser } from './utils/userActions';
 
