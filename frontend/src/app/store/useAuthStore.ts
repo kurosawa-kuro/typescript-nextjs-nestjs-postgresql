@@ -1,3 +1,5 @@
+// frontend\src\app\store\useAuthStore.ts
+
 import { create } from 'zustand';
 import { AuthState, User, ApiError } from '../types/models';
 import { ApiService } from '../lib/api/apiService';

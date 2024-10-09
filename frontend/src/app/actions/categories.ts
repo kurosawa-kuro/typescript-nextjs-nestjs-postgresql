@@ -1,3 +1,5 @@
+// frontend\src\app\actions\categories.ts
+
 'use server'
 
 import { Category, Micropost } from '../types/models'
