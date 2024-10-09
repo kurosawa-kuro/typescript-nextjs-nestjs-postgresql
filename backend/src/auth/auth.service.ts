@@ -53,7 +53,8 @@ export class AuthService {
 
       if (user && (await bcrypt.compare(password, user.password_hash))) {
         const payload = {
-          sub: user.id,
+          id: user.id,
+          name: user.name,
           email: user.email,
           isAdmin: user.isAdmin,
         };
