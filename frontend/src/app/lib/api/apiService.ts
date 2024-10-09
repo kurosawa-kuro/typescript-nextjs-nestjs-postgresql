@@ -1,5 +1,3 @@
-// frontend\src\app\lib\api\apiService.ts
-
 import { LoginResponse } from '../../types/models';
 import { ApiClient } from './apiClient';
 

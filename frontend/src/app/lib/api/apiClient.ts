@@ -1,5 +1,3 @@
-// src/app/lib/api/apiClient.ts
-
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001';
 
 export class ApiClient {
@@ -19,6 +17,8 @@ export class ApiClient {
       ...options,
       method,
       headers,
+      credentials: 'include',
+      cache: 'no-store',
     };
 
     try {
@@ -30,6 +30,7 @@ export class ApiClient {
 
       return await response.json();
     } catch (error) {
+      console.error(`Error in ${method} request to ${endpoint}:`, error);
       throw error;
     }
   }
