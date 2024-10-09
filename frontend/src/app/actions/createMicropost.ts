@@ -9,6 +9,7 @@ export async function createMicropost(formData: FormData) {
     const title = formData.get('title') as string
     const image = formData.get('image') as File | null
     const userId = formData.get('userId') as string
+    const categoryIds = formData.getAll('categoryIds[]') as string[]
 
     if (!title || !userId) {
       throw new Error('Missing required fields')
@@ -20,6 +21,9 @@ export async function createMicropost(formData: FormData) {
     if (image) {
       newFormData.append('image', image)
     }
+    categoryIds.forEach((categoryId) => {
+      newFormData.append('categoryIds[]', categoryId)
+    })
 
     const response = await fetch(`${API_BASE_URL}/microposts`, {
       method: 'POST',

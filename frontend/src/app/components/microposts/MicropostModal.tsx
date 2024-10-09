@@ -3,7 +3,25 @@ import Image from 'next/image';
 import { MicropostModalProps } from '../../types/models';
 import { ImageUtils } from '../../lib/utils/imageUtils';
 
-export const MicropostModal = ({ isOpen, onClose, onSubmit, title, setTitle, image, onImageChange, isLoading, error }: MicropostModalProps) => {
+type Category = {
+  id: number;
+  title: string;
+};
+
+export const MicropostModal = ({ 
+  isOpen, 
+  onClose, 
+  onSubmit, 
+  title, 
+  setTitle, 
+  image, 
+  onImageChange, 
+  isLoading, 
+  error,
+  selectedCategoryIds,
+  setSelectedCategoryIds,
+  availableCategories
+}: MicropostModalProps & { availableCategories: Category[] }) => {
   if (!isOpen) return null;
 
   return (
@@ -58,6 +76,31 @@ export const MicropostModal = ({ isOpen, onClose, onSubmit, title, setTitle, ima
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base text-gray-800"
               required
             />
+          </div>
+          <div className="mb-4">
+            <label className="block text-base font-semibold text-gray-800 mb-2">Categories</label>
+            <div className="flex flex-wrap gap-2">
+              {availableCategories.map((category) => (
+                <button
+                  key={category.id}
+                  type="button"
+                  onClick={() => {
+                    if (selectedCategoryIds.includes(category.id)) {
+                      setSelectedCategoryIds(selectedCategoryIds.filter((id) => id !== category.id));
+                    } else {
+                      setSelectedCategoryIds([...selectedCategoryIds, category.id]);
+                    }
+                  }}
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    selectedCategoryIds.includes(category.id)
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-200 text-gray-700'
+                  }`}
+                >
+                  {category.title}
+                </button>
+              ))}
+            </div>
           </div>
         </form>
       </div>

@@ -1,9 +1,10 @@
 'use client'
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { usePostForm } from "../../hooks/usePostForm";
 import { MicropostModal } from "../microposts/MicropostModal";
 import { createMicropost } from "../../actions/createMicropost";
+import { getCategories } from "../../actions/getCategories";
 import { useRouter } from 'next/navigation';
 
 type MicropostModalContainerProps = {
@@ -11,11 +12,30 @@ type MicropostModalContainerProps = {
   onClose: () => void;
 };
 
+type Category = {
+  id: number;
+  title: string;
+};
+
 export function MicropostModalContainer({ isOpen, onClose }: MicropostModalContainerProps) {
   const { formTitle, setFormTitle, formImage, setFormImage, resetForm } = usePostForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
+  const [availableCategories, setAvailableCategories] = useState<Category[]>([]);
   const router = useRouter();
+
+  useEffect(() => {
+    async function fetchCategories() {
+      const result = await getCategories();
+      if (Array.isArray(result)) {
+        setAvailableCategories(result);
+      } else {
+        setError('Failed to fetch categories');
+      }
+    }
+    fetchCategories();
+  }, []);
 
   const handleSubmitPost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,13 +55,17 @@ export function MicropostModalContainer({ isOpen, onClose }: MicropostModalConta
     if (formImage) {
       formData.append('image', formImage);
     }
+    selectedCategoryIds.forEach((categoryId) => {
+      formData.append('categoryIds[]', categoryId.toString());
+    });
 
     try {
       const result = await createMicropost(formData);
       if (result.success) {
         resetForm();
+        setSelectedCategoryIds([]);
         onClose();
-        router.refresh(); // Refresh the current page to show the new micropost
+        router.refresh();
       } else {
         setError(result.error || 'Failed to create micropost');
       }
@@ -69,6 +93,9 @@ export function MicropostModalContainer({ isOpen, onClose }: MicropostModalConta
       onImageChange={handleImageChange}
       isLoading={isSubmitting}
       error={error}
+      selectedCategoryIds={selectedCategoryIds}
+      setSelectedCategoryIds={setSelectedCategoryIds}
+      availableCategories={availableCategories}
     />
   );
 }

@@ -26,14 +26,19 @@ export interface AsyncOperationState {
   error: string | null;
 }
 
-export interface MicropostModalProps extends AsyncOperationState {
+export interface MicropostModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (event: React.FormEvent) => void;
+  onSubmit: (e: React.FormEvent) => void;
   title: string;
-  setTitle: (title: string) => void;
+  setTitle: React.Dispatch<React.SetStateAction<string>>;
   image: File | null;
-  onImageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  isLoading: boolean;
+  error: string | null;
+  selectedCategoryIds: number[];
+  setSelectedCategoryIds: React.Dispatch<React.SetStateAction<number[]>>;
+  availableCategories: Category[];
 }
 
 export interface AuthState extends AsyncOperationState {
