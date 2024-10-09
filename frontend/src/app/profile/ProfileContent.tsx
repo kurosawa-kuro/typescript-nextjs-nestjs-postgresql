@@ -30,10 +30,12 @@ export function ProfileContent({ initialProfile }: ProfileContentProps) {
           <span className="font-semibold text-gray-700">User ID:</span>{' '}
           <span className="text-black">{user.id}</span>
         </div>
-        <div>
-          <span className="font-semibold text-gray-700">Admin Status:</span>{' '}
-          <span className="text-black">{user.isAdmin ? 'Yes' : 'No'}</span>
-        </div>
+        {user.isAdmin && (
+          <div>
+            <span className="font-semibold text-gray-700">Admin Status:</span>{' '}
+            <span className="text-black">Yes</span>
+          </div>
+        )}
       </div>
       <div className="mt-6">
         <button 
