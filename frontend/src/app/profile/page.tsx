@@ -6,7 +6,7 @@ import { ErrorMessage } from '../components/common/ErrorMessage';
 
 export default async function ProfilePage() {
   const userProfile = await getUserProfile();
-console.log("userProfile", userProfile);
+  
   if (!userProfile) {
     return <ErrorMessage message="Please log in to view your profile." />;
   }
