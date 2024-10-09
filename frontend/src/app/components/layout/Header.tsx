@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { User } from '../../types/models';
+import Link from 'next/link';
 
 interface HeaderProps {
   isLoggedIn: boolean;
@@ -33,7 +34,12 @@ export const Header: React.FC<HeaderProps> = ({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
               </button>
-              <span className="text-sm font-medium text-gray-700">{currentUser?.name}</span>
+              <Link 
+                href="/profile" 
+                className="text-sm font-medium text-gray-700 hover:text-gray-900 hover:underline"
+              >
+                {currentUser?.name}
+              </Link>
               <button 
                 onClick={logout}
                 className="text-sm font-medium text-gray-700 hover:text-gray-900"

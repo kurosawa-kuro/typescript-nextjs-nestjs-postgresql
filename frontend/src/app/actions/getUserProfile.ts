@@ -13,8 +13,6 @@ export async function getUserProfile(): Promise<User | null> {
       return null;
     }
 
-    console.log('getUserProfile token:', token);
-
     const response = await fetch('http://localhost:3001/auth/profile', {
       method: 'GET',
       headers: {
@@ -24,8 +22,6 @@ export async function getUserProfile(): Promise<User | null> {
       credentials: 'include',
       cache: 'no-store',
     });
-
-    console.log('getUserProfile Response:', response);
 
     if (!response.ok) {
       const errorText = await response.text();
