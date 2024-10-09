@@ -1,6 +1,6 @@
 // HeaderContainer.tsx
 import React from "react";
-import { Header } from '../layout/Header';
+import { Header } from '../layouts/Header';
 import { User } from '../../types/models';
 
 type HeaderContainerProps = {
