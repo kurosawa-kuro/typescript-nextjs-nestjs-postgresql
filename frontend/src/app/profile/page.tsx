@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { ProfileContent } from './ProfileContent';
-import { getUserProfile } from '../actions/getUserProfile';
+import { getUserProfile } from '../actions/users';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { ErrorMessage } from '../components/common/ErrorMessage';
 

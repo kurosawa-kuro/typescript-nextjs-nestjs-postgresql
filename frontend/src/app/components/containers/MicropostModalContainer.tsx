@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { usePostForm } from "../../hooks/usePostForm";
 import { MicropostModal } from "../microposts/MicropostModal";
-import { createMicropost } from "../../actions/createMicropost";
-import { getCategories } from "../../actions/getCategories";
+import { createMicropost } from "../../actions/microposts";
+import { getCategories } from "../../actions/categories";
 import { useRouter } from 'next/navigation';
 
 type MicropostModalContainerProps = {

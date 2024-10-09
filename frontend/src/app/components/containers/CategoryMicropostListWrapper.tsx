@@ -1,5 +1,5 @@
 import { MicropostList } from "../microposts/MicropostList";
-import { getCategoryMicroposts } from '../../actions/getCategoryMicroposts';
+import { getCategoryMicroposts } from '../../actions/categories';
 import { ErrorMessage } from '../common/ErrorMessage';
 
 export async function CategoryMicropostListWrapper({ categoryName }: { categoryName: string }) {
