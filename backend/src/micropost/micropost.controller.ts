@@ -43,12 +43,7 @@ export class MicroPostController {
     @Body('categoryIds') categoryIds: string | string[],
     @UploadedFile() file: Express.Multer.File,
   ): Promise<MicroPost> {
-    // デバッグの為、全てのリクエストをコンソールに出力
-    console.log('userId:', userId);
-    console.log('title:', title);
-    console.log('categoryIds:', categoryIds);
-    console.log('file:', file);
-    
+
     if (!title) {
       throw new BadRequestException('Title is required');
     }
