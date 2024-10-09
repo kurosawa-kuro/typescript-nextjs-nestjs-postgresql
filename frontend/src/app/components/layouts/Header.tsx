@@ -1,5 +1,3 @@
-// frontend/src/app/components/Header.tsx
-
 import React from 'react';
 import { User } from '../../types/models';
 import Link from 'next/link';
@@ -22,7 +20,9 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="bg-white border-b border-gray-300 fixed top-0 left-0 right-0 z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-pink-500">TypeGram</h1>
+        <Link href="/" className="text-3xl font-bold text-pink-500 hover:text-pink-600 transition duration-300">
+          TypeGram
+        </Link>
         <div className="flex items-center space-x-4">
           {isLoggedIn ? (
             <>
