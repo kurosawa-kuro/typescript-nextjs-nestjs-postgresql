@@ -1,4 +1,3 @@
-// src/micropost/micropost.service.ts
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 
@@ -8,6 +7,11 @@ export interface MicroPost {
   title: string;
   imagePath: string | null;
   userName: string;
+}
+
+export interface Category {
+  id: number;
+  title: string;
 }
 
 @Injectable()
@@ -41,6 +45,20 @@ export class MicroPostService {
     ORDER BY m.id DESC
   `;
     const result = await this.databaseService.executeQuery(query);
+    return result.rows;
+  }
+
+  async getCategoriesForMicropost(id: number): Promise<Category[]> {
+    const query = `
+      SELECT c.id, c.title
+      FROM category c
+      JOIN micropost_category mc ON c.id = mc.category_id
+      WHERE mc.micropost_id = $1
+    `;
+    const result = await this.databaseService.executeQuery(query, [id]);
+    if (result.rows.length === 0) {
+      return null;
+    }
     return result.rows;
   }
 }

@@ -1,9 +1,9 @@
-// src/micropost/micropost.controller.ts
 import {
   Controller,
   Get,
   Post,
   Body,
+  Param,
   ParseIntPipe,
   UseInterceptors,
   UploadedFile,
@@ -28,12 +28,10 @@ export class MicroPostController {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, cb) => {
-          /* istanbul ignore next */
           const randomName = Array(32)
             .fill(null)
             .map(() => Math.round(Math.random() * 16).toString(16))
             .join('');
-          /* istanbul ignore next */
           return cb(null, `${randomName}${extname(file.originalname)}`);
         },
       }),
@@ -62,5 +60,14 @@ export class MicroPostController {
   async index(): Promise<MicroPost[]> {
     const microposts = await this.microPostService.list();
     return microposts;
+  }
+
+  @Get(':id/categories')
+  async getCategories(@Param('id', ParseIntPipe) id: number) {
+    const categories = await this.microPostService.getCategoriesForMicropost(id);
+    if (!categories) {
+      throw new BadRequestException('Micropost not found');
+    }
+    return categories;
   }
 }
