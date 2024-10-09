@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { CategoryMicropostListWrapper } from '../../components/containers/CategoryMicropostListWrapper';
+import { CategoryMicropostListWrapper } from '../../components/containers/wrappers/CategoryMicropostListWrapper';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 
 interface CategoryPageProps {

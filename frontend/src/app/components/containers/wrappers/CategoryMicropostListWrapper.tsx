@@ -1,6 +1,6 @@
-import { MicropostList } from "../microposts/MicropostList";
-import { getCategoryMicroposts } from '../../actions/categories';
-import { ErrorMessage } from '../common/ErrorMessage';
+import { MicropostList } from "../../microposts/MicropostList";
+import { getCategoryMicroposts } from '../../../actions/categories';
+import { ErrorMessage } from '../../common/ErrorMessage';
 
 export async function CategoryMicropostListWrapper({ categoryName }: { categoryName: string }) {
   const microposts = await getCategoryMicroposts(categoryName);

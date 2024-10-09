@@ -1,11 +1,11 @@
 'use client';
 
 import React from "react";
-import { useAuthStore } from "../../store/useAuthStore";
-import { useModal } from "../../hooks/useModal";
-import { HeaderContainer } from './HeaderContainer';
-import { LoginModalContainer } from './LoginModalContainer';
-import { MicropostModalContainer } from './MicropostModalContainer';
+import { useAuthStore } from "../../../store/useAuthStore";
+import { useModal } from "../../../hooks/useModal";
+import { HeaderContainer } from '../HeaderContainer';
+import { LoginModalContainer } from '../LoginModalContainer';
+import { MicropostModalContainer } from '../MicropostModalContainer';
 
 export function ClientSideWrapper({ children }: { children: React.ReactNode }) {
   const { isLoggedIn, currentUser, logout  } = useAuthStore();

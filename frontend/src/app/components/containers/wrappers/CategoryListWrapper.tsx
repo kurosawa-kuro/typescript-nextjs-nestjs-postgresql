@@ -1,5 +1,5 @@
-import { CategoryList } from "../Categories/CategoryList";
-import { getCategories } from '../../actions/categories';
+import { CategoryList } from "../../categories/CategoryList";
+import { getCategories } from '../../../actions/categories';
 
 export async function CategoryListWrapper() {
   const categories = await getCategories();

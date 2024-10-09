@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
-import { MicropostListWrapper } from "./components/containers/MicropostListWrapper";
-import { CategoryListWrapper } from "./components/containers/CategoryListWrapper";
+import { MicropostListWrapper } from "./components/containers/wrappers/MicropostListWrapper";
+import { CategoryListWrapper } from "./components/containers/wrappers/CategoryListWrapper";
 import { LoadingSpinner } from './components/common/LoadingSpinner';
 
 export default function Home() {
