@@ -23,4 +23,13 @@ export class CategoryService {
       .executeQuery(query)
       .then((result) => result.rows);
   }
+
+  async findByName(name: string): Promise<Category> {
+    const query = 'SELECT id, title FROM category WHERE LOWER(title) = LOWER($1)';
+    const result = await this.databaseService.executeQuery(query, [name]);
+    // if (result.rows.length === 0) {
+    //   throw new NotFoundException(`Category "${name}" not found`);
+    // }
+    return result.rows[0];
+  }
 }

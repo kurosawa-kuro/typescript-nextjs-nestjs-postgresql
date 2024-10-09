@@ -1,12 +1,10 @@
-'use server'
-
 import { Micropost } from '../types/models';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001';
 
-export async function getCategoryMicroposts(categoryId: string): Promise<Micropost[]> {
+export async function getCategoryMicroposts(categoryName: string): Promise<Micropost[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/categories/${categoryId}/microposts`, {
+    const response = await fetch(`${API_BASE_URL}/categories/${encodeURIComponent(categoryName)}/microposts`, {
       cache: 'no-cache'
     });
     if (!response.ok) {

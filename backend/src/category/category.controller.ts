@@ -47,21 +47,31 @@ export class CategoryController {
     }
   }
 
-  @Get(':id/microposts')
-  async microposts(@Param('id') id: string) {
-    try {
-      const categoryId = parseInt(id, 10);
-      const microposts =
-        await this.micropostCategoryService.microposts(categoryId);
-      return microposts;
-    } catch (error) {
-      this.logger.error(
-        `Failed to get microposts for category: ${error.message}`,
-        error.stack,
-      );
-      throw new InternalServerErrorException(
-        'Failed to get microposts for category',
-      );
-    }
+  // @Get(':id/microposts')
+  // async microposts(@Param('id') id: string) {
+  //   try {
+  //     const categoryId = parseInt(id, 10);
+  //     const microposts =
+  //       await this.micropostCategoryService.microposts(categoryId);
+  //     return microposts;
+  //   } catch (error) {
+  //     this.logger.error(
+  //       `Failed to get microposts for category: ${error.message}`,
+  //       error.stack,
+  //     );
+  //     throw new InternalServerErrorException(
+  //       'Failed to get microposts for category',
+  //     );
+  //   }
+  // }
+
+  @Get(':categoryName/microposts')
+  async microposts(@Param('categoryName') categoryName: string) {
+    const category = await this.categoryService.findByName(categoryName);
+    // if (!category) {
+    //   throw new NotFoundException(`Category "${categoryName}" not found`);
+    // }
+    const microposts = await this.micropostCategoryService.microposts(category.id);
+    return microposts;
   }
 }
