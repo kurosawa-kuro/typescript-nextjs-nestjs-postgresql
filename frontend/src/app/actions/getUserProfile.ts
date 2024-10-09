@@ -4,8 +4,6 @@ import { cookies } from 'next/headers';
 export async function getUserProfile(): Promise<User | null> {
   try {
     const cookieStore = cookies();
-    console.log('All cookies:', cookieStore.getAll()); // Keep this for debugging
-
     const token = cookieStore.get('token')?.value; // Change 'jwt' to 'token'
 
     if (!token) {
