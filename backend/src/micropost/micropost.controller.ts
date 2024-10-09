@@ -40,20 +40,30 @@ export class MicroPostController {
   async create(
     @Body('userId', ParseIntPipe) userId: number,
     @Body('title') title: string,
+    @Body('categoryIds') categoryIds: string | string[],
     @UploadedFile() file: Express.Multer.File,
   ): Promise<MicroPost> {
     if (!title) {
       throw new BadRequestException('Title is required');
     }
-
+  
     const user = await this.userService.find(userId);
     if (!user) {
       throw new BadRequestException('User not found');
     }
-
+  
     const imagePath = file ? file.path : null;
-
-    return this.microPostService.create(userId, title, imagePath);
+  
+    let parsedCategoryIds: number[] = [];
+    if (categoryIds) {
+      if (Array.isArray(categoryIds)) {
+        parsedCategoryIds = categoryIds.map(Number);
+      } else if (typeof categoryIds === 'string') {
+        parsedCategoryIds = categoryIds.split(',').map(Number);
+      }
+    }
+  
+    return this.microPostService.create(userId, title, imagePath, parsedCategoryIds);
   }
 
   @Get()

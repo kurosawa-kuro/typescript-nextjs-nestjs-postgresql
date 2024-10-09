@@ -22,19 +22,34 @@ export class MicroPostService {
     userId: number,
     title: string,
     imagePath: string | null,
+    categoryIds: number[],
   ): Promise<MicroPost> {
-    const query = `
-      INSERT INTO micropost(user_id, title, image_path) 
-      VALUES($1, $2, $3) 
-      RETURNING id, user_id as "userId", title, image_path as "imagePath",
-        (SELECT name FROM "user" WHERE id = $1) as "userName"
-    `;
-    const result = await this.databaseService.executeQuery(query, [
-      userId,
-      title,
-      imagePath,
-    ]);
-    return result.rows[0];
+    try {
+      await this.databaseService.executeQuery('BEGIN');
+
+      const insertMicropostQuery = `
+        INSERT INTO micropost(user_id, title, image_path) 
+        VALUES($1, $2, $3) 
+        RETURNING id, user_id as "userId", title, image_path as "imagePath",
+          (SELECT name FROM "user" WHERE id = $1) as "userName"
+      `;
+      const micropostResult = await this.databaseService.executeQuery(insertMicropostQuery, [userId, title, imagePath]);
+      const micropost = micropostResult.rows[0];
+
+      if (categoryIds && categoryIds.length > 0) {
+        const insertCategoryQuery = `
+          INSERT INTO micropost_category(micropost_id, category_id)
+          SELECT $1, unnest($2::int[])
+        `;
+        await this.databaseService.executeQuery(insertCategoryQuery, [micropost.id, categoryIds]);
+      }
+
+      await this.databaseService.executeQuery('COMMIT');
+      return micropost;
+    } catch (error) {
+      await this.databaseService.executeQuery('ROLLBACK');
+      throw error;
+    }
   }
 
   async list(): Promise<MicroPost[]> {
