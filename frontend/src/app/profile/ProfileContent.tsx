@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { User } from '../types/models';
 import { ErrorMessage } from '../components/common/ErrorMessage';
 
@@ -9,7 +8,7 @@ interface ProfileContentProps {
 }
 
 export function ProfileContent({ initialProfile }: ProfileContentProps) {
-  const [user, setUser] = useState<User | null>(initialProfile);
+  const user = initialProfile;
 
   if (!user) {
     return <ErrorMessage message="User not found" />;
@@ -17,7 +16,7 @@ export function ProfileContent({ initialProfile }: ProfileContentProps) {
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6">
-      <h2 className="text-2xl font-bold  text-gray-700 mb-4">User Profile</h2>
+      <h2 className="text-2xl font-bold text-gray-700 mb-4">User Profile</h2>
       <div className="space-y-4">
         <div>
           <span className="font-semibold text-gray-700">Name:</span>{' '}
