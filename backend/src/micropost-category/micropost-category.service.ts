@@ -32,6 +32,7 @@ export class MicropostCategoryService {
       JOIN micropost_category mc ON m.id = mc.micropost_id
       JOIN "user" u ON m.user_id = u.id
       WHERE mc.category_id = $1
+      ORDER BY m.id DESC
     `;
     const result = await this.pool.query(query, [categoryId]);
     return result.rows;
