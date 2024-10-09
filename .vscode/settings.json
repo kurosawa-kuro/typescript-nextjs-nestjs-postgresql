@@ -1,0 +1,16 @@
+{
+    "favorites.resources": [
+        {
+            "filePath": "backend\\test\\app.http",
+            "group": "Default"
+        },
+        {
+            "filePath": "frontend\\output.txt",
+            "group": "Default"
+        },
+        {
+            "filePath": "frontend\\to_AI.txt",
+            "group": "Default"
+        }
+    ]
+}
