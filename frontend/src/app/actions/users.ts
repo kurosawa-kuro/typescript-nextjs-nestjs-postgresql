@@ -1,6 +1,6 @@
 import { User } from '../types/models';
 import { cookies } from 'next/headers';
-import { ApiClient } from '../lib/api/apiClient';
+import { ApiClient } from '../api/apiClient';
 
 export async function getUserProfile(): Promise<User | null> {
   try {
