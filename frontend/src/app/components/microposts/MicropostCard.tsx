@@ -1,17 +1,17 @@
 // src/app/components/microposts/MicropostCard.tsx
-
 import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { Micropost } from '../../types/models';
 import { ImageUtils } from '../../lib/utils/imageUtils';
 
 interface MicropostCardProps {
-  post?: Micropost;
+  post: Micropost;
+  onClick: (post: Micropost) => void;
 }
 
 const API_BASE_URL = 'http://localhost:3001';
 
-export const MicropostCard: React.FC<MicropostCardProps> = ({ post }) => {
+export const MicropostCard: React.FC<MicropostCardProps> = ({ post, onClick }) => {
   const [imageError, setImageError] = useState(false);
 
   const imageUrl = useMemo(() => {
@@ -26,18 +26,12 @@ export const MicropostCard: React.FC<MicropostCardProps> = ({ post }) => {
     setImageError(true);
   };
 
-  if (!post) {
-    return (
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-          <span className="text-gray-700 font-medium text-lg">Post not available</span>
-        </div>
-      </div>
-    );
-  }
+  const handleClick = () => {
+    onClick(post);
+  };
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer" onClick={handleClick}>
       {imageUrl && !imageError ? (
         <div className="relative w-full h-48">
           <Image
