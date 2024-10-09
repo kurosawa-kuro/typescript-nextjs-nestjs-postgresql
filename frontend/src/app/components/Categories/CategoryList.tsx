@@ -19,6 +19,13 @@ export const CategoryList: React.FC<CategoryListProps> = ({ categories }) => {
           </li>
         ))}
       </ul>
+      <div className="mt-4 text-center">
+        <button
+          className="text-xs text-gray-600 hover:text-blue-500 transition duration-300 ease-in-out focus:outline-none"
+        >
+          + Add Category
+        </button>
+      </div>
     </div>
   );
 };
