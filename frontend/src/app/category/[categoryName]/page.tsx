@@ -19,11 +19,3 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     </CommonLayout>
   );
 }
-
-export function generateMetadata({ params }: CategoryPageProps) {
-  const { categoryName } = params;
-  return {
-    title: `${categoryName} - TypeGram`,
-    description: `View all posts in the ${categoryName} category on TypeGram`,
-  };
-}
