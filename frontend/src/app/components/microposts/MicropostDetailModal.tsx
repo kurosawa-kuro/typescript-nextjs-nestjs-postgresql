@@ -19,7 +19,7 @@ export const MicropostDetailModal: React.FC<MicropostDetailModalProps> = ({ post
       <div className="bg-white rounded-lg p-8 max-w-2xl w-full mx-4">
         <h2 className="text-3xl font-bold mb-4 text-black">{post.title}</h2>
         {imageUrl && (
-          <div className="relative w-full h-96 mb-4">
+          <div className="relative w-full h-96 mb-4 border border-gray-300 rounded">
             <Image
               src={imageUrl}
               alt={post.title}
