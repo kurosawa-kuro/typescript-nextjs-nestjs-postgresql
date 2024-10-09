@@ -11,6 +11,7 @@ async function bootstrap() {
     origin: 'http://localhost:3000', // Next.jsアプリのURL
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
   });
 
   app.use(cookieParser());

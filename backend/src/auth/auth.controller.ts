@@ -46,7 +46,7 @@ export class AuthController {
   }> {
     const result = await this.authService.login(email, password);
     if (result.success) {
-      res.cookie('jwt', result.token, {
+      res.cookie('token', result.token, { // Change 'jwt' to 'token'
         httpOnly: true,
         secure: process.env.NODE_ENV !== 'development',
         sameSite: 'strict',
@@ -69,7 +69,7 @@ export class AuthController {
   async logout(
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ success: boolean; message: string }> {
-    res.clearCookie('jwt');
+    res.clearCookie('token'); // Change 'jwt' to 'token'
     return { success: true, message: 'Successfully logged out' };
   }
 

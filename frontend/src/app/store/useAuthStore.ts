@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { AuthState, User, ApiError } from '../types/models';
 import { ApiService } from '../lib/api/apiService';
+import { setCookie, deleteCookie } from 'cookies-next';
 
 export const useAuthStore = create<AuthState>((set) => ({
   isLoggedIn: false,
@@ -22,8 +23,7 @@ export const useAuthStore = create<AuthState>((set) => ({
           isLoading: false,
           error: null
         });
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        setCookie('token', data.token, { maxAge: 30 * 24 * 60 * 60 }); // Use 'token' instead of 'jwt'
         return true;
       } else {
         set({
@@ -50,8 +50,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    deleteCookie('token'); // Use 'token' instead of 'jwt'
     set({
       isLoggedIn: false,
       currentUser: null,
