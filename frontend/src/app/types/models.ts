@@ -55,3 +55,8 @@ export interface MicropostState extends AsyncOperationState {
 export interface ApiError extends Error {
   statusCode?: number;
 }
+
+export interface Category {
+  id: number;
+  title: string;
+}
