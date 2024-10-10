@@ -2,14 +2,14 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MicropostModalContainer } from '../../../src/app/components/containers/MicropostModalContainer';
-import * as createMicropostModule from '../../../src/app/actions/createMicropost';
+import * as createMicropostModule from '../../../src/app/actions/microposts';
 import { useRouter } from 'next/navigation';
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
 
-jest.mock('../../../src/app/actions/createMicropost', () => ({
+jest.mock('../../../src/app/actions/microposts', () => ({
   createMicropost: jest.fn(),
 }));
 

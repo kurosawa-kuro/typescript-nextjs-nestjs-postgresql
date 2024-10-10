@@ -1,12 +1,11 @@
-// src/app/components/microposts/MicropostCard.tsx
 import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { Micropost } from '../../types/models';
 import { ImageUtils } from '../../lib/utils/imageUtils';
 
 interface MicropostCardProps {
-  post: Micropost;
-  onClick: (post: Micropost) => void;
+  post?: Micropost;
+  onClick?: (post: Micropost) => void;
 }
 
 const API_BASE_URL = 'http://localhost:3001';
@@ -27,8 +26,18 @@ export const MicropostCard: React.FC<MicropostCardProps> = ({ post, onClick }) =
   };
 
   const handleClick = () => {
-    onClick(post);
+    if (post && onClick) {
+      onClick(post);
+    }
   };
+
+  if (!post) {
+    return (
+      <div className="bg-white rounded-lg shadow-md overflow-hidden p-4">
+        <span className="text-gray-700 font-medium text-lg">Post not available</span>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer" onClick={handleClick}>

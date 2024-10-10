@@ -1,4 +1,4 @@
-import { createMicropost } from '../../src/app/actions/createMicropost';
+import { createMicropost } from '../../src/app/actions/microposts';
 import { Micropost } from '../../src/app/types/models';
 
 // Mock the global fetch function

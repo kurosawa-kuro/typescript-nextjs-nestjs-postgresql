@@ -1,4 +1,4 @@
-import React, { act } from 'react';
+import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MicropostCard } from '../../src/app/components/microposts/MicropostCard';
 import { Micropost } from '../../src/app/types/models';
@@ -37,9 +37,7 @@ describe('MicropostCard', () => {
     render(<MicropostCard post={mockPost} />);
     const img = screen.getByAltText('Test Post');
     
-    await act(async () => {
-      fireEvent.error(img);
-    });
+    fireEvent.error(img);
 
     expect(screen.getByText('No image available')).toBeInTheDocument();
   });
@@ -54,5 +52,12 @@ describe('MicropostCard', () => {
     render(<MicropostCard post={postWithWindowsPath} />);
     const img = screen.getByAltText('Test Post');
     expect(img).toHaveAttribute('src', expect.stringContaining('test/image.jpg'));
+  });
+
+  it('calls onClick when the card is clicked', () => {
+    const onClickMock = jest.fn();
+    render(<MicropostCard post={mockPost} onClick={onClickMock} />);
+    fireEvent.click(screen.getByText('Test Post'));
+    expect(onClickMock).toHaveBeenCalledWith(mockPost);
   });
 });
