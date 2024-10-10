@@ -1,3 +1,5 @@
+// frontend\__tests__\actions\getMicroposts.test.ts
+
 import { getMicroposts } from '../../src/app/actions/microposts';
 import { ApiClient } from '../../src/app/api/apiClient';
 
