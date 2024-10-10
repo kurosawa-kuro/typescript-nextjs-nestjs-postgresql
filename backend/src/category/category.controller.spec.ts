@@ -17,7 +17,7 @@ describe('CategoryController', () => {
           provide: CategoryService,
           useValue: {
             create: jest.fn(),
-            list: jest.fn(), // Changed from index to list
+            list: jest.fn(),
           },
         },
         {
@@ -58,7 +58,7 @@ describe('CategoryController', () => {
   describe('index', () => {
     it('should return an array of categories', async () => {
       const mockCategories = [{ id: 1, title: 'Technology' }];
-      categoryService.list.mockResolvedValue(mockCategories); // Changed from index to list
+      categoryService.list.mockResolvedValue(mockCategories);
 
       const result = await categoryController.index();
 
@@ -66,7 +66,7 @@ describe('CategoryController', () => {
     });
 
     it('should throw InternalServerErrorException when list fails', async () => {
-      categoryService.list.mockRejectedValue(new Error('Database error')); // Changed from index to list
+      categoryService.list.mockRejectedValue(new Error('Database error'));
 
       await expect(categoryController.index()).rejects.toThrow(
         InternalServerErrorException,
