@@ -285,5 +285,31 @@ describe('MicroPostController', () => {
 
       await expect(microPostController.getCategories(micropostId)).rejects.toThrow(BadRequestException);
     });
+
+    it('should return categories for a given micropost', async () => {
+      const micropostId = 1;
+      const mockCategories = [
+        { id: 1, title: 'Category 1' },
+        { id: 2, title: 'Category 2' },
+      ];
+  
+      // getCategoriesForMicropostが正しいカテゴリを返すようにモックする
+      microPostService.getCategoriesForMicropost.mockResolvedValue(mockCategories);
+  
+      const result = await microPostController.getCategories(micropostId);
+  
+      // 期待されるカテゴリが返っていることを確認
+      expect(result).toEqual(mockCategories);
+      expect(microPostService.getCategoriesForMicropost).toHaveBeenCalledWith(micropostId);
+    });
+  
+    it('should throw BadRequestException when micropost is not found', async () => {
+      const micropostId = 1;
+  
+      // マイクロポストが見つからなかった場合
+      microPostService.getCategoriesForMicropost.mockResolvedValue(null);
+  
+      await expect(microPostController.getCategories(micropostId)).rejects.toThrow(BadRequestException);
+    });
   });
 });
