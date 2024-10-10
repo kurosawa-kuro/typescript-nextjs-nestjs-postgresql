@@ -91,6 +91,33 @@ describe('Category Actions', () => {
       expect(ApiClient.get).toHaveBeenCalledWith('/categories');
       expect(result).toBeNull();
     });
+
+    it('should handle error in getCategories and return null', async () => {
+      jest.spyOn(console, 'error').mockImplementation(() => {}); // console.error をサイレントにする
+      (ApiClient.get as jest.Mock).mockRejectedValue(new Error('Network error'));
+
+      const result = await getCategoryId('Category 1');
+
+      expect(ApiClient.get).toHaveBeenCalledWith('/categories');
+      expect(console.error).toHaveBeenCalledWith('Error fetching categories:', expect.any(Error));
+      expect(result).toBeNull();
+
+      (console.error as jest.Mock).mockRestore(); // console.error のモックを元に戻す
+    });
+
+    it('should handle case-insensitive category name matching', async () => {
+      const mockCategories: Category[] = [
+        { id: 1, title: 'Category 1' },
+        { id: 2, title: 'Category 2' },
+      ];
+
+      (ApiClient.get as jest.Mock).mockResolvedValue(mockCategories);
+
+      const result = await getCategoryId('cAtEgOrY 1');
+
+      expect(ApiClient.get).toHaveBeenCalledWith('/categories');
+      expect(result).toBe(1);
+    });
   });
 
   describe('getCategoryMicroposts', () => {
