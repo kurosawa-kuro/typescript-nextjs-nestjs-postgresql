@@ -1,7 +1,7 @@
 // backend\src\database\database.service.spec.ts
 
 import { Test, TestingModule } from '@nestjs/testing';
-import { DatabaseService } from './database.service';
+import { DatabaseService } from '../../../src/database/database.service';
 import { QueryResult } from 'pg';
 
 describe('DatabaseService', () => {

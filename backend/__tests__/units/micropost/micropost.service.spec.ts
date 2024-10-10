@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MicroPostService, MicroPost, Category } from './micropost.service';
-import { DatabaseService } from '../database/database.service';
+import { MicroPostService, MicroPost, Category } from '../../../src/micropost/micropost.service';
+import { DatabaseService } from '../../../src/database/database.service';
 import { QueryResult } from 'pg';
 import { Logger } from '@nestjs/common';
 

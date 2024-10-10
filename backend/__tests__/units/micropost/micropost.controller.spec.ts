@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MicroPostController } from './micropost.controller';
-import { MicroPostService } from './micropost.service';
-import { UserService } from '../user/user.service';
+import { MicroPostController } from '../../../src/micropost/micropost.controller';
+import { MicroPostService } from '../../../src/micropost/micropost.service';
+import { UserService } from '../../../src/user/user.service';
 import { BadRequestException } from '@nestjs/common';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';

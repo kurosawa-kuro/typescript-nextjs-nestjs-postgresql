@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { JwtStrategy } from './jwt.strategy';
+import { JwtStrategy } from '../../../src/auth/jwt.strategy';
 import { ExtractJwt } from 'passport-jwt';
 
 jest.mock('passport-jwt', () => ({

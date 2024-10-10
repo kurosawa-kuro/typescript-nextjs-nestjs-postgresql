@@ -1,7 +1,7 @@
 // src/user/user.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserService, User, UserCreationData } from './user.service';
-import { DatabaseService } from '../database/database.service';
+import { UserService, User, UserCreationData } from '../../../src/user/user.service';
+import { DatabaseService } from '../../../src/database/database.service';
 import * as bcrypt from 'bcrypt';
 
 jest.mock('bcrypt');

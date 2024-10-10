@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MicropostCategoryService } from './micropost-category.service';
+import { MicropostCategoryService } from '../../../src/micropost-category/micropost-category.service';
 
 // Create a mock type for Pool
 type MockPool = {

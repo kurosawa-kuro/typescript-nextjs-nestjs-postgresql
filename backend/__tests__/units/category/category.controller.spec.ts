@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CategoryController } from './category.controller';
-import { CategoryService } from './category.service';
-import { MicropostCategoryService } from '../micropost-category/micropost-category.service';
+import { CategoryController } from '../../../src/category/category.controller';
+import { CategoryService } from '../../../src/category/category.service';
+import { MicropostCategoryService } from '../../../src/micropost-category/micropost-category.service';
 import { InternalServerErrorException } from '@nestjs/common';
 
 describe('CategoryController', () => {
