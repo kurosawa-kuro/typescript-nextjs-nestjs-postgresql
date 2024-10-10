@@ -14,14 +14,9 @@ export async function getCategories(): Promise<Category[]> {
 }
 
 export async function getCategoryId(categoryName: string): Promise<number | null> {
-  try {
-    const categories = await getCategories()
-    const category = categories.find(c => c.title.toLowerCase() === categoryName.toLowerCase())
-    return category ? category.id : null
-  } catch (error) {
-    console.error('Error fetching category id:', error)
-    return null
-  }
+  const categories = await getCategories()
+  const category = categories.find(c => c.title.toLowerCase() === categoryName.toLowerCase())
+  return category ? category.id : null
 }
 
 export async function getCategoryMicroposts(categoryName: string): Promise<Micropost[]> {
