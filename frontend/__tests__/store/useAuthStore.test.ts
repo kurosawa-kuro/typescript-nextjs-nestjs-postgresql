@@ -1,15 +1,20 @@
 import { renderHook, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { useAuthStore } from '../../src/app/store/useAuthStore';
-import { ApiService } from '../../src/app/lib/api/apiService';
+import { ApiService } from '../../src/app/api/apiService';
+import { setCookie, getCookie, deleteCookie } from 'cookies-next';
 
-// Mock ApiService
-jest.mock('../../src/app/lib/api/apiService');
+// Mock ApiService and cookies-next
+jest.mock('../../src/app/api/apiService');
+jest.mock('cookies-next');
 
 describe('useAuthStore', () => {
   beforeEach(() => {
     jest.resetAllMocks();
     localStorage.clear();
+    (setCookie as jest.Mock).mockImplementation(() => {});
+    (getCookie as jest.Mock).mockImplementation(() => null);
+    (deleteCookie as jest.Mock).mockImplementation(() => {});
   });
 
   it('should initialize with default values', () => {
@@ -39,7 +44,7 @@ describe('useAuthStore', () => {
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBeNull();
 
-    expect(localStorage.getItem('token')).toBe('fake-token');
+    expect(setCookie).toHaveBeenCalledWith('token', 'fake-token', expect.any(Object));
     expect(localStorage.getItem('user')).toBe(JSON.stringify(mockUser));
   });
 
@@ -92,14 +97,14 @@ describe('useAuthStore', () => {
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBeNull();
 
-    expect(localStorage.getItem('token')).toBeNull();
+    expect(deleteCookie).toHaveBeenCalledWith('token');
     expect(localStorage.getItem('user')).toBeNull();
   });
 
-  it('should initialize auth from localStorage', () => {
+  it('should initialize auth from localStorage and cookie', () => {
     const mockUser = { id: 1, name: 'Test User', email: 'test@example.com' };
-    localStorage.setItem('token', 'fake-token');
     localStorage.setItem('user', JSON.stringify(mockUser));
+    (getCookie as jest.Mock).mockReturnValue('fake-token');
 
     const { result } = renderHook(() => useAuthStore());
 
@@ -114,8 +119,8 @@ describe('useAuthStore', () => {
   });
 
   it('should handle error when initializing auth with invalid data', () => {
-    localStorage.setItem('token', 'fake-token');
     localStorage.setItem('user', 'invalid-json');
+    (getCookie as jest.Mock).mockReturnValue('fake-token');
 
     const { result } = renderHook(() => useAuthStore());
 

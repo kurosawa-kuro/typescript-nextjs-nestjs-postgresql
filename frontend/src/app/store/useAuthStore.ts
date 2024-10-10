@@ -1,9 +1,7 @@
-// frontend\src\app\store\useAuthStore.ts
-
 import { create } from 'zustand';
 import { AuthState, User, ApiError } from '../types/models';
 import { ApiService } from '../api/apiService';
-import { setCookie, deleteCookie } from 'cookies-next';
+import { setCookie, deleteCookie, getCookie } from 'cookies-next';
 
 export const useAuthStore = create<AuthState>((set) => ({
   isLoggedIn: false,
@@ -25,7 +23,8 @@ export const useAuthStore = create<AuthState>((set) => ({
           isLoading: false,
           error: null
         });
-        setCookie('token', data.token, { maxAge: 30 * 24 * 60 * 60 }); // Use 'token' instead of 'jwt'
+        setCookie('token', data.token, { maxAge: 30 * 24 * 60 * 60 });
+        localStorage.setItem('user', JSON.stringify(data.user));
         return true;
       } else {
         set({
@@ -52,7 +51,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: () => {
-    deleteCookie('token'); // Use 'token' instead of 'jwt'
+    deleteCookie('token');
+    localStorage.removeItem('user');
     set({
       isLoggedIn: false,
       currentUser: null,
@@ -64,7 +64,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   initializeAuth: () => {
     const storedUser = localStorage.getItem('user');
-    const storedToken = localStorage.getItem('token');
+    const storedToken = getCookie('token');
     if (storedUser && storedToken) {
       try {
         const user: User = JSON.parse(storedUser);

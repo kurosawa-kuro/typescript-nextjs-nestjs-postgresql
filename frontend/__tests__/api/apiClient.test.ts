@@ -1,4 +1,4 @@
-import { ApiClient } from '../../../src/app/lib/api/apiClient';
+import { ApiClient } from '../../src/app/api/apiClient';
 
 // Mock the global fetch function
 global.fetch = jest.fn();

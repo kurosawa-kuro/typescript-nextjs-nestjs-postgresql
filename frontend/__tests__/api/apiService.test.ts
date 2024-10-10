@@ -1,14 +1,14 @@
-import { ApiService } from '../../../src/app/lib/api/apiService';
-import { ApiClient } from '../../../src/app/lib/api/apiClient';
-import { LoginResponse } from '../../../src/app/types/models';
+import { ApiService } from '../../src/app/api/apiService';
+import { ApiClient } from '../../src/app/api//apiClient';
+import { LoginResponse } from '../../src/app/types/models';
 
 // Mock the ApiClient
-jest.mock('../../../src/app/lib/api/apiClient');
+jest.mock('../../src/app/api//apiClient');
 
 describe('ApiService - login', () => {
   const mockEmail = 'test@example.com';
   const mockPassword = 'password123';
-  const mockUser = { id: 1, name: 'Test User', email: mockEmail };
+  const mockUser = { id: 1, name: 'Test User', email: mockEmail, isAdmin: false };
   const mockLoginResponse: LoginResponse = {
     success: true,
     message: 'Login successful',
