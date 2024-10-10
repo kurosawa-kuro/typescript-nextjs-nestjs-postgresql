@@ -29,6 +29,7 @@ describe('MicroPostService', () => {
       const userId = 1;
       const title = 'Test MicroPost';
       const imagePath = 'path/to/image.jpg';
+      const categoryIds = [1, 2];
       const mockMicroPost: MicroPost = {
         id: 1,
         userId,
@@ -37,7 +38,7 @@ describe('MicroPostService', () => {
         imagePath,
       };
 
-      mockDatabaseService.executeQuery.mockResolvedValue({
+      mockDatabaseService.executeQuery.mockResolvedValueOnce({
         rows: [mockMicroPost],
         command: '',
         rowCount: 1,
@@ -45,12 +46,34 @@ describe('MicroPostService', () => {
         fields: [],
       });
 
-      const result = await microPostService.create(userId, title, imagePath);
+      mockDatabaseService.executeQuery.mockResolvedValueOnce({
+        rows: [],
+        command: '',
+        rowCount: 2,
+        oid: 0,
+        fields: [],
+      });
 
+      mockDatabaseService.executeQuery.mockResolvedValueOnce({
+        rows: [],
+        command: '',
+        rowCount: 0,
+        oid: 0,
+        fields: [],
+      });
+
+      const result = await microPostService.create(userId, title, imagePath, categoryIds);
+
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith('BEGIN');
       expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
-        expect.any(String),
+        expect.stringContaining('INSERT INTO micropost'),
         [userId, title, imagePath],
       );
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
+        expect.stringContaining('INSERT INTO micropost_category'),
+        [1, categoryIds],
+      );
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith('COMMIT');
       expect(result).toEqual(mockMicroPost);
     });
 
@@ -58,6 +81,7 @@ describe('MicroPostService', () => {
       const userId = 1;
       const title = 'Test MicroPost';
       const imagePath = null;
+      const categoryIds: number[] = [];
       const mockMicroPost: MicroPost = {
         id: 1,
         userId,
@@ -66,7 +90,7 @@ describe('MicroPostService', () => {
         imagePath,
       };
 
-      mockDatabaseService.executeQuery.mockResolvedValue({
+      mockDatabaseService.executeQuery.mockResolvedValueOnce({
         rows: [mockMicroPost],
         command: '',
         rowCount: 1,
@@ -74,8 +98,26 @@ describe('MicroPostService', () => {
         fields: [],
       });
 
-      const result = await microPostService.create(userId, title, imagePath);
+      mockDatabaseService.executeQuery.mockResolvedValueOnce({
+        rows: [],
+        command: '',
+        rowCount: 0,
+        oid: 0,
+        fields: [],
+      });
 
+      const result = await microPostService.create(userId, title, imagePath, categoryIds);
+
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith('BEGIN');
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
+        expect.stringContaining('INSERT INTO micropost'),
+        [userId, title, imagePath],
+      );
+      expect(mockDatabaseService.executeQuery).not.toHaveBeenCalledWith(
+        expect.stringContaining('INSERT INTO micropost_category'),
+        expect.anything(),
+      );
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith('COMMIT');
       expect(result).toEqual(mockMicroPost);
     });
 
@@ -83,14 +125,18 @@ describe('MicroPostService', () => {
       const userId = 1;
       const title = 'Test MicroPost';
       const imagePath = 'path/to/image.jpg';
+      const categoryIds = [1];
 
-      mockDatabaseService.executeQuery.mockRejectedValue(
+      mockDatabaseService.executeQuery.mockRejectedValueOnce(
         new Error('Unique constraint violation'),
       );
 
       await expect(
-        microPostService.create(userId, title, imagePath),
+        microPostService.create(userId, title, imagePath, categoryIds),
       ).rejects.toThrow('Unique constraint violation');
+
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith('BEGIN');
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith('ROLLBACK');
     });
   });
 
@@ -150,6 +196,58 @@ describe('MicroPostService', () => {
       );
 
       await expect(microPostService.list()).rejects.toThrow('Query failed');
+    });
+  });
+
+  describe('getCategoriesForMicropost', () => {
+    it('should return categories for a given micropost', async () => {
+      const micropostId = 1;
+      const mockCategories = [
+        { id: 1, title: 'Technology' },
+        { id: 2, title: 'Science' },
+      ];
+
+      mockDatabaseService.executeQuery.mockResolvedValue({
+        rows: mockCategories,
+        command: '',
+        rowCount: mockCategories.length,
+        oid: 0,
+        fields: [],
+      });
+
+      const result = await microPostService.getCategoriesForMicropost(micropostId);
+
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
+        expect.stringContaining('SELECT c.id, c.title'),
+        [micropostId],
+      );
+      expect(result).toEqual(mockCategories);
+    });
+
+    it('should return null if no categories are found', async () => {
+      const micropostId = 1;
+
+      mockDatabaseService.executeQuery.mockResolvedValue({
+        rows: [],
+        command: '',
+        rowCount: 0,
+        oid: 0,
+        fields: [],
+      });
+
+      const result = await microPostService.getCategoriesForMicropost(micropostId);
+
+      expect(result).toBeNull();
+    });
+
+    it('should throw an error if query fails', async () => {
+      const micropostId = 1;
+
+      mockDatabaseService.executeQuery.mockRejectedValue(
+        new Error('Query failed'),
+      );
+
+      await expect(microPostService.getCategoriesForMicropost(micropostId)).rejects.toThrow('Query failed');
     });
   });
 });
