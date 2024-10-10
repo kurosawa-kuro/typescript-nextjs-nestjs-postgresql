@@ -13,6 +13,7 @@ describe('MicroPostController', () => {
     microPostService = {
       create: jest.fn(),
       list: jest.fn(),
+      getCategoriesForMicropost: jest.fn(),
     } as unknown as jest.Mocked<MicroPostService>;
     userService = {
       find: jest.fn(),
@@ -33,6 +34,7 @@ describe('MicroPostController', () => {
     it('should create a micropost', async () => {
       const userId = 1;
       const title = 'Test Post';
+      const categoryIds = '1,2';
       const file = { path: 'uploads/test.png' } as Express.Multer.File;
       const mockUser = {
         id: userId,
@@ -51,7 +53,7 @@ describe('MicroPostController', () => {
       };
       microPostService.create.mockResolvedValue(mockMicroPost);
 
-      const result = await microPostController.create(userId, title, file);
+      const result = await microPostController.create(userId, title, categoryIds, file);
 
       expect(result).toEqual(mockMicroPost);
       expect(userService.find).toHaveBeenCalledWith(userId);
@@ -59,34 +61,38 @@ describe('MicroPostController', () => {
         userId,
         title,
         file.path,
+        [1, 2],
       );
     });
 
     it('should throw BadRequestException when title is missing', async () => {
       const userId = 1;
       const title = '';
+      const categoryIds = '';
       const file = {} as Express.Multer.File;
 
       await expect(
-        microPostController.create(userId, title, file),
+        microPostController.create(userId, title, categoryIds, file),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw BadRequestException when user is not found', async () => {
       const userId = 1;
       const title = 'Test MicroPost';
+      const categoryIds = '1';
       const file = {} as Express.Multer.File;
 
       userService.find.mockResolvedValue(null);
 
       await expect(
-        microPostController.create(userId, title, file),
+        microPostController.create(userId, title, categoryIds, file),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('should handle null file', async () => {
       const userId = 1;
       const title = 'Test MicroPost';
+      const categoryIds = '1';
       const file = null;
       const mockUser = {
         id: userId,
@@ -105,10 +111,10 @@ describe('MicroPostController', () => {
       };
       microPostService.create.mockResolvedValue(mockMicroPost);
 
-      const result = await microPostController.create(userId, title, file);
+      const result = await microPostController.create(userId, title, categoryIds, file);
 
       expect(result).toEqual(mockMicroPost);
-      expect(microPostService.create).toHaveBeenCalledWith(userId, title, null);
+      expect(microPostService.create).toHaveBeenCalledWith(userId, title, null, [1]);
     });
   });
 
@@ -143,6 +149,31 @@ describe('MicroPostController', () => {
       microPostService.list.mockRejectedValue(new Error('Database error'));
 
       await expect(microPostController.index()).rejects.toThrow();
+    });
+  });
+
+  describe('getCategories', () => {
+    it('should return categories for a given micropost', async () => {
+      const micropostId = 1;
+      const mockCategories = [
+        { id: 1, title: 'Category 1' },
+        { id: 2, title: 'Category 2' },
+      ];
+
+      microPostService.getCategoriesForMicropost.mockResolvedValue(mockCategories);
+
+      const result = await microPostController.getCategories(micropostId);
+
+      expect(result).toEqual(mockCategories);
+      expect(microPostService.getCategoriesForMicropost).toHaveBeenCalledWith(micropostId);
+    });
+
+    it('should throw BadRequestException when micropost is not found', async () => {
+      const micropostId = 1;
+
+      microPostService.getCategoriesForMicropost.mockResolvedValue(null);
+
+      await expect(microPostController.getCategories(micropostId)).rejects.toThrow(BadRequestException);
     });
   });
 });
