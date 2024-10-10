@@ -1,4 +1,4 @@
-// frontend\__tests__\actions\categoryActions.test.ts
+// frontend\__tests__\actions\categories.test.ts
 
 import { getCategories, getCategoryId, getCategoryMicroposts } from '../../src/app/actions/categories';
 import { ApiClient } from '../../src/app/api/apiClient';
@@ -92,17 +92,13 @@ describe('Category Actions', () => {
       expect(result).toBeNull();
     });
 
-    it('should handle error in getCategories and return null', async () => {
-      jest.spyOn(console, 'error').mockImplementation(() => {}); // console.error をサイレントにする
-      (ApiClient.get as jest.Mock).mockRejectedValue(new Error('Network error'));
+    it('should handle case when getCategories returns an empty array', async () => {
+      (ApiClient.get as jest.Mock).mockResolvedValue([]);
 
       const result = await getCategoryId('Category 1');
 
       expect(ApiClient.get).toHaveBeenCalledWith('/categories');
-      expect(console.error).toHaveBeenCalledWith('Error fetching categories:', expect.any(Error));
       expect(result).toBeNull();
-
-      (console.error as jest.Mock).mockRestore(); // console.error のモックを元に戻す
     });
 
     it('should handle case-insensitive category name matching', async () => {
