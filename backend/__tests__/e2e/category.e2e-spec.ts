@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { CategoryService } from '../src/category/category.service';
-import { DatabaseService } from '../src/database/database.service';
+import { CategoryService } from '../../src/category/category.service';
+import { DatabaseService } from '../../src/database/database.service';
 import { setupTestApp, clearDatabase } from './test-utils';
 
 describe('CategoryController (e2e)', () => {

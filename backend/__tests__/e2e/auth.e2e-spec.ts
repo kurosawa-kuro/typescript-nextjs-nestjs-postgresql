@@ -1,7 +1,7 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { UserService } from '../src/user/user.service';
-import { DatabaseService } from '../src/database/database.service';
+import { UserService } from '../../src/user/user.service';
+import { DatabaseService } from '../../src/database/database.service';
 import { setupTestApp, clearDatabase, createTestUser } from './test-utils';
 
 describe('AuthController (e2e)', () => {

@@ -1,8 +1,8 @@
 // test/micropost.e2e-spec.ts
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { DatabaseService } from '../src/database/database.service';
-import { UserService } from '../src/user/user.service';
+import { DatabaseService } from '../../src/database/database.service';
+import { UserService } from '../../src/user/user.service';
 import { setupTestApp, clearDatabase, createTestUser } from './test-utils';
 import * as path from 'path';
 
@@ -31,7 +31,7 @@ describe('MicroPostController (e2e)', () => {
       'password123',
     );
 
-    const testImagePath = path.join(__dirname, 'test.png');
+    const testImagePath = path.join(__dirname, '..', 'test.png');
 
     const response = await request(app.getHttpServer())
       .post('/microposts')
