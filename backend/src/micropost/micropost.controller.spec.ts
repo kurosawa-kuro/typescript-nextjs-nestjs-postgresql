@@ -155,6 +155,74 @@ describe('MicroPostController', () => {
       // Ensure extname was called with the correct file original name
       expect(extname).toHaveBeenCalledWith('test.jpg');
     });
+
+    it('should correctly parse categoryIds from string array to number array', async () => {
+      const userId = 1;
+      const title = 'Test Post';
+      const categoryIds = ['1', '2', '3']; // 文字列配列
+      const file = { path: 'uploads/test.png' } as Express.Multer.File;
+      const mockUser = {
+        id: userId,
+        name: 'TestUser',
+        email: 'test@example.com',
+        isAdmin: false,
+      };
+      userService.find.mockResolvedValue(mockUser);
+
+      const mockMicroPost = {
+        id: 1,
+        userId,
+        title,
+        userName: mockUser.name,
+        imagePath: file.path,
+      };
+      microPostService.create.mockResolvedValue(mockMicroPost);
+
+      const result = await microPostController.create(userId, title, categoryIds, file);
+
+      expect(result).toEqual(mockMicroPost);
+      expect(userService.find).toHaveBeenCalledWith(userId);
+      expect(microPostService.create).toHaveBeenCalledWith(
+        userId,
+        title,
+        file.path,
+        [1, 2, 3], // 数値配列になっていることを確認
+      );
+    });
+
+    it('should handle invalid categoryIds by converting them to NaN', async () => {
+      const userId = 1;
+      const title = 'Test Post';
+      const categoryIds = ['a', 'b', '3']; // 無効な値が含まれる
+      const file = { path: 'uploads/test.png' } as Express.Multer.File;
+      const mockUser = {
+        id: userId,
+        name: 'TestUser',
+        email: 'test@example.com',
+        isAdmin: false,
+      };
+      userService.find.mockResolvedValue(mockUser);
+
+      const mockMicroPost = {
+        id: 1,
+        userId,
+        title,
+        userName: mockUser.name,
+        imagePath: file.path,
+      };
+      microPostService.create.mockResolvedValue(mockMicroPost);
+
+      const result = await microPostController.create(userId, title, categoryIds, file);
+
+      expect(result).toEqual(mockMicroPost);
+      expect(userService.find).toHaveBeenCalledWith(userId);
+      expect(microPostService.create).toHaveBeenCalledWith(
+        userId,
+        title,
+        file.path,
+        [NaN, NaN, 3], // 無効な値はNaNになる
+      );
+    });
   });
 
   describe('index', () => {
