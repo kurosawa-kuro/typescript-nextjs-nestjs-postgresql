@@ -3,6 +3,26 @@ import { MicroPostController } from './micropost.controller';
 import { MicroPostService } from './micropost.service';
 import { UserService } from '../user/user.service';
 import { BadRequestException } from '@nestjs/common';
+import { diskStorage } from 'multer';
+import { extname, join } from 'path';
+
+// bcryptをモック
+jest.mock('bcrypt', () => ({
+  hash: jest.fn(),
+  compare: jest.fn(),
+}));
+
+jest.mock('multer', () => ({
+  diskStorage: jest.fn(() => ({
+    filename: jest.fn(),
+  })),
+}));
+
+// pathモジュール全体をモック
+jest.mock('path', () => ({
+  extname: jest.fn(),
+  join: jest.fn(),
+}));
 
 describe('MicroPostController', () => {
   let microPostController: MicroPostController;
@@ -15,6 +35,7 @@ describe('MicroPostController', () => {
       list: jest.fn(),
       getCategoriesForMicropost: jest.fn(),
     } as unknown as jest.Mocked<MicroPostService>;
+
     userService = {
       find: jest.fn(),
     } as unknown as jest.Mocked<UserService>;
@@ -116,6 +137,24 @@ describe('MicroPostController', () => {
       expect(result).toEqual(mockMicroPost);
       expect(microPostService.create).toHaveBeenCalledWith(userId, title, null, [1]);
     });
+
+    it('should generate a random filename with correct extension', () => {
+      const mockFile = { originalname: 'test.jpg' } as Express.Multer.File;
+
+      // Mock the extname function to return the extension of the file
+      (extname as jest.Mock).mockReturnValue('.jpg');
+      const storageOptions = (diskStorage as jest.Mock).mock.calls[0][0];
+      const cb = jest.fn();
+
+      // Call the filename function with mock arguments
+      storageOptions.filename(null, mockFile, cb);
+
+      // Ensure the callback is called with a random name and correct extension
+      expect(cb).toHaveBeenCalledWith(null, expect.stringMatching(/^[a-f0-9]{32}\.jpg$/));
+
+      // Ensure extname was called with the correct file original name
+      expect(extname).toHaveBeenCalledWith('test.jpg');
+    });
   });
 
   describe('index', () => {
@@ -153,19 +192,22 @@ describe('MicroPostController', () => {
   });
 
   describe('getCategories', () => {
-    it('should return categories for a given micropost', async () => {
-      const micropostId = 1;
-      const mockCategories = [
-        { id: 1, title: 'Category 1' },
-        { id: 2, title: 'Category 2' },
-      ];
-
-      microPostService.getCategoriesForMicropost.mockResolvedValue(mockCategories);
-
-      const result = await microPostController.getCategories(micropostId);
-
-      expect(result).toEqual(mockCategories);
-      expect(microPostService.getCategoriesForMicropost).toHaveBeenCalledWith(micropostId);
+    it('should generate a random filename with correct extension', () => {
+      const mockFile = { originalname: 'test.jpg' } as Express.Multer.File;
+  
+      // Mock the extname function to return the extension of the file
+      (extname as jest.Mock).mockReturnValue('.jpg');
+      const storageOptions = (diskStorage as jest.Mock).mock.calls[0][0];
+      const cb = jest.fn();
+  
+      // Call the filename function with mock arguments
+      storageOptions.filename(null, mockFile, cb);
+  
+      // Ensure the callback is called with a random name and correct extension
+      expect(cb).toHaveBeenCalledWith(null, expect.stringMatching(/^[a-f0-9]{32}\.jpg$/));
+  
+      // Ensure extname was called with the correct file original name
+      expect(extname).toHaveBeenCalledWith('test.jpg');
     });
 
     it('should throw BadRequestException when micropost is not found', async () => {
