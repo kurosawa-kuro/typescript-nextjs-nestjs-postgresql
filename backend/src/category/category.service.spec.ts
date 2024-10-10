@@ -101,4 +101,53 @@ describe('CategoryService', () => {
       await expect(categoryService.list()).rejects.toThrow('Query failed');
     });
   });
+
+  describe('findByName', () => {
+    it('should return a category by name', async () => {
+      const name = 'Test Category';
+      const mockCategory = { id: 1, title: name };
+      mockDatabaseService.executeQuery.mockResolvedValue({
+        command: 'SELECT',
+        rowCount: 1,
+        oid: 0,
+        rows: [mockCategory],
+        fields: [],
+      });
+  
+      const result = await categoryService.findByName(name);
+  
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
+        'SELECT id, title FROM category WHERE LOWER(title) = LOWER($1)',
+        [name],
+      );
+      expect(result).toEqual(mockCategory);
+    });
+  
+    it('should return undefined if no category is found', async () => {
+      const name = 'Nonexistent Category';
+      mockDatabaseService.executeQuery.mockResolvedValue({
+        command: 'SELECT',
+        rowCount: 0,
+        oid: 0,
+        rows: [],
+        fields: [],
+      });
+  
+      const result = await categoryService.findByName(name);
+  
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(
+        'SELECT id, title FROM category WHERE LOWER(title) = LOWER($1)',
+        [name],
+      );
+      expect(result).toBeUndefined();
+    });
+  
+    it('should throw an error if the query fails', async () => {
+      const name = 'Test Category';
+      mockDatabaseService.executeQuery.mockRejectedValue(new Error('Query failed'));
+  
+      await expect(categoryService.findByName(name)).rejects.toThrow('Query failed');
+    });
+  });
+  
 });
