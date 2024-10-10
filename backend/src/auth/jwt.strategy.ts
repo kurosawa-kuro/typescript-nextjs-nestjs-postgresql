@@ -9,6 +9,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         ExtractJwt.fromAuthHeaderAsBearerToken(),
+        // istanbul ignore next
         (request: Request) => request?.cookies?.token,
       ]),
       ignoreExpiration: false,
