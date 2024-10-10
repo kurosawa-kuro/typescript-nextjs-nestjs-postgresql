@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MicroPostService, MicroPost } from './micropost.service';
+import { MicroPostService, MicroPost, Category } from './micropost.service';
 import { DatabaseService } from '../database/database.service';
 import { QueryResult } from 'pg';
 import { Logger } from '@nestjs/common';
@@ -149,43 +149,114 @@ describe('MicroPostService', () => {
 
       console.log('Test completed: rollback transaction on error');
     });
-    //   console.log('Starting test: log appropriate messages');
-    //   const userId = 1;
-    //   const title = 'Test MicroPost';
-    //   const imagePath = 'path/to/image.jpg';
-    //   const categoryIds = [1, 2];
-    //   const mockMicroPost: MicroPost = {
-    //     id: 1,
-    //     userId,
-    //     title,
-    //     userName: 'TestUser',
-    //     imagePath,
-    //   };
+  });
 
-    //   const mockQueryResult: QueryResult = {
-    //     rows: [mockMicroPost],
-    //     command: '',
-    //     rowCount: 1,
-    //     oid: 0,
-    //     fields: [],
-    //   };
+  describe('list', () => {
+    it('should return all microposts in descending order of id', async () => {
+      console.log('Starting test: list all microposts');
+      const mockMicroPosts: MicroPost[] = [
+        { id: 2, userId: 2, title: 'Post 2', userName: 'User2', imagePath: null },
+        { id: 1, userId: 1, title: 'Post 1', userName: 'User1', imagePath: 'path/to/image.jpg' },
+      ];
 
-    //   mockDatabaseService.executeQuery
-    //     .mockResolvedValueOnce(mockQueryResult)
-    //     .mockResolvedValueOnce(mockQueryResult)
-    //     .mockResolvedValueOnce({ ...mockQueryResult, rows: [] })
-    //     .mockResolvedValueOnce({ ...mockQueryResult, rows: [] });
+      const mockQueryResult: QueryResult = {
+        rows: mockMicroPosts,
+        command: '',
+        rowCount: mockMicroPosts.length,
+        oid: 0,
+        fields: [],
+      };
 
-    //   await microPostService.create(userId, title, imagePath, categoryIds);
+      mockDatabaseService.executeQuery.mockResolvedValueOnce(mockQueryResult);
 
-    //   expect(mockLogger.log).toHaveBeenCalledWith(`Creating micropost: userId=${userId}, title=${title}, imagePath=${imagePath}, categoryIds=${categoryIds}`);
-    //   expect(mockLogger.debug).toHaveBeenCalledWith('Transaction begun');
-    //   expect(mockLogger.debug).toHaveBeenCalledWith(expect.stringContaining('Micropost created:'));
-    //   expect(mockLogger.debug).toHaveBeenCalledWith(`Categories associated: micropostId=1, categoryIds=${categoryIds}`);
-    //   expect(mockLogger.debug).toHaveBeenCalledWith('Transaction committed');
-    //   expect(mockLogger.log).toHaveBeenCalledWith(expect.stringContaining('Micropost created successfully:'));
+      const result = await microPostService.list();
 
-    //   console.log('Test completed: log appropriate messages');
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(expect.stringContaining('ORDER BY m.id DESC'));
+      expect(result).toEqual(mockMicroPosts);
+      expect(result[0].id).toBeGreaterThan(result[1].id);
+
+      expect(mockLogger.log).toHaveBeenCalledWith('Fetching all microposts');
+      expect(mockLogger.debug).toHaveBeenCalledWith(`Fetched ${mockMicroPosts.length} microposts`);
+
+      console.log('Test completed: list all microposts');
+    });
+
+    it('should throw an error if query fails', async () => {
+      console.log('Starting test: list microposts error');
+      mockDatabaseService.executeQuery.mockRejectedValueOnce(new Error('Database error'));
+
+      await expect(microPostService.list()).rejects.toThrow('Database error');
+
+      expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining('Error fetching microposts:'), expect.any(String));
+
+      console.log('Test completed: list microposts error');
+    });
+  });
+
+  describe('getCategoriesForMicropost', () => {
+    it('should return categories for a given micropost', async () => {
+      console.log('Starting test: get categories for micropost');
+      const micropostId = 1;
+      const mockCategories: Category[] = [
+        { id: 1, title: 'Category 1' },
+        { id: 2, title: 'Category 2' },
+      ];
+
+      const mockQueryResult: QueryResult = {
+        rows: mockCategories,
+        command: '',
+        rowCount: mockCategories.length,
+        oid: 0,
+        fields: [],
+      };
+
+      mockDatabaseService.executeQuery.mockResolvedValueOnce(mockQueryResult);
+
+      const result = await microPostService.getCategoriesForMicropost(micropostId);
+
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(expect.any(String), [micropostId]);
+      expect(result).toEqual(mockCategories);
+
+      expect(mockLogger.log).toHaveBeenCalledWith(`Fetching categories for micropost with id: ${micropostId}`);
+      expect(mockLogger.debug).toHaveBeenCalledWith(`Fetched ${mockCategories.length} categories for micropost with id: ${micropostId}`);
+
+      console.log('Test completed: get categories for micropost');
+    });
+
+    it('should return null if no categories are found', async () => {
+      console.log('Starting test: no categories found for micropost');
+      const micropostId = 1;
+
+      const mockQueryResult: QueryResult = {
+        rows: [],
+        command: '',
+        rowCount: 0,
+        oid: 0,
+        fields: [],
+      };
+
+      mockDatabaseService.executeQuery.mockResolvedValueOnce(mockQueryResult);
+
+      const result = await microPostService.getCategoriesForMicropost(micropostId);
+
+      expect(result).toBeNull();
+
+      expect(mockLogger.log).toHaveBeenCalledWith(`Fetching categories for micropost with id: ${micropostId}`);
+      expect(mockLogger.debug).toHaveBeenCalledWith(`No categories found for micropost with id: ${micropostId}`);
+
+      console.log('Test completed: no categories found for micropost');
+    });
+
+    // it('should throw an error if query fails', async () => {
+    //   console.log('Starting test: get categories for micropost error');
+    //   const micropostId = 1;
+    //   mockDatabaseService.executeQuery.mockRejectedValueOnce(new Error('Database error'));
+
+    //   await expect(microPostService.getCategoriesForMicropost(micropostId)).rejects.toThrow('Database error');
+
+    //   expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining(`Error fetching categories for micropost with id ${micropostId}:`), expect.any(String));
+
+    //   console.log('Test completed: get categories for micropost error');
     // });
   });
 });
