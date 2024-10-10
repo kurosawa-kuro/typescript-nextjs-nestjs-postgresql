@@ -97,7 +97,7 @@ describe('AuthController', () => {
         user: { id: 1, name: 'John', email: 'john@example.com' },
       });
       expect(mockResponse.cookie).toHaveBeenCalledWith(
-        'jwt',
+        'token',
         'abc123',
         expect.objectContaining({
           httpOnly: true,
@@ -140,13 +140,12 @@ describe('AuthController', () => {
         success: true,
         message: 'Successfully logged out',
       });
-      expect(mockResponse.clearCookie).toHaveBeenCalledWith('jwt');
+      expect(mockResponse.clearCookie).toHaveBeenCalledWith('token');
     });
   });
 
   describe('getProfile', () => {
     it('should return the user profile from the request', () => {
-      // Mock request object with user attached
       const mockRequest = {
         user: { id: 1, name: 'John Doe', email: 'john.doe@example.com' },
       };
@@ -161,7 +160,6 @@ describe('AuthController', () => {
     });
 
     it('should return undefined if user is not attached to the request', () => {
-      // Mock request object without user
       const mockRequest = {
         user: undefined,
       };
