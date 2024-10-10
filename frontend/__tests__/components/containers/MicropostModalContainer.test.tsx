@@ -105,4 +105,65 @@ describe('MicropostModalContainer', () => {
       expect(screen.getByText('User not found')).toBeInTheDocument();
     });
   });
+
+  it('handles image upload', async () => {
+    render(<MicropostModalContainer isOpen={true} onClose={() => {}} />);
+
+    const file = new File(['dummy content'], 'test.png', { type: 'image/png' });
+    const input = screen.getByLabelText('Upload a file');
+
+    fireEvent.change(input, { target: { files: [file] } });
+
+    await waitFor(() => {
+      expect(screen.getByAltText('Preview')).toBeInTheDocument();
+    });
+  });
+
+  it('submits form with image', async () => {
+    (createMicropost as jest.Mock).mockResolvedValue({ success: true });
+
+    render(<MicropostModalContainer isOpen={true} onClose={() => {}} />);
+
+    const file = new File(['dummy content'], 'test.png', { type: 'image/png' });
+    const input = screen.getByLabelText('Upload a file');
+
+    fireEvent.change(input, { target: { files: [file] } });
+    fireEvent.change(screen.getByLabelText('Title'), { target: { value: 'Test Title' } });
+    fireEvent.click(screen.getByText('Share'));
+
+    await waitFor(() => {
+      expect(createMicropost).toHaveBeenCalledWith(expect.any(FormData));
+      const formData = (createMicropost as jest.Mock).mock.calls[0][0];
+      expect(formData.get('title')).toBe('Test Title');
+      expect(formData.get('image')).toEqual(file);
+    });
+  });
+
+  it('handles unexpected error during form submission', async () => {
+    (createMicropost as jest.Mock).mockRejectedValue(new Error('Unexpected error'));
+
+    render(<MicropostModalContainer isOpen={true} onClose={() => {}} />);
+
+    fireEvent.change(screen.getByLabelText('Title'), { target: { value: 'Test Title' } });
+    fireEvent.click(screen.getByText('Share'));
+
+    await waitFor(() => {
+      expect(screen.getByText('An error occurred while creating the micropost')).toBeInTheDocument();
+    });
+  });
+  //   (createMicropost as jest.Mock).mockResolvedValue({ success: true });
+
+  //   const onCloseMock = jest.fn();
+  //   render(<MicropostModalContainer isOpen={true} onClose={onCloseMock} />);
+
+  //   fireEvent.change(screen.getByLabelText('Title'), { target: { value: 'Test Title' } });
+  //   fireEvent.click(screen.getByText('Category 1'));
+  //   fireEvent.click(screen.getByText('Share'));
+
+  //   await waitFor(() => {
+  //     expect(onCloseMock).toHaveBeenCalled();
+  //     expect(screen.queryByDisplayValue('Test Title')).not.toBeInTheDocument();
+  //     expect(screen.getByText('Category 1')).toHaveClass('bg-gray-200');
+  //   });
+  // });
 });
