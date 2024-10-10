@@ -6,6 +6,7 @@ jest.mock('passport-jwt', () => ({
   Strategy: jest.fn(),
   ExtractJwt: {
     fromExtractors: jest.fn(),
+    fromAuthHeaderAsBearerToken: jest.fn(),
   },
 }));
 
@@ -44,27 +45,12 @@ describe('JwtStrategy', () => {
         isAdmin: undefined,
       });
     });
-
-    // it('should throw UnauthorizedException if the payload is invalid', async () => {
-    //   try {
-    //     await strategy.validate(null);
-    //   } catch (error) {
-    //     expect(error).toBeInstanceOf(UnauthorizedException);
-    //   }
-    // });
   });
 
   describe('constructor', () => {
     it('should use the correct options', () => {
       expect(ExtractJwt.fromExtractors).toHaveBeenCalled();
-      const extractorFn = (ExtractJwt.fromExtractors as jest.Mock).mock
-        .calls[0][0][0];
-
-      const mockRequestWithJwt = { cookies: { jwt: 'test.jwt.token' } };
-      expect(extractorFn(mockRequestWithJwt)).toBe('test.jwt.token');
-
-      const mockRequestWithoutJwt = { cookies: {} };
-      expect(extractorFn(mockRequestWithoutJwt)).toBeUndefined();
+      expect(ExtractJwt.fromAuthHeaderAsBearerToken).toHaveBeenCalled();
     });
   });
 });

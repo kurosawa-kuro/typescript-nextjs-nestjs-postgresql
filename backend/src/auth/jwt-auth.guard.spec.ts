@@ -3,7 +3,6 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException } from '@nestjs/common';
 import { ExecutionContext } from '@nestjs/common';
-import { Request } from 'express';
 
 describe('JwtAuthGuard', () => {
   let guard: JwtAuthGuard;
@@ -32,8 +31,9 @@ describe('JwtAuthGuard', () => {
 
   it('should allow access when a valid token is provided', () => {
     const mockRequest = {
-      cookies: { jwt: 'valid.jwt.token' },
-    } as unknown as Request;
+      cookies: { token: 'valid.jwt.token' },
+      headers: {},
+    };
     const mockContext = {
       switchToHttp: () => ({
         getRequest: () => mockRequest,
@@ -46,13 +46,14 @@ describe('JwtAuthGuard', () => {
     });
 
     expect(guard.canActivate(mockContext)).toBe(true);
-    expect(mockRequest.user).toEqual({ userId: 1, email: 'test@example.com' });
+    expect(mockRequest['user']).toEqual({ userId: 1, email: 'test@example.com' });
   });
 
   it('should throw UnauthorizedException when no token is provided', () => {
     const mockRequest = {
       cookies: {},
-    } as unknown as Request;
+      headers: {},
+    };
     const mockContext = {
       switchToHttp: () => ({
         getRequest: () => mockRequest,
@@ -64,8 +65,9 @@ describe('JwtAuthGuard', () => {
 
   it('should throw UnauthorizedException when the token is invalid', () => {
     const mockRequest = {
-      cookies: { jwt: 'invalid.jwt.token' },
-    } as unknown as Request;
+      cookies: { token: 'invalid.jwt.token' },
+      headers: {},
+    };
     const mockContext = {
       switchToHttp: () => ({
         getRequest: () => mockRequest,
