@@ -227,5 +227,19 @@ describe('MicroPostService', () => {
 
       expect(result).toBeNull();
     });
+
+    it('should throw an error if the query fails', async () => {
+      const micropostId = 1;
+      const errorMessage = 'Database query failed';
+      
+      // Mock the executeQuery method to reject with an error
+      mockDatabaseService.executeQuery.mockRejectedValueOnce(new Error(errorMessage));
+  
+      // Expect the service method to throw the same error
+      await expect(microPostService.getCategoriesForMicropost(micropostId)).rejects.toThrow(errorMessage);
+      
+      // Ensure executeQuery was called with the correct arguments
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(expect.any(String), [micropostId]);
+    });
   });
 });
