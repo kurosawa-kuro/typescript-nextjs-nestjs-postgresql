@@ -1,5 +1,3 @@
-// __tests__/e2e/micropost.e2e-spec.ts
-
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { DatabaseService } from '../../src/database/database.service';
@@ -43,10 +41,13 @@ describe('MicroPostController (e2e)', () => {
 
     expect(response.body).toMatchObject({
       id: expect.any(Number),
-      userId: user.id,
       title: 'Test Micropost',
-      imagePath: expect.stringMatching(/^uploads[\/\\].+\.png$/),
-      userName: 'Test User',
+      imagePath: expect.stringMatching(/^[a-f0-9]{32}\.png$/),
+      user: {
+        id: user.id,
+        name: 'Test User',
+        avatarPath: expect.any(String),
+      },
     });
   });
 
@@ -74,20 +75,24 @@ describe('MicroPostController (e2e)', () => {
       expect.arrayContaining([
         expect.objectContaining({
           id: expect.any(Number),
-          userId: user.id,
           title: 'Test Micropost 2',
-          imagePath: 'uploads/image2.jpg',
-          userName: 'Test User',
-          userAvatarPath: expect.any(String),
+          imagePath: 'image2.jpg',
+          user: {
+            id: user.id,
+            name: 'Test User',
+            avatarPath: expect.any(String),
+          },
           categories: expect.any(Array),
         }),
         expect.objectContaining({
           id: expect.any(Number),
-          userId: user.id,
           title: 'Test Micropost 1',
-          imagePath: 'uploads/image1.jpg',
-          userName: 'Test User',
-          userAvatarPath: expect.any(String),
+          imagePath: 'image1.jpg',
+          user: {
+            id: user.id,
+            name: 'Test User',
+            avatarPath: expect.any(String),
+          },
           categories: expect.any(Array),
         }),
       ]),
