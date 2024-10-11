@@ -1,7 +1,7 @@
 // frontend\__tests__\actions\micropostActions.test.ts
 
 import { createMicropost, getMicroposts } from '../../src/app/actions/microposts';
-import { ApiClient } from '../../src/app/api/apiClient';
+import { ApiClient } from '../../src/app/services/apiClient';
 import { MicroPost } from '../../src/app/types/models';
 
 jest.mock('../../src/app/api/apiClient');

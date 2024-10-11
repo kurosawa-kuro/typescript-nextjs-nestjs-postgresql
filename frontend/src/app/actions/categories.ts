@@ -1,7 +1,7 @@
 'use server'
 
 import { Category, MicroPost } from '../types/models'
-import { ApiClient } from '../api/apiClient'
+import { ApiClient } from '../services/apiClient'
 
 export async function getCategories(): Promise<Category[]> {
   try {

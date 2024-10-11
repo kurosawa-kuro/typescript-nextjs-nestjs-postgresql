@@ -1,5 +1,5 @@
 import { getCategories, getCategoryId, getCategoryMicroposts } from '../../src/app/actions/categories';
-import { ApiClient } from '../../src/app/api/apiClient';
+import { ApiClient } from '../../src/app/services/apiClient';
 import { Category, MicroPost } from '../../src/app/types/models';
 
 jest.mock('../../src/app/api/apiClient');

@@ -1,5 +1,5 @@
 import { getUserProfile } from '../../src/app/actions/users';
-import { ApiClient } from '../../src/app/api/apiClient';
+import { ApiClient } from '../../src/app/services/apiClient';
 import { User } from '../../src/app/types/models';
 
 // モックのインポート

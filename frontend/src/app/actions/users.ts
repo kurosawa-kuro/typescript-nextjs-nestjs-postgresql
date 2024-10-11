@@ -2,7 +2,7 @@
 
 import { User } from '../types/models';
 import { cookies } from 'next/headers';
-import { ApiClient } from '../api/apiClient';
+import { ApiClient } from '../services/apiClient';
 
 export async function getUserProfile(): Promise<User | null> {
   try {

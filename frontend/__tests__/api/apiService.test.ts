@@ -1,5 +1,5 @@
-import { ApiService } from '../../src/app/api/apiService';
-import { ApiClient } from '../../src/app/api/apiClient';
+import { ApiService } from '../../src/app/services/apiService';
+import { ApiClient } from '../../src/app/services/apiClient';
 import { LoginResponse, User } from '../../src/app/types/models';
 
 // Mock the ApiClient

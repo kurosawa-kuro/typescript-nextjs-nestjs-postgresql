@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { AuthState, User, ApiError } from '../types/models';
-import { ApiService } from '../api/apiService';
+import { ApiService } from '../services/apiService';
 import { setCookie, deleteCookie, getCookie } from 'cookies-next';
 
 export const useAuthStore = create<AuthState>((set) => ({

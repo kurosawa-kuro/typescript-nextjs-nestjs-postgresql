@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { useAuthStore } from '../../src/app/store/useAuthStore';
-import { ApiService } from '../../src/app/api/apiService';
+import { ApiService } from '../../src/app/services/apiService';
 import { setCookie, getCookie, deleteCookie } from 'cookies-next';
 
 // Mock ApiService and cookies-next

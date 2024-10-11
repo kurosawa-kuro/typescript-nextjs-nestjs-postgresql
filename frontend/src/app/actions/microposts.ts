@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { MicroPost } from '../types/models'
-import { ApiClient } from '../api/apiClient'
+import { ApiClient } from '../services/apiClient'
 
 export async function createMicropost(formData: FormData): Promise<{ success: boolean; micropost?: MicroPost; error?: string }> {
   try {
