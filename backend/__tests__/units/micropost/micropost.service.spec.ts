@@ -142,6 +142,43 @@ describe('MicroPostService', () => {
       expect(mockDatabaseService.executeQuery).toHaveBeenNthCalledWith(2, expect.stringContaining('INSERT INTO micropost'), [userId, title, imagePath]);
       expect(mockDatabaseService.executeQuery).toHaveBeenNthCalledWith(3, 'ROLLBACK');
     });
+
+    it('should rollback transaction if COMMIT fails', async () => {
+      const userId = 1;
+      const title = 'Test MicroPost';
+      const imagePath = 'path/to/image.jpg';
+      const categoryIds = [1, 2];
+
+      const mockMicroPost: MicroPost = {
+        id: 1,
+        userId,
+        title,
+        userName: 'TestUser',
+        imagePath,
+        userAvatarPath: 'path/to/avatar.jpg',
+        categories: [],
+      };
+
+      const mockQueryResult: QueryResult = {
+        rows: [mockMicroPost],
+        command: '',
+        rowCount: 1,
+        oid: 0,
+        fields: [],
+      };
+
+      mockDatabaseService.executeQuery
+        .mockResolvedValueOnce({ rows: [], command: '', rowCount: 0, oid: 0, fields: [] }) // BEGIN
+        .mockResolvedValueOnce(mockQueryResult) // INSERT micropost
+        .mockResolvedValueOnce({ rows: [], command: '', rowCount: 0, oid: 0, fields: [] }) // INSERT categories
+        .mockRejectedValueOnce(new Error('COMMIT failed')) // COMMIT fails
+        .mockResolvedValueOnce({ rows: [], command: '', rowCount: 0, oid: 0, fields: [] }); // ROLLBACK
+
+      await expect(microPostService.create(userId, title, imagePath, categoryIds)).rejects.toThrow('COMMIT failed');
+
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledTimes(5);
+      expect(mockDatabaseService.executeQuery).toHaveBeenNthCalledWith(5, 'ROLLBACK');
+    });
   });
 
   describe('list', () => {
@@ -172,6 +209,66 @@ describe('MicroPostService', () => {
       mockDatabaseService.executeQuery.mockRejectedValueOnce(new Error('Database error'));
 
       await expect(microPostService.list()).rejects.toThrow('Database error');
+    });
+  });
+
+  describe('findById', () => {
+    it('should return a micropost when found', async () => {
+      const micropostId = 1;
+      const mockMicropost: MicroPost = {
+        id: micropostId,
+        userId: 1,
+        title: 'Test Micropost',
+        userName: 'User1',
+        imagePath: 'path/to/image.jpg',
+        userAvatarPath: 'path/to/avatar.jpg',
+        categories: [{ id: 1, title: 'Category 1' }],
+      };
+
+      const mockQueryResult: QueryResult = {
+        rows: [mockMicropost],
+        command: '',
+        rowCount: 1,
+        oid: 0,
+        fields: [],
+      };
+
+      mockDatabaseService.executeQuery.mockResolvedValueOnce(mockQueryResult);
+
+      const result = await microPostService.findById(micropostId);
+
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(expect.any(String), [micropostId]);
+      expect(result).toEqual(mockMicropost);
+    });
+
+    it('should return null when micropost is not found', async () => {
+      const micropostId = 1;
+
+      const mockQueryResult: QueryResult = {
+        rows: [],
+        command: '',
+        rowCount: 0,
+        oid: 0,
+        fields: [],
+      };
+
+      mockDatabaseService.executeQuery.mockResolvedValueOnce(mockQueryResult);
+
+      const result = await microPostService.findById(micropostId);
+
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(expect.any(String), [micropostId]);
+      expect(result).toBeNull();
+    });
+
+    it('should throw an error if executeQuery fails in findById', async () => {
+      const micropostId = 1;
+      const errorMessage = 'Database error';
+
+      mockDatabaseService.executeQuery.mockRejectedValueOnce(new Error(errorMessage));
+
+      await expect(microPostService.findById(micropostId)).rejects.toThrow(errorMessage);
+
+      expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(expect.any(String), [micropostId]);
     });
   });
 
