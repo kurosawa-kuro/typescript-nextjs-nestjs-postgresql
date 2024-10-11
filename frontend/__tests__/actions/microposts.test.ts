@@ -4,7 +4,7 @@ import { createMicropost, getMicroposts } from '../../src/app/actions/microposts
 import { ApiClient } from '../../src/app/services/apiClient';
 import { MicroPost } from '../../src/app/types/models';
 
-jest.mock('../../src/app/api/apiClient');
+jest.mock('../../src/app/services/apiClient');
 jest.mock('next/cache', () => ({
   revalidatePath: jest.fn(),
 }));

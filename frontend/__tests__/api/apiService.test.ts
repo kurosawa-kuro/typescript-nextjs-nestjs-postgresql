@@ -3,7 +3,7 @@ import { ApiClient } from '../../src/app/services/apiClient';
 import { LoginResponse, User } from '../../src/app/types/models';
 
 // Mock the ApiClient
-jest.mock('../../src/app/api/apiClient');
+jest.mock('../../src/app/services/apiClient');
 
 describe('ApiService', () => {
   const mockEmail = 'test@example.com';

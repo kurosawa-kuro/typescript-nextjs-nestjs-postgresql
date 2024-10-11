@@ -5,7 +5,7 @@ import { ApiService } from '../../src/app/services/apiService';
 import { setCookie, getCookie, deleteCookie } from 'cookies-next';
 
 // Mock ApiService and cookies-next
-jest.mock('../../src/app/api/apiService');
+jest.mock('../../src/app/services/apiService');
 jest.mock('cookies-next');
 
 describe('useAuthStore', () => {

@@ -2,7 +2,7 @@ import { getCategories, getCategoryId, getCategoryMicroposts } from '../../src/a
 import { ApiClient } from '../../src/app/services/apiClient';
 import { Category, MicroPost } from '../../src/app/types/models';
 
-jest.mock('../../src/app/api/apiClient');
+jest.mock('../../src/app/services/apiClient');
 
 describe('Category Actions', () => {
   beforeEach(() => {

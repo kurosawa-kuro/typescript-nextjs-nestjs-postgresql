@@ -6,7 +6,7 @@ import { User } from '../../src/app/types/models';
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),
 }));
-jest.mock('../../src/app/api/apiClient');
+jest.mock('../../src/app/services/apiClient');
 
 describe('getUserProfile', () => {
   beforeEach(() => {
