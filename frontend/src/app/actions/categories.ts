@@ -21,10 +21,15 @@ export async function getCategoryId(categoryName: string): Promise<number | null
 
 export async function getCategoryMicroposts(categoryName: string): Promise<Micropost[]> {
   try {
-    const microposts = await ApiClient.get<Micropost[]>(`/categories/${encodeURIComponent(categoryName)}/microposts`)
-    return microposts.filter((post): post is Micropost => post !== undefined)
+    const categoryId = await getCategoryId(categoryName);
+    if (!categoryId) {
+      console.error('Category not found:', categoryName);
+      return [];
+    }
+    const microposts = await ApiClient.get<Micropost[]>(`/categories/${categoryId}/microposts`);
+    return microposts.filter((post): post is Micropost => post !== undefined);
   } catch (error) {
-    console.error('Error fetching category microposts:', error)
-    return []
+    console.error('Error fetching category microposts:', error);
+    return [];
   }
 }
