@@ -21,9 +21,7 @@ describe('Micropost Actions', () => {
       const mockImage = new File(['test'], 'test.png', { type: 'image/png' });
       const mockNewMicropost: MicroPost = {
         id: 1,
-        // userId: 1,
         title: mockTitle,
-        // userName: 'TestUser',
         imagePath: '/uploads/test.png',
         user: {
           id: 1,
