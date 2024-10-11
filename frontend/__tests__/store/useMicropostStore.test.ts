@@ -1,49 +1,56 @@
 import { renderHook, act } from '@testing-library/react';
 import { useMicropostStore } from '../../src/app/store/useMicropostStore';
+import { MicroPost } from '@/app/types/models';
 
 describe('useMicropostStore', () => {
   beforeEach(() => {
-    useMicropostStore.getState().setMicroposts([]);
+    useMicropostStore.getState().setMicroPosts([]);
   });
 
   it('should initialize with empty microposts', () => {
     const { result } = renderHook(() => useMicropostStore());
-    expect(result.current.microposts).toEqual([]);
+    expect(result.current.MicroPosts).toEqual([]);
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBeNull();
   });
 
   it('should set microposts', () => {
     const { result } = renderHook(() => useMicropostStore());
-    const testMicroposts = [
-      { id: 1, userId: 1, title: 'Test Post 1', userName: 'User1' },
-      { id: 2, userId: 2, title: 'Test Post 2', userName: 'User2' },
+    const testMicroposts: MicroPost[] = [
+      { id: 1, user: { id: 1, name: 'User1', avatarPath: '' }, title: 'Test Post 1', imagePath: '', categories: [] },
+      { id: 2, user: { id: 2, name: 'User2', avatarPath: '' }, title: 'Test Post 2', imagePath: '', categories: [] },
     ];
 
     act(() => {
-      result.current.setMicroposts(testMicroposts);
+      result.current.setMicroPosts(testMicroposts);
     });
 
-    expect(result.current.microposts).toEqual(testMicroposts);
+    expect(result.current.MicroPosts).toEqual(testMicroposts);
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBeNull();
   });
 
   it('should add a new micropost', () => {
     const { result } = renderHook(() => useMicropostStore());
-    const initialMicroposts = [
-      { id: 1, userId: 1, title: 'Test Post 1', userName: 'User1' },
+    const initialMicroposts: MicroPost[] = [
+      { id: 1, user: { id: 1, name: 'User1', avatarPath: '' }, title: 'Test Post 1', imagePath: '', categories: [] },
     ];
-    const newMicropost = { id: 2, userId: 2, title: 'New Post', userName: 'User2' };
+    const newMicropost: MicroPost = { 
+      id: 2, 
+      user: { id: 2, name: 'User2', avatarPath: '' }, 
+      title: 'New Post', 
+      imagePath: '', 
+      categories: [] 
+    };
 
     act(() => {
-      result.current.setMicroposts(initialMicroposts);
+      result.current.setMicroPosts(initialMicroposts);
     });
 
     act(() => {
-      result.current.addMicropost(newMicropost);
+      result.current.addMicroPost(newMicropost);
     });
 
-    expect(result.current.microposts).toEqual([newMicropost, ...initialMicroposts]);
+    expect(result.current.MicroPosts).toEqual([newMicropost, ...initialMicroposts]);
   });
 });

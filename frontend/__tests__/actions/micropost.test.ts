@@ -2,7 +2,7 @@
 
 import { createMicropost, getMicroposts } from '../../src/app/actions/microposts';
 import { ApiClient } from '../../src/app/api/apiClient';
-import { Micropost } from '../../src/app/types/models';
+import { MicroPost } from '../../src/app/types/models';
 
 jest.mock('../../src/app/api/apiClient');
 jest.mock('next/cache', () => ({
@@ -19,12 +19,18 @@ describe('Micropost Actions', () => {
       const mockTitle = 'Test Micropost';
       const mockUserId = '1';
       const mockImage = new File(['test'], 'test.png', { type: 'image/png' });
-      const mockNewMicropost: Micropost = {
+      const mockNewMicropost: MicroPost = {
         id: 1,
-        userId: 1,
+        // userId: 1,
         title: mockTitle,
-        userName: 'TestUser',
-        imagePath: '/uploads/test.png'
+        // userName: 'TestUser',
+        imagePath: '/uploads/test.png',
+        user: {
+          id: 1,
+          name: 'TestUser',
+          avatarPath: null,
+        },
+        categories: []
       };
 
       const formData = new FormData();
