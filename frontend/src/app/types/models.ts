@@ -19,8 +19,9 @@ export interface Micropost {
   id: number;
   userId: number;
   title: string;
+  imagePath: string | null;
   userName: string;
-  imagePath?: string;
+  userAvatarPath: string | null;
 }
 
 export interface AsyncOperationState {

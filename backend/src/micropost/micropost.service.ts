@@ -7,6 +7,7 @@ export interface MicroPost {
   title: string;
   imagePath: string | null;
   userName: string;
+  userAvatarPath: string | null;
 }
 
 export interface Category {
@@ -31,7 +32,8 @@ export class MicroPostService {
         INSERT INTO micropost(user_id, title, image_path) 
         VALUES($1, $2, $3) 
         RETURNING id, user_id as "userId", title, image_path as "imagePath",
-          (SELECT name FROM "user" WHERE id = $1) as "userName"
+          (SELECT name FROM "user" WHERE id = $1) as "userName",
+          (SELECT avatar_path FROM "user" WHERE id = $1) as "userAvatarPath"
       `;
       const micropostResult = await this.databaseService.executeQuery(insertMicropostQuery, [userId, title, imagePath]);
       const micropost = micropostResult.rows[0];
@@ -55,7 +57,8 @@ export class MicroPostService {
   async list(): Promise<MicroPost[]> {
     try {
       const query = `
-      SELECT m.id, m.user_id as "userId", m.title, m.image_path as "imagePath", u.name as "userName"
+      SELECT m.id, m.user_id as "userId", m.title, m.image_path as "imagePath", 
+             u.name as "userName", u.avatar_path as "userAvatarPath"
       FROM micropost m
       JOIN "user" u ON m.user_id = u.id
       ORDER BY m.id DESC

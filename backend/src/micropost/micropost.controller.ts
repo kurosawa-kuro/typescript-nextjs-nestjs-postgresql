@@ -30,7 +30,7 @@ export class MicroPostController {
         filename: (req, file, cb) => {
           const randomName = Array(32)
             .fill(null)
-            .map(() => Math.floor(Math.random() * 16).toString(16))  // Math.floorを使用
+            .map(() => Math.floor(Math.random() * 16).toString(16))
             .join('');
 
           return cb(null, `${randomName}${extname(file.originalname)}`);
@@ -44,7 +44,6 @@ export class MicroPostController {
     @Body('categoryIds') categoryIds: string | string[],
     @UploadedFile() file: Express.Multer.File,
   ): Promise<MicroPost> {
-
     if (!title) {
       throw new BadRequestException('Title is required');
     }
@@ -70,8 +69,7 @@ export class MicroPostController {
 
   @Get()
   async index(): Promise<MicroPost[]> {
-    const microposts = await this.microPostService.list();
-    return microposts;
+    return this.microPostService.list();
   }
 
   @Get(':id/categories')
