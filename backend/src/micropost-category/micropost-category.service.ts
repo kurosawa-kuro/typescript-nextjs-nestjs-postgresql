@@ -27,13 +27,14 @@ export class MicropostCategoryService {
 
   async microposts(categoryId: number) {
     const query = `
-      SELECT m.id, m.user_id as "userId", m.title, m.image_path as "imagePath", u.name as "userName"
-      FROM micropost m
-      JOIN micropost_category mc ON m.id = mc.micropost_id
-      JOIN "user" u ON m.user_id = u.id
-      WHERE mc.category_id = $1
-      ORDER BY m.id DESC
-    `;
+    SELECT m.id, m.user_id as "userId", m.title, m.image_path as "imagePath",
+           u.name as "userName", u.avatar_path as "userAvatarPath"
+    FROM micropost m
+    JOIN micropost_category mc ON m.id = mc.micropost_id
+    JOIN "user" u ON m.user_id = u.id
+    WHERE mc.category_id = $1
+    ORDER BY m.id DESC
+  `;
     const result = await this.pool.query(query, [categoryId]);
     return result.rows;
   }
