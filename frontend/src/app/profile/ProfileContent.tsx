@@ -1,7 +1,6 @@
-'use client';
-
 import { User } from '../types/models';
 import { ErrorMessage } from '../components/common/ErrorMessage';
+import Image from 'next/image';
 
 interface ProfileContentProps {
   initialProfile: User | null;
@@ -14,14 +13,32 @@ export function ProfileContent({ initialProfile }: ProfileContentProps) {
     return <ErrorMessage message="User not found" />;
   }
 
+  // バックエンドの画像URLを構築する関数
+  const getAvatarUrl = (path: string) => {
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return path;
+    }
+    return `http://localhost:3001/uploads/${path}`;
+  };
+
   return (
     <div className="bg-white shadow-md rounded-lg p-6">
       <h2 className="text-2xl font-bold text-gray-700 mb-6">User Profile</h2>
       <div className="flex flex-col md:flex-row items-center md:items-start mb-6">
         <div className="w-32 h-32 rounded-full overflow-hidden mb-4 md:mb-0 md:mr-6 flex-shrink-0">
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
-            No Image
-          </div>
+          {user.avatar_path ? (
+            <Image
+              src={getAvatarUrl(user.avatar_path)}
+              alt={`${user.name}'s avatar`}
+              width={128}
+              height={128}
+              className="object-cover w-full h-full"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
+              No Image
+            </div>
+          )}
         </div>
         <div className="flex-grow space-y-3">
           <div>

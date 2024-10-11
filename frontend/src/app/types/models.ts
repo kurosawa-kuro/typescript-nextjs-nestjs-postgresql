@@ -5,6 +5,7 @@ export interface User {
   name: string;
   email: string;
   isAdmin: boolean; 
+  avatar_path: string;
 }
 
 export interface LoginResponse {
