@@ -23,7 +23,7 @@ export const useAuthStore = create<AuthState>((set) => ({
           isLoading: false,
           error: null
         });
-        setCookie('token', data.token, { maxAge: 30 * 24 * 60 * 60 });
+        setCookie('jwt', data.token, { maxAge: 30 * 24 * 60 * 60 });
         localStorage.setItem('user', JSON.stringify(data.user));
         return true;
       } else {
@@ -51,7 +51,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: () => {
-    deleteCookie('token');
+    deleteCookie('jwt');
     localStorage.removeItem('user');
     set({
       isLoggedIn: false,
@@ -62,39 +62,42 @@ export const useAuthStore = create<AuthState>((set) => ({
     });
   },
 
-  initializeAuth: () => {
-    const storedUser = localStorage.getItem('user');
-    const storedToken = getCookie('token');
-    if (storedUser && storedToken) {
+  initializeAuth: async () => {
+    const storedToken = getCookie('jwt');
+    if (storedToken) {
       try {
-        const user: User = JSON.parse(storedUser);
-        set({
-          isLoggedIn: true,
-          currentUser: user,
-          isLoading: false,
-          error: null
-        });
+        const user = await ApiService.getUserProfile();
+        if (user) {
+          set({
+            isLoggedIn: true,
+            currentUser: user,
+            isLoading: false,
+            error: null
+          });
+          return;
+        }
       } catch (error) {
-        console.error('Error parsing stored user:', error);
-        set({
-          isLoggedIn: false,
-          currentUser: null,
-          isLoading: false,
-          error: 'Error initializing auth'
-        });
+        console.error('Error getting user profile:', error);
       }
-    } else {
-      set({
-        isLoggedIn: false,
-        currentUser: null,
-        isLoading: false,
-        error: null
-      });
     }
+    
+    // If profile fetch fails or there's no token, reset the state
+    set({
+      isLoggedIn: false,
+      currentUser: null,
+      isLoading: false,
+      error: null
+    });
+  },
+
+  checkAuthStatus: async () => {
+    set({ isLoading: true });
+    await useAuthStore.getState().initializeAuth();
+    set({ isLoading: false });
   }
 }));
 
-// Hydrate the store with persisted data on the client side
+// Initialize auth on the client side
 if (typeof window !== 'undefined') {
   useAuthStore.getState().initializeAuth();
 }
