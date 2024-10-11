@@ -36,10 +36,8 @@ export class UserController {
       };
 
       const user = await this.userService.create(userCreationData);
-      console.log({ message: 'User created', user });
       return { message: 'User created', user };
     } catch (error) {
-      console.error('Error creating user:', error);
       throw new BadRequestException('Failed to create user');
     }
   }

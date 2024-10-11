@@ -46,7 +46,6 @@ export function ProfileContent({ initialProfile }: ProfileContentProps) {
       </div>
       <div className="mt-6">
         <button 
-          onClick={() => console.log('Edit profile clicked')} 
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
         >
           Edit Profile

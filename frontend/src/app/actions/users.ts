@@ -8,7 +8,6 @@ export async function getUserProfile(): Promise<User | null> {
     const token = cookieStore.get('token')?.value;
 
     if (!token) {
-      console.log('No token found in cookies');
       return null;
     }
 

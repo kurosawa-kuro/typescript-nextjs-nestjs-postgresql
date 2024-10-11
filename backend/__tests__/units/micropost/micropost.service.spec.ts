@@ -41,7 +41,6 @@ describe('MicroPostService', () => {
 
   describe('create', () => {
     it('should create a new micropost with categories', async () => {
-      console.log('Starting test: create a new micropost with categories');
       const userId = 1;
       const title = 'Test MicroPost';
       const imagePath = 'path/to/image.jpg';
@@ -69,7 +68,6 @@ describe('MicroPostService', () => {
         .mockResolvedValueOnce({ ...mockQueryResult, rows: [] }); // COMMIT
 
       const result = await microPostService.create(userId, title, imagePath, categoryIds);
-      console.log('Micropost created:', result);
 
       expect(mockDatabaseService.executeQuery).toHaveBeenCalledTimes(4);
       expect(mockDatabaseService.executeQuery).toHaveBeenNthCalledWith(1, 'BEGIN');
@@ -80,7 +78,6 @@ describe('MicroPostService', () => {
     });
 
     it('should create a new micropost without categories', async () => {
-      console.log('Starting test: create a new micropost without categories');
       const userId = 1;
       const title = 'Test MicroPost';
       const imagePath = null;
@@ -107,7 +104,6 @@ describe('MicroPostService', () => {
         .mockResolvedValueOnce({ ...mockQueryResult, rows: [] }); // COMMIT
 
       const result = await microPostService.create(userId, title, imagePath, categoryIds);
-      console.log('Micropost created:', result);
 
       expect(mockDatabaseService.executeQuery).toHaveBeenCalledTimes(3);
       expect(mockDatabaseService.executeQuery).toHaveBeenNthCalledWith(1, 'BEGIN');
@@ -117,7 +113,6 @@ describe('MicroPostService', () => {
     });
 
     it('should rollback transaction on error', async () => {
-      console.log('Starting test: rollback transaction on error');
       const userId = 1;
       const title = 'Test MicroPost';
       const imagePath = 'path/to/image.jpg';
@@ -147,7 +142,6 @@ describe('MicroPostService', () => {
 
   describe('list', () => {
     it('should return all microposts in descending order of id', async () => {
-      console.log('Starting test: list all microposts');
       const mockMicroPosts: MicroPost[] = [
         { id: 2, userId: 2, title: 'Post 2', userName: 'User2', imagePath: null },
         { id: 1, userId: 1, title: 'Post 1', userName: 'User1', imagePath: 'path/to/image.jpg' },
@@ -171,7 +165,6 @@ describe('MicroPostService', () => {
     });
 
     it('should throw an error if query fails', async () => {
-      console.log('Starting test: list microposts error');
       mockDatabaseService.executeQuery.mockRejectedValueOnce(new Error('Database error'));
 
       await expect(microPostService.list()).rejects.toThrow('Database error');
@@ -180,7 +173,6 @@ describe('MicroPostService', () => {
 
   describe('getCategoriesForMicropost', () => {
     it('should return categories for a given micropost', async () => {
-      console.log('Starting test: get categories for micropost');
       const micropostId = 1;
       const mockCategories: Category[] = [
         { id: 1, title: 'Category 1' },
@@ -204,7 +196,6 @@ describe('MicroPostService', () => {
     });
 
     it('should return null if no categories are found', async () => {
-      console.log('Starting test: no categories found for micropost');
       const micropostId = 1;
 
       const mockQueryResult: QueryResult = {
