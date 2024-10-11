@@ -12,7 +12,7 @@ interface MicropostDetailModalProps {
 const API_BASE_URL = 'http://localhost:3001';
 
 export const MicropostDetailModal: React.FC<MicropostDetailModalProps> = ({ post, onClose }) => {
-  const imageUrl = post.imagePath ? `${API_BASE_URL}/${ImageUtils.normalizePath(post.imagePath)}` : null;
+  const imageUrl = post.imagePath ? `${API_BASE_URL}/uploads/${ImageUtils.normalizePath(post.imagePath)}` : null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
