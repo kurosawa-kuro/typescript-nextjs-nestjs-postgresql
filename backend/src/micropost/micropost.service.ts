@@ -43,11 +43,6 @@ export class MicroPostService {
       const micropostResult = await this.databaseService.executeQuery(insertMicropostQuery, [userId, title, cleanedImagePath]);
       const micropost = micropostResult.rows[0];
 
-      // Add 'uploads/' prefix to imagePath
-      if (micropost.imagePath) {
-        micropost.imagePath = 'uploads/' + micropost.imagePath;
-      }
-
       if (categoryIds && categoryIds.length > 0) {
         const insertCategoryQuery = `
           INSERT INTO micropost_category(micropost_id, category_id)
@@ -81,9 +76,7 @@ export class MicroPostService {
 
     // Add 'uploads/' prefix to imagePath
     return result.rows.map(micropost => {
-      if (micropost.imagePath) {
-        micropost.imagePath = 'uploads/' + micropost.imagePath;
-      }
+
       return micropost;
     });
   }
@@ -106,11 +99,6 @@ export class MicroPostService {
       return null;
     }
     const micropost = result.rows[0];
-
-    // Add 'uploads/' prefix to imagePath
-    if (micropost.imagePath) {
-      micropost.imagePath = 'uploads/' + micropost.imagePath;
-    }
 
     return micropost;
   }

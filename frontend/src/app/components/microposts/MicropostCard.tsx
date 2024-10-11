@@ -1,7 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import Image from 'next/image';
 import { Micropost } from '../../types/models';
-import { ImageUtils } from '../../lib/utils/imageUtils';
 
 interface MicropostCardProps {
   post?: Micropost;
@@ -20,7 +18,7 @@ export const MicropostCard: React.FC<MicropostCardProps> = ({ post, onClick }) =
       return path;
     }
     // Remove any leading 'uploads/' and normalize the path
-    const normalizedPath = ImageUtils.normalizePath(path.replace(/^uploads\//, ''));
+    const normalizedPath = path.replace(/^uploads\//, '').replace(/\\/g, '/');
     return `${API_BASE_URL}/uploads/${normalizedPath}`;
   };
 
@@ -55,11 +53,10 @@ export const MicropostCard: React.FC<MicropostCardProps> = ({ post, onClick }) =
     <div className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer" onClick={handleClick}>
       <div className="relative w-full h-48">
         {imageUrl && !imageError ? (
-          <Image
+          <img
             src={imageUrl}
             alt={post.title}
-            fill
-            style={{ objectFit: 'cover' }}
+            className="w-full h-full object-cover"
             onError={handleImageError}
           />
         ) : (
@@ -74,12 +71,10 @@ export const MicropostCard: React.FC<MicropostCardProps> = ({ post, onClick }) =
         <div className="flex items-center mb-2">
           <div className="w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0">
             {avatarUrl && !avatarError ? (
-              <Image
+              <img
                 src={avatarUrl}
                 alt={`${post.userName}'s avatar`}
-                width={40}
-                height={40}
-                style={{ objectFit: 'cover' }}
+                className="w-full h-full object-cover"
                 onError={handleAvatarError}
               />
             ) : (
@@ -90,6 +85,7 @@ export const MicropostCard: React.FC<MicropostCardProps> = ({ post, onClick }) =
           </div>
           <div>
             <h2 className="text-lg font-semibold text-gray-900">{post.title}</h2>
+            <p className="text-sm text-gray-600">{post.userName}</p>
           </div>
         </div>
       </div>

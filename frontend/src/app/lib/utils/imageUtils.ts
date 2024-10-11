@@ -8,6 +8,10 @@ export const ImageUtils = {
   },
 
   normalizePath: (path: string) => {
-    return path.replace(/\\/g, '/');
+    console.log('Original path:', path);
+    // パスが既に 'uploads/' で始まっている場合は追加しない
+    const normalizedPath = path.startsWith('uploads/') ? path : `uploads/${path}`;
+    console.log('Normalized path:', normalizedPath);
+    return normalizedPath.replace(/\\/g, '/');
   }
 };

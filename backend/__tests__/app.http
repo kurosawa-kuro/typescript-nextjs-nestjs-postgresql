@@ -97,6 +97,13 @@ Content-Type: image/jpeg
 ### すべてのマイクロポストを取得する
 GET http://localhost:3001/microposts
 
+### マイクロポストに関連付けられたカテゴリーを取得する
+GET http://localhost:3001/microposts/1
+
+### マイクロポストに関連付けられたカテゴリーを取得する
+GET http://localhost:3001/microposts/1/categories
+
+
 ### カテゴリーを作成する
 POST http://localhost:3001/categories
 Content-Type: application/json
@@ -107,13 +114,6 @@ Content-Type: application/json
 
 ### すべてのカテゴリーを取得する
 GET http://localhost:3001/categories
-
-### マイクロポストに関連付けられたカテゴリーを取得する
-GET http://localhost:3001/microposts/1
-
-### マイクロポストに関連付けられたカテゴリーを取得する
-GET http://localhost:3001/microposts/1/categories
-
 
 ### カテゴリーに属するマイクロポストを取得する
 GET http://localhost:3001/categories/1/microposts
