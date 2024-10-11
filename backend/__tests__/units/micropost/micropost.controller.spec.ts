@@ -56,7 +56,7 @@ describe('MicroPostController', () => {
       const userId = 1;
       const title = 'Test Post';
       const categoryIds = '1,2';
-      const file = { path: 'uploads/test.png' } as Express.Multer.File;
+      const file = { path: '__tests__/test.png' } as Express.Multer.File;
       const mockUser = {
         id: userId,
         name: 'TestUser',
@@ -160,7 +160,7 @@ describe('MicroPostController', () => {
       const userId = 1;
       const title = 'Test Post';
       const categoryIds = ['1', '2', '3']; // 文字列配列
-      const file = { path: 'uploads/test.png' } as Express.Multer.File;
+      const file = { path: '__tests__/test.png' } as Express.Multer.File;
       const mockUser = {
         id: userId,
         name: 'TestUser',
@@ -194,7 +194,7 @@ describe('MicroPostController', () => {
       const userId = 1;
       const title = 'Test Post';
       const categoryIds = ['a', 'b', '3']; // 無効な値が含まれる
-      const file = { path: 'uploads/test.png' } as Express.Multer.File;
+      const file = { path: '__tests__/test.png' } as Express.Multer.File;
       const mockUser = {
         id: userId,
         name: 'TestUser',
