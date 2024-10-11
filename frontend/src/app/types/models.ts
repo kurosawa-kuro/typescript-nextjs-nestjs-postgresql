@@ -22,6 +22,7 @@ export interface Micropost {
   imagePath: string | null;
   userName: string;
   userAvatarPath: string | null;
+  // categories: Category[]; // カテゴリー情報を追加
 }
 
 export interface AsyncOperationState {

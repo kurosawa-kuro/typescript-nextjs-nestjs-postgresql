@@ -47,14 +47,14 @@ export class MicroPostController {
     if (!title) {
       throw new BadRequestException('Title is required');
     }
-  
+
     const user = await this.userService.find(userId);
     if (!user) {
       throw new BadRequestException('User not found');
     }
-  
+
     const imagePath = file ? file.path : null;
-  
+
     let parsedCategoryIds: number[] = [];
     if (categoryIds) {
       if (Array.isArray(categoryIds)) {
@@ -63,7 +63,7 @@ export class MicroPostController {
         parsedCategoryIds = categoryIds.split(',').map(Number);
       }
     }
-  
+
     return this.microPostService.create(userId, title, imagePath, parsedCategoryIds);
   }
 
@@ -72,12 +72,12 @@ export class MicroPostController {
     return this.microPostService.list();
   }
 
-  @Get(':id/categories')
-  async getCategories(@Param('id', ParseIntPipe) id: number) {
-    const categories = await this.microPostService.getCategoriesForMicropost(id);
-    if (!categories) {
+  @Get(':id')
+  async getMicropost(@Param('id', ParseIntPipe) id: number): Promise<MicroPost> {
+    const micropost = await this.microPostService.findById(id);
+    if (!micropost) {
       throw new BadRequestException('Micropost not found');
     }
-    return categories;
+    return micropost;
   }
 }

@@ -109,7 +109,11 @@ Content-Type: application/json
 GET http://localhost:3001/categories
 
 ### マイクロポストに関連付けられたカテゴリーを取得する
-GET http://localhost:3001/microposts/15/categories
+GET http://localhost:3001/microposts/1
+
+### マイクロポストに関連付けられたカテゴリーを取得する
+GET http://localhost:3001/microposts/1/categories
+
 
 ### カテゴリーに属するマイクロポストを取得する
 GET http://localhost:3001/categories/1/microposts

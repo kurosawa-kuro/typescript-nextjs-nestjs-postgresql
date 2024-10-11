@@ -8,6 +8,7 @@ export interface MicroPost {
   imagePath: string | null;
   userName: string;
   userAvatarPath: string | null;
+  categories: Category[]; // カテゴリー情報を追加
 }
 
 export interface Category {
@@ -28,9 +29,7 @@ export class MicroPostService {
     try {
       await this.databaseService.executeQuery('BEGIN');
 
-      // Remove 'uploads\' or 'uploads/' from the imagePath
       const cleanedImagePath = imagePath ? imagePath.replace(/^uploads[\/\\]/, '') : null;
-      console.log('cleanedImagePath', cleanedImagePath);
 
       const insertMicropostQuery = `
         INSERT INTO micropost(user_id, title, image_path) 
@@ -59,36 +58,54 @@ export class MicroPostService {
   }
 
   async list(): Promise<MicroPost[]> {
-    try {
-      const query = `
+    const query = `
       SELECT m.id, m.user_id as "userId", m.title, m.image_path as "imagePath", 
-             u.name as "userName", u.avatar_path as "userAvatarPath"
+             u.name as "userName", u.avatar_path as "userAvatarPath",
+             COALESCE(json_agg(json_build_object('id', c.id, 'title', c.title)) 
+                      FILTER (WHERE c.id IS NOT NULL), '[]') as categories
       FROM micropost m
       JOIN "user" u ON m.user_id = u.id
+      LEFT JOIN micropost_category mc ON m.id = mc.micropost_id
+      LEFT JOIN category c ON mc.category_id = c.id
+      GROUP BY m.id, u.name, u.avatar_path
       ORDER BY m.id DESC
     `;
-      const result = await this.databaseService.executeQuery(query);
-      return result.rows;
-    } catch (error) {
-      throw error;
+    const result = await this.databaseService.executeQuery(query);
+    return result.rows;
+  }
+
+  async findById(id: number): Promise<MicroPost | null> {
+    const query = `
+      SELECT m.id, m.user_id as "userId", m.title, m.image_path as "imagePath",
+             u.name as "userName", u.avatar_path as "userAvatarPath",
+             COALESCE(json_agg(json_build_object('id', c.id, 'title', c.title)) 
+                      FILTER (WHERE c.id IS NOT NULL), '[]') as categories
+      FROM micropost m
+      JOIN "user" u ON m.user_id = u.id
+      LEFT JOIN micropost_category mc ON m.id = mc.micropost_id
+      LEFT JOIN category c ON mc.category_id = c.id
+      WHERE m.id = $1
+      GROUP BY m.id, u.name, u.avatar_path
+    `;
+    const result = await this.databaseService.executeQuery(query, [id]);
+    if (result.rows.length === 0) {
+      return null;
     }
+    const micropost = result.rows[0];
+    return micropost;
   }
 
   async getCategoriesForMicropost(id: number): Promise<Category[] | null> {
-    try {
-      const query = `
-        SELECT c.id, c.title
-        FROM category c
-        JOIN micropost_category mc ON c.id = mc.category_id
-        WHERE mc.micropost_id = $1
-      `;
-      const result = await this.databaseService.executeQuery(query, [id]);
-      if (result.rows.length === 0) {
-        return null;
-      }
-      return result.rows;
-    } catch (error) {
-      throw error;
+    const query = `
+      SELECT c.id, c.title
+      FROM category c
+      JOIN micropost_category mc ON c.id = mc.category_id
+      WHERE mc.micropost_id = $1
+    `;
+    const result = await this.databaseService.executeQuery(query, [id]);
+    if (result.rows.length === 0) {
+      return null;
     }
+    return result.rows;
   }
 }
