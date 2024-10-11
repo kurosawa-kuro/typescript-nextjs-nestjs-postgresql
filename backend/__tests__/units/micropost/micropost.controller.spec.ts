@@ -62,6 +62,7 @@ describe('MicroPostController', () => {
         name: 'TestUser',
         email: 'test@example.com',
         isAdmin: false,
+        avatar_path: 'path/to/avatar.png',
       };
       userService.find.mockResolvedValue(mockUser);
 
@@ -120,6 +121,7 @@ describe('MicroPostController', () => {
         name: 'TestUser',
         email: 'test@example.com',
         isAdmin: false,
+        avatar_path: 'path/to/avatar.png',
       };
       userService.find.mockResolvedValue(mockUser);
 
@@ -166,6 +168,7 @@ describe('MicroPostController', () => {
         name: 'TestUser',
         email: 'test@example.com',
         isAdmin: false,
+        avatar_path: 'path/to/avatar.png',
       };
       userService.find.mockResolvedValue(mockUser);
 
@@ -200,6 +203,7 @@ describe('MicroPostController', () => {
         name: 'TestUser',
         email: 'test@example.com',
         isAdmin: false,
+        avatar_path: 'path/to/avatar.png',
       };
       userService.find.mockResolvedValue(mockUser);
 
