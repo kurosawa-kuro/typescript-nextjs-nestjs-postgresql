@@ -67,10 +67,10 @@ INSERT INTO public."user" (name, email, password_hash, is_admin) VALUES
 `;
 
 const insertUsersSql = `
-INSERT INTO public."user" (name, email, password_hash, is_admin) VALUES 
-  ('Alice', 'alice@example.com', '$2b$10$trAqnUDNSyLrcf2SbiLvjOijquaQDRAwQM4IBkWomc5au.OdxuiK.', false),
-  ('Bob', 'bob@example.com', '$2b$10$trAqnUDNSyLrcf2SbiLvjOijquaQDRAwQM4IBkWomc5au.OdxuiK.', false),
-  ('Charlie', 'charlie@example.com', '$2b$10$trAqnUDNSyLrcf2SbiLvjOijquaQDRAwQM4IBkWomc5au.OdxuiK.', false);
+INSERT INTO public."user" (name, email, password_hash, is_admin, avatar_path) VALUES 
+  ('Alice', 'alice@example.com', '$2b$10$trAqnUDNSyLrcf2SbiLvjOijquaQDRAwQM4IBkWomc5au.OdxuiK.', false, 'alice_avatar.png'),
+  ('Bob', 'bob@example.com', '$2b$10$trAqnUDNSyLrcf2SbiLvjOijquaQDRAwQM4IBkWomc5au.OdxuiK.', false, 'bob_avatar.png'),
+  ('Charlie', 'charlie@example.com', '$2b$10$trAqnUDNSyLrcf2SbiLvjOijquaQDRAwQM4IBkWomc5au.OdxuiK.', false, 'charlie_avatar.png');
 `;
 
 const insertOtherDataSql = `
