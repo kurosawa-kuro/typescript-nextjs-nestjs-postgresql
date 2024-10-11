@@ -41,13 +41,11 @@ describe('MicroPostController (e2e)', () => {
 
     expect(response.body).toMatchObject({
       id: expect.any(Number),
+      userId: user.id,
       title: 'Test Micropost',
       imagePath: expect.stringMatching(/^[a-f0-9]{32}\.png$/),
-      user: {
-        id: user.id,
-        name: 'Test User',
-        avatarPath: expect.any(String),
-      },
+      userName: 'Test User',
+      userAvatarPath: expect.any(String),
     });
   });
 
