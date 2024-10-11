@@ -26,6 +26,14 @@ describe('MicropostCard', () => {
     }],
   };
 
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it('renders post with image correctly', () => {
     render(<MicropostCard post={mockPost} />);
     expect(screen.getByAltText('Test Post')).toBeInTheDocument();
@@ -38,14 +46,15 @@ describe('MicropostCard', () => {
     expect(screen.getByText('No image available')).toBeInTheDocument();
   });
 
-  // it('renders "No image available" when image fails to load', async () => {
-  //   render(<MicropostCard post={mockPost} />);
-  //   const img = screen.getByAltText('Test Post');
+  it('renders "Image failed to load" when image fails to load', () => {
+    render(<MicropostCard post={mockPost} />);
+    const img = screen.getByAltText('Test Post');
     
-  //   fireEvent.error(img);
+    fireEvent.error(img);
 
-  //   expect(screen.getByText('No image available')).toBeInTheDocument();
-  // });
+    expect(screen.getByText('Image failed to load')).toBeInTheDocument();
+    expect(console.error).toHaveBeenCalledWith('Image failed to load:', expect.any(String));
+  });
 
   it('renders "Post not available" when post is undefined', () => {
     render(<MicropostCard post={undefined} />);
@@ -64,5 +73,35 @@ describe('MicropostCard', () => {
     render(<MicropostCard post={mockPost} onClick={onClickMock} />);
     fireEvent.click(screen.getByText('Test Post'));
     expect(onClickMock).toHaveBeenCalledWith(mockPost);
+  });
+
+  it('handles full URL for imagePath correctly', () => {
+    const postWithFullUrl = { ...mockPost, imagePath: 'https://example.com/image.jpg' };
+    render(<MicropostCard post={postWithFullUrl} />);
+    const img = screen.getByAltText('Test Post');
+    expect(img).toHaveAttribute('src', 'https://example.com/image.jpg');
+  });
+
+  it('handles full URL for userAvatarPath correctly', () => {
+    const postWithFullUrl = { ...mockPost, userAvatarPath: 'https://example.com/avatar.jpg' };
+    render(<MicropostCard post={postWithFullUrl} />);
+    const img = screen.getByAltText(`${mockPost.userName}'s avatar`);
+    expect(img).toHaveAttribute('src', 'https://example.com/avatar.jpg');
+  });
+
+  it('renders "Avatar failed" when avatar fails to load', () => {
+    render(<MicropostCard post={mockPost} />);
+    const avatar = screen.getByAltText(`${mockPost.userName}'s avatar`);
+    
+    fireEvent.error(avatar);
+
+    expect(screen.getByText('Avatar failed')).toBeInTheDocument();
+    expect(console.error).toHaveBeenCalledWith('Avatar failed to load:', expect.any(String));
+  });
+
+  it('renders "No Avatar" when userAvatarPath is not provided', () => {
+    const postWithoutAvatar = { ...mockPost, userAvatarPath: null };
+    render(<MicropostCard post={postWithoutAvatar} />);
+    expect(screen.getByText('No Avatar')).toBeInTheDocument();
   });
 });
