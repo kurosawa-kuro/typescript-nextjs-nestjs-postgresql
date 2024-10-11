@@ -77,8 +77,6 @@ describe('MicroPostService', () => {
       expect(mockDatabaseService.executeQuery).toHaveBeenNthCalledWith(3, expect.stringContaining('INSERT INTO micropost_category'), [mockMicroPost.id, categoryIds]);
       expect(mockDatabaseService.executeQuery).toHaveBeenNthCalledWith(4, 'COMMIT');
       expect(result).toEqual(mockMicroPost);
-
-      console.log('Test completed: create a new micropost with categories');
     });
 
     it('should create a new micropost without categories', async () => {
@@ -116,8 +114,6 @@ describe('MicroPostService', () => {
       expect(mockDatabaseService.executeQuery).toHaveBeenNthCalledWith(2, expect.stringContaining('INSERT INTO micropost'), [userId, title, imagePath]);
       expect(mockDatabaseService.executeQuery).toHaveBeenNthCalledWith(3, 'COMMIT');
       expect(result).toEqual(mockMicroPost);
-
-      console.log('Test completed: create a new micropost without categories');
     });
 
     it('should rollback transaction on error', async () => {
@@ -146,8 +142,6 @@ describe('MicroPostService', () => {
       expect(mockDatabaseService.executeQuery).toHaveBeenNthCalledWith(1, 'BEGIN');
       expect(mockDatabaseService.executeQuery).toHaveBeenNthCalledWith(2, expect.stringContaining('INSERT INTO micropost'), [userId, title, imagePath]);
       expect(mockDatabaseService.executeQuery).toHaveBeenNthCalledWith(3, 'ROLLBACK');
-
-      console.log('Test completed: rollback transaction on error');
     });
   });
 
