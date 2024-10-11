@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MicropostCard } from '../../src/app/components/microposts/MicropostCard';
-import { Micropost } from '../../src/app/types/models';
+import { MicroPost } from '../../src/app/types/models';
 
 // Mock the next/image component
 jest.mock('next/image', () => ({
@@ -12,14 +12,13 @@ jest.mock('next/image', () => ({
   },
 }));
 
+
 describe('MicropostCard', () => {
-  const mockPost: Micropost = {
+  const mockPost: MicroPost = {
     id: 1,
-    userId: 1,
     title: 'Test Post',
-    userName: 'Test User',
     imagePath: 'test/image.jpg',
-    userAvatarPath: 'test/avatar.jpg',
+    user: { id: 1, name: 'Test User', avatarPath: 'test/avatar.jpg' },
     categories: [{
       id: 1,
       title: 'abc'
@@ -85,13 +84,13 @@ describe('MicropostCard', () => {
   it('handles full URL for userAvatarPath correctly', () => {
     const postWithFullUrl = { ...mockPost, userAvatarPath: 'https://example.com/avatar.jpg' };
     render(<MicropostCard post={postWithFullUrl} />);
-    const img = screen.getByAltText(`${mockPost.userName}'s avatar`);
+    const img = screen.getByAltText(`${mockPost.user.name}'s avatar`);
     expect(img).toHaveAttribute('src', 'https://example.com/avatar.jpg');
   });
 
   it('renders "Avatar failed" when avatar fails to load', () => {
     render(<MicropostCard post={mockPost} />);
-    const avatar = screen.getByAltText(`${mockPost.userName}'s avatar`);
+    const avatar = screen.getByAltText(`${mockPost.user.name}'s avatar`);
     
     fireEvent.error(avatar);
 

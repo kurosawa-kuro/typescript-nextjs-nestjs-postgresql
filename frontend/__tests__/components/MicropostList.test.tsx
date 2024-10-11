@@ -4,11 +4,11 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MicropostList } from '../../src/app/components/microposts/MicropostList';
-import { Micropost, Category } from '../../src/app/types/models';
+import { MicroPost, Category } from '../../src/app/types/models';
 
 // Mock the child components
 jest.mock('../../src/app/components/microposts/MicropostCard', () => ({
-  MicropostCard: ({ post, onClick }: { post: Micropost; onClick: () => void }) => (
+  MicropostCard: ({ post, onClick }: { post: MicroPost; onClick: () => void }) => (
     <div data-testid={`micropost-card-${post.id}`} onClick={onClick}>
       {post.title}
     </div>
@@ -16,7 +16,7 @@ jest.mock('../../src/app/components/microposts/MicropostCard', () => ({
 }));
 
 jest.mock('../../src/app/components/microposts/MicropostDetailModal', () => ({
-  MicropostDetailModal: ({ post, onClose }: { post: Micropost; onClose: () => void }) => (
+  MicropostDetailModal: ({ post, onClose }: { post: MicroPost; onClose: () => void }) => (
     <div data-testid="micropost-detail-modal">
       <h2 data-testid="modal-title">{post.title}</h2>
       <button onClick={onClose}>Close</button>
@@ -25,9 +25,9 @@ jest.mock('../../src/app/components/microposts/MicropostDetailModal', () => ({
 }));
 
 describe('MicropostList', () => {
-  const mockMicroposts: Micropost[] = [
-    { id: 1, userId: 1, title: 'Test Post 1', userName: 'User 1', imagePath: '/test1.jpg', userAvatarPath: '/avatar1.jpg', categories: ['Category1' as unknown as Category] },
-    { id: 2, userId: 2, title: 'Test Post 2', userName: 'User 2', imagePath: '/test2.jpg', userAvatarPath: '/avatar2.jpg', categories: ['Category2' as unknown as Category] },
+  const mockMicroposts: MicroPost[] = [
+    { id: 1, user: { id: 1, name: 'User 1', avatarPath: '/avatar1.jpg' }, title: 'Test Post 1', imagePath: '/test1.jpg', categories: ['Category1' as unknown as Category] },
+    { id: 2, user: { id: 2, name: 'User 2', avatarPath: '/avatar2.jpg' }, title: 'Test Post 2', imagePath: '/test2.jpg', categories: ['Category2' as unknown as Category] },
   ];
 
   it('renders micropost cards correctly', () => {
@@ -48,10 +48,10 @@ describe('MicropostList', () => {
       ...mockMicroposts,
       null,
       undefined,
-      {} as Micropost, // Invalid object without id
+      {} as MicroPost, // Invalid object without id
     ];
 
-    render(<MicropostList microposts={invalidMicroposts as Micropost[]} />);
+    render(<MicropostList microposts={invalidMicroposts as MicroPost[]} />);
 
     expect(screen.getByTestId('micropost-card-1')).toBeInTheDocument();
     expect(screen.getByTestId('micropost-card-2')).toBeInTheDocument();

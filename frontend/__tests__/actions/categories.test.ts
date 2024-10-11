@@ -1,6 +1,6 @@
 import { getCategories, getCategoryId, getCategoryMicroposts } from '../../src/app/actions/categories';
 import { ApiClient } from '../../src/app/api/apiClient';
-import { Category, Micropost } from '../../src/app/types/models';
+import { Category, MicroPost } from '../../src/app/types/models';
 
 jest.mock('../../src/app/api/apiClient');
 
@@ -120,9 +120,9 @@ describe('Category Actions', () => {
         { id: 1, title: 'Category 1' },
         { id: 2, title: 'Category 2' },
       ];
-      const mockMicroposts: Micropost[] = [
-        { id: 1, userId: 1, title: 'Post 1', userName: 'User1', imagePath: '', userAvatarPath: '', categories: [] },
-        { id: 2, userId: 2, title: 'Post 2', userName: 'User2', imagePath: '', userAvatarPath: '', categories: [] },
+      const mockMicroposts: MicroPost[] = [
+        { id: 1, user: { id: 1, name: 'User1', avatarPath: '' }, title: 'Post 1',  imagePath: '',   categories: [] },
+        { id: 2, user: { id: 2, name: 'User2', avatarPath: '' }, title: 'Post 2',   imagePath: '',  categories: [] },
       ];
 
       (ApiClient.get as jest.Mock)

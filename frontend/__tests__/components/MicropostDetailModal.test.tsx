@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MicropostDetailModal } from '../../src/app/components/microposts/MicropostDetailModal';
-import { Micropost } from '../../src/app/types/models';
+import { MicroPost } from '../../src/app/types/models';
 
 // Mock the next/image component
 jest.mock('next/image', () => ({
@@ -22,13 +22,15 @@ jest.mock('next/link', () => ({
 }));
 
 describe('MicropostDetailModal', () => {
-  const mockPost: Micropost = {
+  const mockPost: MicroPost = {
     id: 1,
-    userId: 1,
     title: 'Test Micropost',
-    userName: 'Test User',
     imagePath: 'test/image.jpg',
-    userAvatarPath: 'test/avatar.jpg',
+    user: {
+      id: 1,
+      name: 'Test User',
+      avatarPath: 'test/avatar.jpg',
+    },
     categories: [{ id: 1, title: 'Test Category' }],
   };
 
