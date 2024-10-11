@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { Micropost } from '../../types/models';
+import { ImageUtils } from '../../lib/utils/imageUtils';
 
 interface MicropostCardProps {
   post?: Micropost;
@@ -18,9 +19,9 @@ export const MicropostCard: React.FC<MicropostCardProps> = ({ post, onClick }) =
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return path;
     }
-    // Ensure the path starts with 'uploads/'
-    const normalizedPath = path.startsWith('uploads/') ? path : `uploads/${path}`;
-    return `${API_BASE_URL}/${normalizedPath}`;
+    // Remove any leading 'uploads/' and ensure the path starts with 'uploads/'
+    const normalizedPath = path.replace(/^uploads\/?/, '');
+    return `${API_BASE_URL}/uploads/${ImageUtils.normalizePath(normalizedPath)}`;
   };
 
   const imageUrl = useMemo(() => getImageUrl(post?.imagePath), [post?.imagePath]);
