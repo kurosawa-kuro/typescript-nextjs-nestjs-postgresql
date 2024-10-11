@@ -51,6 +51,8 @@ describe('MicroPostService', () => {
         title,
         userName: 'TestUser',
         imagePath,
+        userAvatarPath: 'path/to/avatar.jpg',
+        categories: [],
       };
 
       const mockQueryResult: QueryResult = {
@@ -88,6 +90,8 @@ describe('MicroPostService', () => {
         title,
         userName: 'TestUser',
         imagePath,
+        userAvatarPath: 'path/to/avatar.jpg',
+        categories: [],
       };
 
       const mockQueryResult: QueryResult = {
@@ -143,8 +147,8 @@ describe('MicroPostService', () => {
   describe('list', () => {
     it('should return all microposts in descending order of id', async () => {
       const mockMicroPosts: MicroPost[] = [
-        { id: 2, userId: 2, title: 'Post 2', userName: 'User2', imagePath: null },
-        { id: 1, userId: 1, title: 'Post 1', userName: 'User1', imagePath: 'path/to/image.jpg' },
+        { id: 2, userId: 2, title: 'Post 2', userName: 'User2', imagePath: null, userAvatarPath: 'path/to/avatar2.jpg', categories: [] },
+        { id: 1, userId: 1, title: 'Post 1', userName: 'User1', imagePath: 'path/to/image.jpg', userAvatarPath: 'path/to/avatar1.jpg', categories: [] },
       ];
 
       const mockQueryResult: QueryResult = {

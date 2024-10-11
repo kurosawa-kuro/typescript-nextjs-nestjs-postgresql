@@ -15,6 +15,7 @@ describe('UserService', () => {
     name: 'John Doe',
     email: 'john@example.com',
     isAdmin: false,
+    avatar_path: 'path/to/avatar.jpg',
   };
 
   const setupTestingModule = async () => {
@@ -137,8 +138,9 @@ describe('UserService', () => {
 
   describe('index', () => {
     const mockUsers: User[] = [
-      { id: 1, name: 'John Doe', email: 'john@example.com', isAdmin: false },
-      { id: 2, name: 'Jane Doe', email: 'jane@example.com', isAdmin: true },
+      { id: 1, name: 'John Doe', email: 'john@example.com', isAdmin: false, avatar_path: 'path/to/avatar1.jpg' },
+      { id: 2, name: 'Jane Doe', email: 'jane@example.com', isAdmin: true, avatar_path: 'path/to/avatar2.jpg' },
+      { id: 2, name: 'Jane Doe', email: 'jane@example.com', isAdmin: true, avatar_path: 'path/to/avatar2.jpg' },
     ];
 
     it('should return all users', async () => {
