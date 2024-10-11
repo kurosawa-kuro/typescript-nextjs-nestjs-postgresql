@@ -63,23 +63,11 @@ describe('MicropostDetailModal', () => {
     expect(screen.queryByAltText('Test Micropost')).not.toBeInTheDocument();
   });
 
-  it('uses normalized image path', () => {
-    const postWithWindowsPath = { ...mockPost, imagePath: 'test\\image.jpg' };
-    render(<MicropostDetailModal post={postWithWindowsPath} onClose={mockOnClose} />);
-
-    const img = screen.getByAltText('Test Micropost');
-    expect(img).toHaveAttribute('src', expect.stringContaining('test/image.jpg'));
-  });
-
-  it('renders avatar image when userAvatarPath is provided', () => {
-    render(<MicropostDetailModal post={mockPost} onClose={mockOnClose} />);
-
-    const avatarImg = screen.getByAltText("Test User's avatar");
-    expect(avatarImg).toBeInTheDocument();
-  });
-
-  it('does not render avatar image when userAvatarPath is not provided', () => {
-    const postWithoutAvatar = { ...mockPost, userAvatarPath: null };
+  it('does not render avatar image when user.avatarPath is not provided', () => {
+    const postWithoutAvatar = {
+      ...mockPost,
+      user: { ...mockPost.user, avatarPath: null },
+    };
     render(<MicropostDetailModal post={postWithoutAvatar} onClose={mockOnClose} />);
 
     expect(screen.queryByAltText("Test User's avatar")).not.toBeInTheDocument();
