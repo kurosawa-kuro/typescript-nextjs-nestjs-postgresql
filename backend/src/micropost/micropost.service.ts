@@ -5,12 +5,17 @@ import { DatabaseService } from '../database/database.service';
 
 export interface MicroPost {
   id: number;
-  userId: number;
   title: string;
   imagePath: string | null;
-  userName: string;
-  userAvatarPath: string | null;
-  categories: Category[];
+  user: {
+    id: number;
+    name: string;
+    avatarPath: string | null;
+  };
+  categories: Array<{
+    id: number;
+    title: string;
+  }>;
 }
 
 export interface Category {
@@ -61,24 +66,32 @@ export class MicroPostService {
 
   async list(): Promise<MicroPost[]> {
     const query = `
-      SELECT m.id, m.user_id as "userId", m.title, m.image_path as "imagePath", 
-             u.name as "userName", u.avatar_path as "userAvatarPath",
-             COALESCE(json_agg(json_build_object('id', c.id, 'title', c.title)) 
-                      FILTER (WHERE c.id IS NOT NULL), '[]') as categories
+      SELECT 
+        m.id, 
+        m.title, 
+        m.image_path as "imagePath",
+        json_build_object(
+          'id', u.id,
+          'name', u.name,
+          'avatarPath', u.avatar_path
+        ) as user,
+        COALESCE(
+          json_agg(
+            json_build_object('id', c.id, 'title', c.title)
+          ) FILTER (WHERE c.id IS NOT NULL), 
+          '[]'
+        ) as categories
       FROM micropost m
       JOIN "user" u ON m.user_id = u.id
       LEFT JOIN micropost_category mc ON m.id = mc.micropost_id
       LEFT JOIN category c ON mc.category_id = c.id
-      GROUP BY m.id, u.name, u.avatar_path
+      GROUP BY m.id, u.id, u.name, u.avatar_path
       ORDER BY m.id DESC
     `;
+    
     const result = await this.databaseService.executeQuery(query);
-
-    // Add 'uploads/' prefix to imagePath
-    return result.rows.map(micropost => {
-
-      return micropost;
-    });
+  
+    return result.rows;
   }
 
   async findById(id: number): Promise<MicroPost | null> {

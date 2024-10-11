@@ -1,5 +1,3 @@
-// src/app/components/microposts/MicropostDetailModal.tsx
-
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { Micropost } from '../../types/models';
@@ -16,13 +14,13 @@ export const MicropostDetailModal: React.FC<MicropostDetailModalProps> = ({ post
   const imageUrl = post.imagePath
     ? `${API_BASE_URL}/${ImageUtils.normalizePath(post.imagePath)}`
     : null;
-  const avatarUrl = post.userAvatarPath
-    ? `${API_BASE_URL}/${ImageUtils.normalizePath(post.userAvatarPath)}`
+  const avatarUrl = post.user.avatarPath
+    ? `${API_BASE_URL}/${ImageUtils.normalizePath(post.user.avatarPath)}`
     : null;
 
   useEffect(() => {
     console.log('post.imagePath:', post.imagePath);
-    console.log('post.userAvatarPath:', post.userAvatarPath);
+    console.log('post.user.avatarPath:', post.user.avatarPath);
     console.log('Normalized imageUrl:', imageUrl);
     console.log('Normalized avatarUrl:', avatarUrl);
   }, [post, imageUrl, avatarUrl]);
@@ -35,12 +33,12 @@ export const MicropostDetailModal: React.FC<MicropostDetailModalProps> = ({ post
             <div className="relative w-[50px] h-[50px]">
               <img
                 src={avatarUrl}
-                alt={`${post.userName}'s avatar`}
+                alt={`${post.user.name}'s avatar`}
                 className="rounded-full object-cover w-full h-full"
               />
             </div>
           )}
-          <span className="ml-4 text-xl font-bold text-black">{post.userName}</span>
+          <span className="ml-4 text-xl font-bold text-black">{post.user.name}</span>
         </div>
         <h2 className="text-3xl font-bold mb-4 text-black">{post.title}</h2>
         {imageUrl && (

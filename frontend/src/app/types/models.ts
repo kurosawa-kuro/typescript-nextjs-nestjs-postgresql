@@ -17,12 +17,17 @@ export interface LoginResponse {
 
 export interface Micropost {
   id: number;
-  userId: number;
   title: string;
   imagePath: string | null;
-  userName: string;
-  userAvatarPath: string | null;
-  categories: Category[]; // カテゴリー情報を追加
+  user: {
+    id: number;
+    name: string;
+    avatarPath: string | null;
+  };
+  categories: Array<{
+    id: number;
+    title: string;
+  }>;
 }
 
 export interface AsyncOperationState {

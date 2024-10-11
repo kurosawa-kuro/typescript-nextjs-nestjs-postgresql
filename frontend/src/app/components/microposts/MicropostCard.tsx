@@ -17,13 +17,12 @@ export const MicropostCard: React.FC<MicropostCardProps> = ({ post, onClick }) =
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return path;
     }
-    // Remove any leading 'uploads/' and normalize the path
     const normalizedPath = path.replace(/^uploads\//, '').replace(/\\/g, '/');
     return `${API_BASE_URL}/uploads/${normalizedPath}`;
   };
 
   const imageUrl = useMemo(() => getImageUrl(post?.imagePath), [post?.imagePath]);
-  const avatarUrl = useMemo(() => getImageUrl(post?.userAvatarPath), [post?.userAvatarPath]);
+  const avatarUrl = useMemo(() => getImageUrl(post?.user?.avatarPath), [post?.user?.avatarPath]);
 
   const handleImageError = () => {
     console.error('Image failed to load:', imageUrl);
@@ -73,7 +72,7 @@ export const MicropostCard: React.FC<MicropostCardProps> = ({ post, onClick }) =
             {avatarUrl && !avatarError ? (
               <img
                 src={avatarUrl}
-                alt={`${post.userName}'s avatar`}
+                alt={`${post.user?.name || 'User'}'s avatar`}
                 className="w-full h-full object-cover"
                 onError={handleAvatarError}
               />
@@ -85,7 +84,7 @@ export const MicropostCard: React.FC<MicropostCardProps> = ({ post, onClick }) =
           </div>
           <div>
             <h2 className="text-lg font-semibold text-gray-900">{post.title}</h2>
-            <p className="text-sm text-gray-600">{post.userName}</p>
+            <p className="text-sm text-gray-600">{post.user?.name || 'Unknown User'}</p>
           </div>
         </div>
       </div>
