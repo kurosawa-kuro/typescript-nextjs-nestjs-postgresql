@@ -33,7 +33,8 @@ CREATE TABLE IF NOT EXISTS "user" (
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
-  is_admin BOOLEAN DEFAULT false
+  is_admin BOOLEAN DEFAULT false,
+  avatar_path VARCHAR(255) DEFAULT 'default_avatar.png'
 );
 ALTER SEQUENCE user_id_seq OWNED BY "user".id;
 
