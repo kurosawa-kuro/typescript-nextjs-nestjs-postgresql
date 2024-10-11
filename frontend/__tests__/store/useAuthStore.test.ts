@@ -27,7 +27,7 @@ describe('useAuthStore', () => {
   });
 
   it('should log in successfully', async () => {
-    const mockUser = { id: 1, name: 'Test User', email: 'test@example.com' };
+    const mockUser = { id: 1, name: 'Test User', email: 'test@example.com', isAdmin: false, avatar_path: '' };
     const mockLoginResponse = { success: true, token: 'fake-token', user: mockUser };
     (ApiService.login as jest.Mock).mockResolvedValue(mockLoginResponse);
 
@@ -44,7 +44,7 @@ describe('useAuthStore', () => {
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBeNull();
 
-    expect(setCookie).toHaveBeenCalledWith('token', 'fake-token', expect.any(Object));
+    expect(setCookie).toHaveBeenCalledWith('jwt', 'fake-token', { maxAge: 30 * 24 * 60 * 60 });
     expect(localStorage.getItem('user')).toBe(JSON.stringify(mockUser));
   });
 
@@ -97,19 +97,19 @@ describe('useAuthStore', () => {
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBeNull();
 
-    expect(deleteCookie).toHaveBeenCalledWith('token');
+    expect(deleteCookie).toHaveBeenCalledWith('jwt');
     expect(localStorage.getItem('user')).toBeNull();
   });
 
-  it('should initialize auth from localStorage and cookie', () => {
-    const mockUser = { id: 1, name: 'Test User', email: 'test@example.com' };
-    localStorage.setItem('user', JSON.stringify(mockUser));
+  it('should initialize auth from localStorage and cookie', async () => {
+    const mockUser = { id: 1, name: 'Test User', email: 'test@example.com', isAdmin: false, avatar_path: '' };
     (getCookie as jest.Mock).mockReturnValue('fake-token');
+    (ApiService.getUserProfile as jest.Mock).mockResolvedValue(mockUser);
 
     const { result } = renderHook(() => useAuthStore());
 
-    act(() => {
-      result.current.initializeAuth();
+    await act(async () => {
+      await result.current.initializeAuth();
     });
 
     expect(result.current.isLoggedIn).toBe(true);
@@ -118,19 +118,19 @@ describe('useAuthStore', () => {
     expect(result.current.error).toBeNull();
   });
 
-  it('should handle error when initializing auth with invalid data', () => {
-    localStorage.setItem('user', 'invalid-json');
+  it('should handle error when initializing auth with invalid data', async () => {
     (getCookie as jest.Mock).mockReturnValue('fake-token');
+    (ApiService.getUserProfile as jest.Mock).mockRejectedValue(new Error('Failed to fetch user profile'));
 
     const { result } = renderHook(() => useAuthStore());
 
-    act(() => {
-      result.current.initializeAuth();
+    await act(async () => {
+      await result.current.initializeAuth();
     });
 
     expect(result.current.isLoggedIn).toBe(false);
     expect(result.current.currentUser).toBeNull();
     expect(result.current.isLoading).toBe(false);
-    expect(result.current.error).toBe('Error initializing auth');
+    expect(result.current.error).toBeNull();
   });
 });
