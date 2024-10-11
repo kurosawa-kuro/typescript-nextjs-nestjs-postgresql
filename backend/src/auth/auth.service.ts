@@ -47,9 +47,11 @@ export class AuthService {
   ): Promise<{ success: boolean; token?: string; user?: object }> {
     try {
       const query =
-        'SELECT id, name, email, password_hash, is_admin as "isAdmin" FROM "user" WHERE email = $1';
+      'SELECT id, name, email, password_hash, is_admin, avatar_path FROM "user" WHERE email = $1';
       const result = await this.pool.query(query, [email]);
       const user = result.rows[0];
+
+      console.log("user", user);
 
       if (user && (await bcrypt.compare(password, user.password_hash))) {
         const payload = {
@@ -57,7 +59,9 @@ export class AuthService {
           name: user.name,
           email: user.email,
           isAdmin: user.isAdmin,
+          avatar_path: user.avatar_path,
         };
+        console.log("payload", payload);
         const token = this.jwtService.sign(payload);
         this.logger.log(`User ${user.id} logged in`);
         return {
@@ -68,6 +72,7 @@ export class AuthService {
             name: user.name,
             email: user.email,
             isAdmin: user.isAdmin,
+            avatar_path: user.avatar_path,
           },
         };
       } else {

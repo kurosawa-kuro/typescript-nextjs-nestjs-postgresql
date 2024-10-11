@@ -5,7 +5,7 @@ Content-Type: application/json
 {
   "name": "Jane Doe2",
   "email": "jane.doe2@example.com",
-  "password": "hashed_password_here"
+  "password": "hashed_password"
 }
 
 ### Login User
@@ -14,7 +14,7 @@ Content-Type: application/json
 
 {
   "email": "alice@example.com",
-  "password": "hashed_password_here"
+  "password": "hashed_password"
 }
 
 ### Get User Profile (Protected Route)

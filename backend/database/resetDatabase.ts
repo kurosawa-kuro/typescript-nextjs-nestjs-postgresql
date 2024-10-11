@@ -63,14 +63,14 @@ CREATE TABLE IF NOT EXISTS micropost_category (
 
 const insertAdminSql = `
 INSERT INTO public."user" (name, email, password_hash, is_admin) VALUES 
-  ('Admin', 'admin@example.com', '$2b$10$A/JMxdiDKWmpxOc3nBBkVeYiCL9uUrIVWpNohuTP4gKaD/1TGXJt6', true);
+  ('Admin', 'admin@example.com', '$2b$10$trAqnUDNSyLrcf2SbiLvjOijquaQDRAwQM4IBkWomc5au.OdxuiK.', true);
 `;
 
 const insertUsersSql = `
 INSERT INTO public."user" (name, email, password_hash, is_admin) VALUES 
-  ('Alice', 'alice@example.com', '$2b$10$A/JMxdiDKWmpxOc3nBBkVeYiCL9uUrIVWpNohuTP4gKaD/1TGXJt6', false),
-  ('Bob', 'bob@example.com', '$2b$10$A/JMxdiDKWmpxOc3nBBkVeYiCL9uUrIVWpNohuTP4gKaD/1TGXJt6', false),
-  ('Charlie', 'charlie@example.com', '$2b$10$A/JMxdiDKWmpxOc3nBBkVeYiCL9uUrIVWpNohuTP4gKaD/1TGXJt6', false);
+  ('Alice', 'alice@example.com', '$2b$10$trAqnUDNSyLrcf2SbiLvjOijquaQDRAwQM4IBkWomc5au.OdxuiK.', false),
+  ('Bob', 'bob@example.com', '$2b$10$trAqnUDNSyLrcf2SbiLvjOijquaQDRAwQM4IBkWomc5au.OdxuiK.', false),
+  ('Charlie', 'charlie@example.com', '$2b$10$trAqnUDNSyLrcf2SbiLvjOijquaQDRAwQM4IBkWomc5au.OdxuiK.', false);
 `;
 
 const insertOtherDataSql = `
