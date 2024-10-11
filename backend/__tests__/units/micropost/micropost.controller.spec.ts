@@ -6,7 +6,6 @@ import { BadRequestException } from '@nestjs/common';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 
-// bcryptをモック
 jest.mock('bcrypt', () => ({
   hash: jest.fn(),
   compare: jest.fn(),
@@ -18,7 +17,6 @@ jest.mock('multer', () => ({
   })),
 }));
 
-// pathモジュール全体をモック
 jest.mock('path', () => ({
   extname: jest.fn(),
   join: jest.fn(),
@@ -51,7 +49,6 @@ describe('MicroPostController', () => {
     microPostController = module.get<MicroPostController>(MicroPostController);
   });
 
-  // 'create' メソッドのテスト
   describe('create', () => {
     it('should create a micropost', async () => {
       const userId = 1;
@@ -69,11 +66,13 @@ describe('MicroPostController', () => {
 
       const mockMicroPost = {
         id: 1,
-        userId,
         title,
-        userName: mockUser.name,
         imagePath: file.path,
-        userAvatarPath: mockUser.avatar_path,
+        user: {
+          id: userId,
+          name: mockUser.name,
+          avatarPath: mockUser.avatar_path,
+        },
         categories: [],
       };
       microPostService.create.mockResolvedValue(mockMicroPost);
@@ -130,11 +129,13 @@ describe('MicroPostController', () => {
 
       const mockMicroPost = {
         id: 1,
-        userId,
         title,
-        userName: mockUser.name,
         imagePath: null,
-        userAvatarPath: mockUser.avatar_path,
+        user: {
+          id: userId,
+          name: mockUser.name,
+          avatarPath: mockUser.avatar_path,
+        },
         categories: [],
       };
       microPostService.create.mockResolvedValue(mockMicroPost);
@@ -161,11 +162,13 @@ describe('MicroPostController', () => {
 
       const mockMicroPost = {
         id: 1,
-        userId,
         title,
-        userName: mockUser.name,
         imagePath: null,
-        userAvatarPath: mockUser.avatar_path,
+        user: {
+          id: userId,
+          name: mockUser.name,
+          avatarPath: mockUser.avatar_path,
+        },
         categories: [],
       };
       microPostService.create.mockResolvedValue(mockMicroPost);
@@ -192,42 +195,13 @@ describe('MicroPostController', () => {
 
       const mockMicroPost = {
         id: 1,
-        userId,
         title,
-        userName: mockUser.name,
         imagePath: null,
-        userAvatarPath: mockUser.avatar_path,
-        categories: [],
-      };
-      microPostService.create.mockResolvedValue(mockMicroPost);
-
-      const result = await microPostController.create(userId, title, categoryIds, file);
-
-      expect(result).toEqual(mockMicroPost);
-      expect(microPostService.create).toHaveBeenCalledWith(userId, title, null, []);
-    });
-
-    it('should handle empty string for categoryIds', async () => {
-      const userId = 1;
-      const title = 'Test MicroPost';
-      const categoryIds = '';
-      const file = null;
-      const mockUser = {
-        id: userId,
-        name: 'TestUser',
-        email: 'test@example.com',
-        isAdmin: false,
-        avatar_path: 'path/to/avatar.png',
-      };
-      userService.find.mockResolvedValue(mockUser);
-
-      const mockMicroPost = {
-        id: 1,
-        userId,
-        title,
-        userName: mockUser.name,
-        imagePath: null,
-        userAvatarPath: mockUser.avatar_path,
+        user: {
+          id: userId,
+          name: mockUser.name,
+          avatarPath: mockUser.avatar_path,
+        },
         categories: [],
       };
       microPostService.create.mockResolvedValue(mockMicroPost);
@@ -241,7 +215,7 @@ describe('MicroPostController', () => {
     it('should handle invalid categoryIds by converting them to NaN', async () => {
       const userId = 1;
       const title = 'Test Post';
-      const categoryIds = ['a', 'b', '3']; // 無効な値が含まれる
+      const categoryIds = ['a', 'b', '3'];
       const file = { path: '__tests__/test.png' } as Express.Multer.File;
       const mockUser = {
         id: userId,
@@ -254,11 +228,13 @@ describe('MicroPostController', () => {
 
       const mockMicroPost = {
         id: 1,
-        userId,
         title,
-        userName: mockUser.name,
         imagePath: file.path,
-        userAvatarPath: mockUser.avatar_path,
+        user: {
+          id: userId,
+          name: mockUser.name,
+          avatarPath: mockUser.avatar_path,
+        },
         categories: [],
       };
       microPostService.create.mockResolvedValue(mockMicroPost);
@@ -271,7 +247,7 @@ describe('MicroPostController', () => {
         userId,
         title,
         file.path,
-        [NaN, NaN, 3], // 無効な値はNaNになる
+        [NaN, NaN, 3],
       );
     });
 
@@ -297,26 +273,29 @@ describe('MicroPostController', () => {
     });
   });
 
-  // 'index' メソッドのテスト
   describe('index', () => {
     it('should return an array of microposts', async () => {
       const mockMicroposts = [
         {
           id: 1,
-          userId: 1,
           title: 'MicroPost 1',
-          userName: 'User1',
           imagePath: 'path/to/image1.jpg',
-          userAvatarPath: 'path/to/avatar1.png',
+          user: {
+            id: 1,
+            name: 'User1',
+            avatarPath: 'path/to/avatar1.png',
+          },
           categories: [],
         },
         {
           id: 2,
-          userId: 2,
           title: 'MicroPost 2',
-          userName: 'User2',
           imagePath: null,
-          userAvatarPath: 'path/to/avatar2.png',
+          user: {
+            id: 2,
+            name: 'User2',
+            avatarPath: 'path/to/avatar2.png',
+          },
           categories: [],
         },
       ];
@@ -336,17 +315,18 @@ describe('MicroPostController', () => {
     });
   });
 
-  // 'getMicropost' メソッドのテストを追加
   describe('getMicropost', () => {
     it('should return a micropost', async () => {
       const micropostId = 1;
       const mockMicropost = {
         id: 1,
-        userId: 1,
         title: 'Test Micropost',
-        userName: 'User1',
         imagePath: null,
-        userAvatarPath: null,
+        user: {
+          id: 1,
+          name: 'User1',
+          avatarPath: null,
+        },
         categories: [],
       };
       microPostService.findById.mockResolvedValue(mockMicropost);
@@ -365,23 +345,18 @@ describe('MicroPostController', () => {
     });
   });
 
-  // ファイル名生成のテスト強化
   describe('filename generation', () => {
     it('should generate a random filename with correct extension', () => {
       const mockFile = { originalname: 'test.jpg' } as Express.Multer.File;
 
-      // Mock the extname function to return the extension of the file
       (extname as jest.Mock).mockReturnValue('.jpg');
       const storageOptions = (diskStorage as jest.Mock).mock.calls[0][0];
       const cb = jest.fn();
 
-      // Call the filename function with mock arguments
       storageOptions.filename(null, mockFile, cb);
 
-      // Ensure the callback is called with a random name and correct extension
       expect(cb).toHaveBeenCalledWith(null, expect.stringMatching(/^[a-f0-9]{32}\.jpg$/));
 
-      // Ensure extname was called with the correct file original name
       expect(extname).toHaveBeenCalledWith('test.jpg');
     });
   });

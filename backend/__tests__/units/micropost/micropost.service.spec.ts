@@ -47,11 +47,13 @@ describe('MicroPostService', () => {
       const categoryIds = [1, 2];
       const mockMicroPost: MicroPost = {
         id: 1,
-        userId,
         title,
-        userName: 'TestUser',
         imagePath,
-        userAvatarPath: 'path/to/avatar.jpg',
+        user: {
+          id: userId,
+          name: 'TestUser',
+          avatarPath: 'path/to/avatar.jpg',
+        },
         categories: [],
       };
 
@@ -86,11 +88,13 @@ describe('MicroPostService', () => {
       const categoryIds: number[] = [];
       const mockMicroPost: MicroPost = {
         id: 1,
-        userId,
         title,
-        userName: 'TestUser',
         imagePath,
-        userAvatarPath: 'path/to/avatar.jpg',
+        user: {
+          id: userId,
+          name: 'TestUser',
+          avatarPath: 'path/to/avatar.jpg',
+        },
         categories: [],
       };
 
@@ -151,11 +155,13 @@ describe('MicroPostService', () => {
 
       const mockMicroPost: MicroPost = {
         id: 1,
-        userId,
         title,
-        userName: 'TestUser',
         imagePath,
-        userAvatarPath: 'path/to/avatar.jpg',
+        user: {
+          id: userId,
+          name: 'TestUser',
+          avatarPath: 'path/to/avatar.jpg',
+        },
         categories: [],
       };
 
@@ -184,8 +190,20 @@ describe('MicroPostService', () => {
   describe('list', () => {
     it('should return all microposts in descending order of id', async () => {
       const mockMicroPosts: MicroPost[] = [
-        { id: 2, userId: 2, title: 'Post 2', userName: 'User2', imagePath: null, userAvatarPath: 'path/to/avatar2.jpg', categories: [] },
-        { id: 1, userId: 1, title: 'Post 1', userName: 'User1', imagePath: 'path/to/image.jpg', userAvatarPath: 'path/to/avatar1.jpg', categories: [] },
+        { 
+          id: 2, 
+          title: 'Post 2', 
+          imagePath: null, 
+          user: { id: 2, name: 'User2', avatarPath: 'path/to/avatar2.jpg' }, 
+          categories: [] 
+        },
+        { 
+          id: 1, 
+          title: 'Post 1', 
+          imagePath: 'path/to/image.jpg', 
+          user: { id: 1, name: 'User1', avatarPath: 'path/to/avatar1.jpg' }, 
+          categories: [] 
+        },
       ];
 
       const mockQueryResult: QueryResult = {
@@ -217,11 +235,13 @@ describe('MicroPostService', () => {
       const micropostId = 1;
       const mockMicropost: MicroPost = {
         id: micropostId,
-        userId: 1,
         title: 'Test Micropost',
-        userName: 'User1',
         imagePath: 'path/to/image.jpg',
-        userAvatarPath: 'path/to/avatar.jpg',
+        user: {
+          id: 1,
+          name: 'User1',
+          avatarPath: 'path/to/avatar.jpg',
+        },
         categories: [{ id: 1, title: 'Category 1' }],
       };
 
@@ -318,13 +338,10 @@ describe('MicroPostService', () => {
       const micropostId = 1;
       const errorMessage = 'Database query failed';
       
-      // Mock the executeQuery method to reject with an error
       mockDatabaseService.executeQuery.mockRejectedValueOnce(new Error(errorMessage));
   
-      // Expect the service method to throw the same error
       await expect(microPostService.getCategoriesForMicropost(micropostId)).rejects.toThrow(errorMessage);
       
-      // Ensure executeQuery was called with the correct arguments
       expect(mockDatabaseService.executeQuery).toHaveBeenCalledWith(expect.any(String), [micropostId]);
     });
   });
