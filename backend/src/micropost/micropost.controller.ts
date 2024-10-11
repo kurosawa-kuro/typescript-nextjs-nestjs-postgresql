@@ -1,5 +1,3 @@
-// src/micropost/micropost.controller.ts
-
 import {
   Controller,
   Get,

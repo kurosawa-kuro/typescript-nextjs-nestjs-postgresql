@@ -59,11 +59,11 @@ describe('MicroPostController (e2e)', () => {
     );
     await databaseService.executeQuery(
       'INSERT INTO micropost (user_id, title, image_path) VALUES ($1, $2, $3)',
-      [user.id, 'Test Micropost 1', 'uploads/image1.jpg'],
+      [user.id, 'Test Micropost 1', 'image1.jpg'],
     );
     await databaseService.executeQuery(
       'INSERT INTO micropost (user_id, title, image_path) VALUES ($1, $2, $3)',
-      [user.id, 'Test Micropost 2', 'uploads/image2.jpg'],
+      [user.id, 'Test Micropost 2', 'image2.jpg'],
     );
 
     const response = await request(app.getHttpServer())
@@ -75,18 +75,26 @@ describe('MicroPostController (e2e)', () => {
         expect.objectContaining({
           id: expect.any(Number),
           userId: user.id,
-          title: 'Test Micropost 1',
-          imagePath: 'uploads/image1.jpg',
+          title: 'Test Micropost 2',
+          imagePath: 'uploads/image2.jpg',
           userName: 'Test User',
+          userAvatarPath: expect.any(String),
+          categories: expect.any(Array),
         }),
         expect.objectContaining({
           id: expect.any(Number),
           userId: user.id,
-          title: 'Test Micropost 2',
-          imagePath: 'uploads/image2.jpg',
+          title: 'Test Micropost 1',
+          imagePath: 'uploads/image1.jpg',
           userName: 'Test User',
+          userAvatarPath: expect.any(String),
+          categories: expect.any(Array),
         }),
       ]),
     );
+
+    // Check if the order is correct (newest first)
+    expect(response.body[0].title).toBe('Test Micropost 2');
+    expect(response.body[1].title).toBe('Test Micropost 1');
   });
 });
