@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { Micropost } from '../../types/models';
+import { MicroPost } from '../../types/models';
 
 interface MicropostCardProps {
-  post?: Micropost;
-  onClick?: (post: Micropost) => void;
+  post?: MicroPost;
+  onClick?: (post: MicroPost) => void;
 }
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';

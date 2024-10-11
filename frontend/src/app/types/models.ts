@@ -15,7 +15,7 @@ export interface LoginResponse {
   user: User;
 }
 
-export interface Micropost {
+export interface MicroPost {
   id: number;
   title: string;
   imagePath: string | null;
@@ -35,7 +35,7 @@ export interface AsyncOperationState {
   error: string | null;
 }
 
-export interface MicropostModalProps {
+export interface MicroPostModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (e: React.FormEvent) => void;
@@ -59,10 +59,10 @@ export interface AuthState extends AsyncOperationState {
   initializeAuth: () => void;
 }
 
-export interface MicropostState extends AsyncOperationState {
-  microposts: Micropost[];
-  setMicroposts: (microposts: Micropost[]) => void;
-  addMicropost: (newMicropost: Micropost) => void;
+export interface MicroPostState extends AsyncOperationState {
+  MicroPosts: MicroPost[];
+  setMicroPosts: (MicroPosts: MicroPost[]) => void;
+  addMicroPost: (newMicroPost: MicroPost) => void;
 }
 
 // 追加された ApiError インターフェース

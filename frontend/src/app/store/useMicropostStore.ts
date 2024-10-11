@@ -1,21 +1,21 @@
 // frontend\src\app\store\useMicropostStore.ts
 
 import { create } from 'zustand';
-import { MicropostState, Micropost } from '../types/models';
+import { MicroPostState, MicroPost } from '../types/models';
 
-export const useMicropostStore = create<MicropostState>((set) => ({
-  microposts: [],
+export const useMicropostStore = create<MicroPostState>((set) => ({
+  MicroPosts: [],
   isLoading: false,
   error: null,
 
-  setMicroposts: (microposts: Micropost[]) => set({ 
-    microposts: microposts.filter(post => post !== undefined),
+  setMicroPosts: (MicroPosts: MicroPost[]) => set({ 
+    MicroPosts: MicroPosts.filter(post => post !== undefined),
     isLoading: false,
     error: null
   }),
 
-  addMicropost: (newMicropost: Micropost) => set((state) => ({
-    microposts: [newMicropost, ...state.microposts]
+  addMicroPost: (newMicroPost: MicroPost) => set((state) => ({
+    MicroPosts: [newMicroPost, ...state.MicroPosts]
   })),
 
   setError: (error: string) => set({ error, isLoading: false }),

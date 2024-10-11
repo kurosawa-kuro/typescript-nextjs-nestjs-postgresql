@@ -2,18 +2,18 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Micropost } from '../../types/models';
+import { MicroPost } from '../../types/models';
 import { MicropostCard } from './MicropostCard';
 import { MicropostDetailModal } from './MicropostDetailModal';
 
 interface MicropostListProps {
-  microposts: Micropost[];
+  microposts: MicroPost[];
 }
 
 export const MicropostList: React.FC<MicropostListProps> = ({ microposts }) => {
-  const [selectedPost, setSelectedPost] = useState<Micropost | null>(null);
+  const [selectedPost, setSelectedPost] = useState<MicroPost | null>(null);
 
-  const handlePostClick = (post: Micropost) => {
+  const handlePostClick = (post: MicroPost) => {
     setSelectedPost(post);
   };
 

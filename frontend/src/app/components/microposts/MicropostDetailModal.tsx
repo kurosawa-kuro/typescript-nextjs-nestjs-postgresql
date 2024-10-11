@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { Micropost } from '../../types/models';
+import { MicroPost } from '../../types/models';
 import { ImageUtils } from '../../lib/utils/imageUtils';
 
 interface MicropostDetailModalProps {
-  post: Micropost;
+  post: MicroPost;
   onClose: () => void;
 }
 
