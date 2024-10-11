@@ -60,12 +60,16 @@ export class UserService {
     return result.rows;
   }
 
-  async findUserByEmail(email: string): Promise<User | null> {
-    const query =
-      'SELECT id, name, email, password_hash, is_admin AS "isAdmin" FROM "user" WHERE email = $1';
+  // src/user/user.service.ts
+  async findUserByEmail(email: string): Promise<any> {
+    const query = `
+      SELECT id, name, email, password_hash, is_admin AS "isAdmin", avatar_path
+      FROM "user" WHERE email = $1
+    `;
     const result = await this.databaseService.executeQuery(query, [email]);
     return result.rows[0] || null;
   }
+
 
   async hashPassword(password: string): Promise<string> {
     const saltRounds = 10;

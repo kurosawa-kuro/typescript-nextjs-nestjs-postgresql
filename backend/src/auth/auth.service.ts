@@ -41,17 +41,9 @@ export class AuthService {
     }
   }
 
-  async login(
-    email: string,
-    password: string,
-  ): Promise<{ success: boolean; token?: string; user?: object }> {
+  async login(email: string, password: string): Promise<{ success: boolean; token?: string; user?: object }> {
     try {
-      const query =
-      'SELECT id, name, email, password_hash, is_admin, avatar_path FROM "user" WHERE email = $1';
-      const result = await this.pool.query(query, [email]);
-      const user = result.rows[0];
-
-      console.log("user", user);
+      const user = await this.userService.findUserByEmail(email);
 
       if (user && (await bcrypt.compare(password, user.password_hash))) {
         const payload = {
@@ -61,7 +53,6 @@ export class AuthService {
           isAdmin: user.isAdmin,
           avatar_path: user.avatar_path,
         };
-        console.log("payload", payload);
         const token = this.jwtService.sign(payload);
         this.logger.log(`User ${user.id} logged in`);
         return {
