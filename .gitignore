@@ -45,7 +45,7 @@ todo.ini
 backend/error.log
 backend/combined.log
 backend/src/app/routes/Todo.md
-# backend/uploads/
+backend/uploads/
 backend/output.txt
 frontend/output.txt
 frontend/to_AI.txt
