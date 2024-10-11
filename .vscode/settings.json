@@ -11,6 +11,10 @@
         {
             "filePath": "frontend\\to_AI.txt",
             "group": "Default"
+        },
+        {
+            "filePath": "backend\\__tests__\\app.http",
+            "group": "Default"
         }
     ]
 }
