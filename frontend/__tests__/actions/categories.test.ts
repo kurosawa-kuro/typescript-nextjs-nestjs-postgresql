@@ -1,5 +1,3 @@
-// frontend\__tests__\actions\categories.test.ts
-
 import { getCategories, getCategoryId, getCategoryMicroposts } from '../../src/app/actions/categories';
 import { ApiClient } from '../../src/app/api/apiClient';
 import { Category, Micropost } from '../../src/app/types/models';
@@ -118,43 +116,83 @@ describe('Category Actions', () => {
 
   describe('getCategoryMicroposts', () => {
     it('should fetch and return microposts for a category successfully', async () => {
+      const mockCategories: Category[] = [
+        { id: 1, title: 'Category 1' },
+        { id: 2, title: 'Category 2' },
+      ];
       const mockMicroposts: Micropost[] = [
-        { id: 1, userId: 1, title: 'Post 1', userName: 'User1' },
-        { id: 2, userId: 2, title: 'Post 2', userName: 'User2' },
+        { id: 1, userId: 1, title: 'Post 1', userName: 'User1', imagePath: '', userAvatarPath: '', categories: [] },
+        { id: 2, userId: 2, title: 'Post 2', userName: 'User2', imagePath: '', userAvatarPath: '', categories: [] },
       ];
 
-      (ApiClient.get as jest.Mock).mockResolvedValue(mockMicroposts);
+      (ApiClient.get as jest.Mock)
+        .mockResolvedValueOnce(mockCategories)
+        .mockResolvedValueOnce(mockMicroposts);
 
       const result = await getCategoryMicroposts('Category 1');
 
-      expect(ApiClient.get).toHaveBeenCalledWith('/categories/Category%201/microposts');
+      expect(ApiClient.get).toHaveBeenCalledTimes(2);
+      expect(ApiClient.get).toHaveBeenNthCalledWith(1, '/categories');
+      expect(ApiClient.get).toHaveBeenNthCalledWith(2, '/categories/1/microposts');
       expect(result).toEqual(mockMicroposts);
     });
 
     it('should handle fetch error and return empty array', async () => {
-      (ApiClient.get as jest.Mock).mockRejectedValue(new Error('Network error'));
+      const mockCategories: Category[] = [
+        { id: 1, title: 'Category 1' },
+        { id: 2, title: 'Category 2' },
+      ];
+
+      (ApiClient.get as jest.Mock)
+        .mockResolvedValueOnce(mockCategories)
+        .mockRejectedValueOnce(new Error('Network error'));
 
       const result = await getCategoryMicroposts('Category 1');
 
-      expect(ApiClient.get).toHaveBeenCalledWith('/categories/Category%201/microposts');
+      expect(ApiClient.get).toHaveBeenCalledTimes(2);
+      expect(ApiClient.get).toHaveBeenNthCalledWith(1, '/categories');
+      expect(ApiClient.get).toHaveBeenNthCalledWith(2, '/categories/1/microposts');
+      expect(result).toEqual([]);
+    });
+
+    it('should return empty array when category is not found', async () => {
+      const mockCategories: Category[] = [
+        { id: 1, title: 'Category 1' },
+        { id: 2, title: 'Category 2' },
+      ];
+
+      (ApiClient.get as jest.Mock).mockResolvedValueOnce(mockCategories);
+
+      const result = await getCategoryMicroposts('Non-existent Category');
+
+      expect(ApiClient.get).toHaveBeenCalledTimes(1);
+      expect(ApiClient.get).toHaveBeenCalledWith('/categories');
       expect(result).toEqual([]);
     });
 
     it('should filter out undefined microposts', async () => {
+      const mockCategories: Category[] = [
+        { id: 1, title: 'Category 1' },
+        { id: 2, title: 'Category 2' },
+      ];
       const mockMicroposts = [
-        { id: 1, userId: 1, title: 'Post 1', userName: 'User1' },
+        { id: 1, userId: 1, title: 'Post 1', userName: 'User1', imagePath: '', userAvatarPath: '', categories: [] },
         undefined,
-        { id: 2, userId: 2, title: 'Post 2', userName: 'User2' },
+        { id: 2, userId: 2, title: 'Post 2', userName: 'User2', imagePath: '', userAvatarPath: '', categories: [] },
       ];
 
-      (ApiClient.get as jest.Mock).mockResolvedValue(mockMicroposts);
+      (ApiClient.get as jest.Mock)
+        .mockResolvedValueOnce(mockCategories)
+        .mockResolvedValueOnce(mockMicroposts);
 
       const result = await getCategoryMicroposts('Category 1');
 
-      expect(ApiClient.get).toHaveBeenCalledWith('/categories/Category%201/microposts');
+      expect(ApiClient.get).toHaveBeenCalledTimes(2);
+      expect(ApiClient.get).toHaveBeenNthCalledWith(1, '/categories');
+      expect(ApiClient.get).toHaveBeenNthCalledWith(2, '/categories/1/microposts');
       expect(result).toEqual([
-        { id: 1, userId: 1, title: 'Post 1', userName: 'User1' },
-        { id: 2, userId: 2, title: 'Post 2', userName: 'User2' },
+        { id: 1, userId: 1, title: 'Post 1', userName: 'User1', imagePath: '', userAvatarPath: '', categories: [] },
+        { id: 2, userId: 2, title: 'Post 2', userName: 'User2', imagePath: '', userAvatarPath: '', categories: [] },
       ]);
     });
   });

@@ -4,7 +4,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MicropostList } from '../../src/app/components/microposts/MicropostList';
-import { Micropost } from '../../src/app/types/models';
+import { Micropost, Category } from '../../src/app/types/models';
 
 // Mock the child components
 jest.mock('../../src/app/components/microposts/MicropostCard', () => ({
@@ -26,8 +26,8 @@ jest.mock('../../src/app/components/microposts/MicropostDetailModal', () => ({
 
 describe('MicropostList', () => {
   const mockMicroposts: Micropost[] = [
-    { id: 1, userId: 1, title: 'Test Post 1', userName: 'User 1', imagePath: '/test1.jpg' },
-    { id: 2, userId: 2, title: 'Test Post 2', userName: 'User 2', imagePath: '/test2.jpg' },
+    { id: 1, userId: 1, title: 'Test Post 1', userName: 'User 1', imagePath: '/test1.jpg', userAvatarPath: '/avatar1.jpg', categories: ['Category1' as unknown as Category] },
+    { id: 2, userId: 2, title: 'Test Post 2', userName: 'User 2', imagePath: '/test2.jpg', userAvatarPath: '/avatar2.jpg', categories: ['Category2' as unknown as Category] },
   ];
 
   it('renders micropost cards correctly', () => {
