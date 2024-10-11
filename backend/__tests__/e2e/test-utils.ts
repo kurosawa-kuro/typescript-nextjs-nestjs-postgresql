@@ -1,4 +1,5 @@
-// test/test-utils.ts
+// __tests__/test-utils.ts
+
 import { Test } from '@nestjs/testing';
 import { AppModule } from '../../src/app.module';
 import { UserService } from '../../src/user/user.service';

@@ -1,3 +1,5 @@
+// src/micropost/micropost.service.ts
+
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 
@@ -8,7 +10,7 @@ export interface MicroPost {
   imagePath: string | null;
   userName: string;
   userAvatarPath: string | null;
-  categories: Category[]; // カテゴリー情報を追加
+  categories: Category[];
 }
 
 export interface Category {
@@ -41,6 +43,11 @@ export class MicroPostService {
       const micropostResult = await this.databaseService.executeQuery(insertMicropostQuery, [userId, title, cleanedImagePath]);
       const micropost = micropostResult.rows[0];
 
+      // Add 'uploads/' prefix to imagePath
+      if (micropost.imagePath) {
+        micropost.imagePath = 'uploads/' + micropost.imagePath;
+      }
+
       if (categoryIds && categoryIds.length > 0) {
         const insertCategoryQuery = `
           INSERT INTO micropost_category(micropost_id, category_id)
@@ -71,7 +78,14 @@ export class MicroPostService {
       ORDER BY m.id DESC
     `;
     const result = await this.databaseService.executeQuery(query);
-    return result.rows;
+
+    // Add 'uploads/' prefix to imagePath
+    return result.rows.map(micropost => {
+      if (micropost.imagePath) {
+        micropost.imagePath = 'uploads/' + micropost.imagePath;
+      }
+      return micropost;
+    });
   }
 
   async findById(id: number): Promise<MicroPost | null> {
@@ -92,6 +106,12 @@ export class MicroPostService {
       return null;
     }
     const micropost = result.rows[0];
+
+    // Add 'uploads/' prefix to imagePath
+    if (micropost.imagePath) {
+      micropost.imagePath = 'uploads/' + micropost.imagePath;
+    }
+
     return micropost;
   }
 

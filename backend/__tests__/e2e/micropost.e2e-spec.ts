@@ -1,4 +1,5 @@
-// test/micropost.e2e-spec.ts
+// __tests__/e2e/micropost.e2e-spec.ts
+
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { DatabaseService } from '../../src/database/database.service';
