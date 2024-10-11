@@ -90,11 +90,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     });
   },
 
-  checkAuthStatus: async () => {
-    set({ isLoading: true });
-    await useAuthStore.getState().initializeAuth();
-    set({ isLoading: false });
-  }
+  // checkAuthStatus: async () => {
+  //   set({ isLoading: true });
+  //   await useAuthStore.getState().initializeAuth();
+  //   set({ isLoading: false });
+  // }
 }));
 
 // Initialize auth on the client side
