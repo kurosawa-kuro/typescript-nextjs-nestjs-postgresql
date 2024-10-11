@@ -12,7 +12,6 @@ jest.mock('next/image', () => ({
   },
 }));
 
-
 describe('MicropostCard', () => {
   const mockPost: MicroPost = {
     id: 1,
@@ -64,7 +63,7 @@ describe('MicropostCard', () => {
     const postWithWindowsPath = { ...mockPost, imagePath: 'test\\image.jpg' };
     render(<MicropostCard post={postWithWindowsPath} />);
     const img = screen.getByAltText('Test Post');
-    expect(img).toHaveAttribute('src', expect.stringContaining('test/image.jpg'));
+    expect(img).toHaveAttribute('src', expect.stringContaining('http://localhost:3001/uploads/test/image.jpg'));
   });
 
   it('calls onClick when the card is clicked', () => {
@@ -81,8 +80,11 @@ describe('MicropostCard', () => {
     expect(img).toHaveAttribute('src', 'https://example.com/image.jpg');
   });
 
-  it('handles full URL for userAvatarPath correctly', () => {
-    const postWithFullUrl = { ...mockPost, userAvatarPath: 'https://example.com/avatar.jpg' };
+  it('handles full URL for user.avatarPath correctly', () => {
+    const postWithFullUrl = {
+      ...mockPost,
+      user: { ...mockPost.user, avatarPath: 'https://example.com/avatar.jpg' }
+    };
     render(<MicropostCard post={postWithFullUrl} />);
     const img = screen.getByAltText(`${mockPost.user.name}'s avatar`);
     expect(img).toHaveAttribute('src', 'https://example.com/avatar.jpg');
@@ -98,8 +100,8 @@ describe('MicropostCard', () => {
     expect(console.error).toHaveBeenCalledWith('Avatar failed to load:', expect.any(String));
   });
 
-  it('renders "No Avatar" when userAvatarPath is not provided', () => {
-    const postWithoutAvatar = { ...mockPost, userAvatarPath: null };
+  it('renders "No Avatar" when user.avatarPath is not provided', () => {
+    const postWithoutAvatar = { ...mockPost, user: { ...mockPost.user, avatarPath: null } };
     render(<MicropostCard post={postWithoutAvatar} />);
     expect(screen.getByText('No Avatar')).toBeInTheDocument();
   });
