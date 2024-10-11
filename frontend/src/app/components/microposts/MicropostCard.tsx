@@ -84,7 +84,6 @@ export const MicropostCard: React.FC<MicropostCardProps> = ({ post, onClick }) =
           </div>
           <div>
             <h2 className="text-lg font-semibold text-gray-900">{post.title}</h2>
-            <p className="text-sm text-gray-600">{post.userName}</p>
           </div>
         </div>
       </div>
