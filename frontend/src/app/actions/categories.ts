@@ -1,6 +1,6 @@
 'use server'
 
-import { Category, Micropost } from '../types/models'
+import { Category, MicroPost } from '../types/models'
 import { ApiClient } from '../api/apiClient'
 
 export async function getCategories(): Promise<Category[]> {
@@ -19,15 +19,15 @@ export async function getCategoryId(categoryName: string): Promise<number | null
   return category ? category.id : null
 }
 
-export async function getCategoryMicroposts(categoryName: string): Promise<Micropost[]> {
+export async function getCategoryMicroposts(categoryName: string): Promise<MicroPost[]> {
   try {
     const categoryId = await getCategoryId(categoryName);
     if (!categoryId) {
       console.error('Category not found:', categoryName);
       return [];
     }
-    const microposts = await ApiClient.get<Micropost[]>(`/categories/${categoryId}/microposts`);
-    return microposts.filter((post): post is Micropost => post !== undefined);
+    const microposts = await ApiClient.get<MicroPost[]>(`/categories/${categoryId}/microposts`);
+    return microposts.filter((post): post is MicroPost => post !== undefined);
   } catch (error) {
     console.error('Error fetching category microposts:', error);
     return [];
