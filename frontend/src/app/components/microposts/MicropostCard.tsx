@@ -19,9 +19,9 @@ export const MicropostCard: React.FC<MicropostCardProps> = ({ post, onClick }) =
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return path;
     }
-    // Remove any leading 'uploads/' and ensure the path starts with 'uploads/'
-    const normalizedPath = path.replace(/^uploads\/?/, '');
-    return `${API_BASE_URL}/uploads/${ImageUtils.normalizePath(normalizedPath)}`;
+    // Remove any leading 'uploads/' and normalize the path
+    const normalizedPath = ImageUtils.normalizePath(path.replace(/^uploads\//, ''));
+    return `${API_BASE_URL}/uploads/${normalizedPath}`;
   };
 
   const imageUrl = useMemo(() => getImageUrl(post?.imagePath), [post?.imagePath]);

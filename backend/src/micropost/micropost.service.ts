@@ -28,6 +28,10 @@ export class MicroPostService {
     try {
       await this.databaseService.executeQuery('BEGIN');
 
+      // Remove 'uploads\' or 'uploads/' from the imagePath
+      const cleanedImagePath = imagePath ? imagePath.replace(/^uploads[\/\\]/, '') : null;
+      console.log('cleanedImagePath', cleanedImagePath);
+
       const insertMicropostQuery = `
         INSERT INTO micropost(user_id, title, image_path) 
         VALUES($1, $2, $3) 
@@ -35,7 +39,7 @@ export class MicroPostService {
           (SELECT name FROM "user" WHERE id = $1) as "userName",
           (SELECT avatar_path FROM "user" WHERE id = $1) as "userAvatarPath"
       `;
-      const micropostResult = await this.databaseService.executeQuery(insertMicropostQuery, [userId, title, imagePath]);
+      const micropostResult = await this.databaseService.executeQuery(insertMicropostQuery, [userId, title, cleanedImagePath]);
       const micropost = micropostResult.rows[0];
 
       if (categoryIds && categoryIds.length > 0) {
