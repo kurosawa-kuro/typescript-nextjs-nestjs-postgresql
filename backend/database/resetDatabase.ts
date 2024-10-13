@@ -75,22 +75,31 @@ INSERT INTO public."user" (name, email, password_hash, is_admin, avatar_path) VA
 
 const insertOtherDataSql = `
 INSERT INTO category (title) VALUES
+  ('Art'),
   ('Technology'),
-  ('Science'),
-  ('Art');
+  ('Animal');
 
-INSERT INTO micropost (user_id, title) VALUES
-  (2, 'Alice''s first post'),
-  (2, 'Alice''s second post'),
-  (3, 'Bob''s post'),
-  (4, 'Charlie''s post');
+INSERT INTO micropost (user_id, title, image_path) VALUES
+  (2, 'Alice''s first post','alice1.png'),
+  (2, 'Alice''s second post','alice2.png'),
+  (3, 'Bob''s post','bob1.png'),
+  (2, 'Alice''s first post','alice3.png'),
+  (4, 'Charlie''s post','charlie1.png'),
+  (3, 'Bob''s post','bob2.png'),
+  (4, 'Charlie''s post','charlie2.png'),
+  (4, 'Charlie''s post','charlie3.png');
+
 
 INSERT INTO micropost_category (micropost_id, category_id) VALUES
   (1, 1),
-  (1, 2),
-  (2, 3),
+  (1, 3),
+  (2, 1),
   (3, 1),
-  (4, 3);
+  (4, 3),
+  (5, 2),
+  (6, 1),
+  (7, 2),
+  (8, 2);
 `;
 
 // データベース接続を管理する関数
